@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="ha">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TauraronWasa - Rijista</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(to bottom, #180022, #300040);
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-size: cover;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+        .preloader {
+            position: fixed;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(24,0,34,0.98);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.8s;
+        }
+        .preloader.hide {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .preloader .loader {
+            border: 6px solid #fff;
+            border-top: 6px solid #6c47ff;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            animation: spin 1.2s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg);}
+        }
+        .register-container {
+            max-width: 410px;
+            margin: 40px auto;
+            background: rgba(30, 8, 47, 0.97);
+            border-radius: 22px;
+            box-shadow: 0 8px 40px #00000038;
+            padding: 32px 22px 24px 22px;
+            position: relative;
+            animation: fadeUp 1.1s cubic-bezier(.39,.57,.56,.97) both;
+        }
+        @keyframes fadeUp {
+            0% {transform: translateY(40px); opacity: 0;}
+            100% {transform: translateY(0); opacity: 1;}
+        }
+        .register-title {
+            text-align: center;
+            font-size: 2.1rem;
+            margin-bottom: 16px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+        .fade-up {
+            opacity: 0;
+            transform: translateY(36px);
+            transition: opacity 0.8s, transform 0.8s;
+        }
+        .fade-up.visible {
+            opacity: 1;
+            transform: none;
+        }
+        .profile-image-container {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 15px auto;
+            position: relative;
+        }
+        .profile-image-preview {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 4px solid #ae91ff;
+            background: #1c0932;
+            display: block;
+            margin: 0 auto;
+            transition: box-shadow 0.4s;
+        }
+        .profile-image-upload-btn {
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            background: #6c47ff;
+            border: none;
+            color: #fff;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+            box-shadow: 0 2px 8px #0002;
+        }
+        .profile-image-upload-btn:active {
+            background: #4827b8;
+        }
+        .form-group {
+            margin-bottom: 17px;
+            position: relative;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 7px;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+        .form-group input, .form-group select {
+            width: 85%;
+            padding: 11px 38px 11px 12px;
+            border-radius: 10px;
+            border: none;
+            font-size: 1rem;
+            background: #2a1150;
+            color: #fff;
+            outline: none;
+            transition: box-shadow 0.2s;
+            box-shadow: 0 2px 6px #0001;
+            border: 0.1px solid #3f2266;
+        }
+        .form-group input:focus, .form-group select:focus {
+            box-shadow: 0 2px 8px #6c47ff50;
+        }
+        .password-toggle {
+            position: absolute;
+            right: 14px;
+            top: 37px;
+            cursor: pointer;
+            font-size: 1.17rem;
+            user-select: none;
+        }
+        .custom-select-container {
+            position: relative;
+        }
+        .custom-select-input {
+            width: 85%;
+            padding: 11px 38px 11px 12px;
+            border-radius: 10px;
+            border: none;
+            font-size: 1rem;
+            background: #2a1150;
+            color: #fff;
+            outline: none;
+            cursor: pointer;
+            box-shadow: 0 2px 6px #0001;
+            transition: box-shadow 0.2s;
+        }
+        .custom-select-input:focus {
+            box-shadow: 0 2px 8px #6c47ff50;
+        }
+        .custom-select-arrow {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #ae91ff;
+            font-size: 1.16em;
+            pointer-events: none;
+        }
+        .clubs-dropdown {
+            display: none;
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: calc(100% + 6px);
+            z-index: 40;
+            background: #fff;
+            border-radius: 12px;
+            padding: 7px 0;
+            box-shadow: 0 4px 24px #2a115088;
+            max-height: 270px;
+            overflow-y: auto;
+            animation: fadeInDropdown 0.19s;
+        }
+        @keyframes fadeInDropdown {
+            from { opacity: 0; transform: translateY(13px);}
+            to   { opacity: 1; transform: translateY(0);}
+        }
+        .club-dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 8px 13px 8px 10px;
+            cursor: pointer;
+            background: #fff;
+            border: none;
+            transition: background 0.12s;
+        }
+        .club-dropdown-item:hover, .club-dropdown-item.selected {
+            background: #f1edff;
+        }
+        .club-dropdown-item img {
+            width: 30px;
+            height: 30px;
+            border-radius: 6px;
+            background: #fff;
+            object-fit: contain;
+            border: 1.5px solid #e8e8e8;
+        }
+        .club-dropdown-name {
+            font-size: 1.01em;
+            font-weight: 600;
+            color: #6c47ff;
+            letter-spacing: 0.2px;
+        }
+        .custom-select-input.selected {
+            background: #fff;
+            color: #6c47ff;
+            font-weight: 700;
+        }
+        .custom-select-input.selected img {
+            border: none;
+        }
+        .submit-btn {
+            display: block;
+            width: 100%;
+            background: linear-gradient(90deg, #6c47ff, #ae91ff);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 13px 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-top: 10px;
+            cursor: pointer;
+            box-shadow: 0 2px 14px #6c47ff22;
+            transition: background 0.18s;
+        }
+        .submit-btn:active {
+            background: linear-gradient(90deg, #4827b8, #ae91ff);
+        }
+        .push-container {
+            position: fixed;
+            top: 34px;
+            right: 40px;
+            background: #1b0e2c;
+            color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px #0005;
+            padding: 20px 32px;
+            z-index: 3000;
+            min-width: 220px;
+            max-width: 380px;
+            font-size: 1.07rem;
+            display: none;
+            align-items: center;
+            gap: 10px;
+        }
+        .push-success {
+            border-left: 6px solid #24d874;
+        }
+        .push-error {
+            border-left: 6px solid #ed2647;
+        }
+        @media (max-width: 600px) {
+            .register-container {
+                max-width: 98vw;
+                margin: 16px 2vw;
+                padding: 18px 5vw 18px 5vw;
+            }
+            .push-container {
+                right: 10px;
+                left: 10px;
+                padding: 13px 14px;
+                font-size: 0.98rem;
+            }
+            .clubs-dropdown {
+                max-height: 220px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="preloader" id="preloader">
+        <div class="loader"></div>
+    </div>
+    <div class="register-container fade-up" id="registerContainer">
+        <div class="register-title"><img src="logo.png" style="width: 50px; height: 50px;">Rijistar TauraronWasa</div>
+        <form id="registerForm" autocomplete="off">
+            <div class="profile-image-container">
+                <img src="https://ui-avatars.com/api/?name=User&background=6c47ff&color=fff&rounded=true&size=110" class="profile-image-preview" id="profilePreview" alt="Fuskar Hoton Ka">
+                <input type="file" id="profileImageInput" accept="image/*" style="display: none" />
+                <button type="button" class="profile-image-upload-btn" id="uploadBtn" title="Danna don saka hoton fuska">
+                    <i class="fa fa-camera"></i>
+                </button>
+            </div>
+            <div style="text-align:center; margin-bottom:10px; font-size:0.98em; color:#d5d5d5;">
+                <span id="profileImgDesc">Loda hoton fuska </span>
+            </div>
+            <div class="form-group">
+                <label for="fullName">Cikakken Suna</label>
+                <input type="text" id="fullName" name="fullName" placeholder="Rubuta cikakken sunanka" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Imel</label>
+                <input type="email" id="email" name="email" placeholder="Shigar da imel ɗinka" required>
+            </div>
+            <div class="form-group">
+                <label>Kungiyar da kake goyon baya</label>
+                <input type="hidden" name="supportTeams" id="supportTeams" required>
+                <input type="hidden" name="supportTeamsLogo" id="supportTeamsLogo" required>
+                <div class="custom-select-container" id="clubCustomSelect">
+                    <div id="clubSelectInput" class="custom-select-input" tabindex="0">
+                        <span id="clubSelectPlaceholder">Zaɓi ƙungiya...</span>
+                        <span id="clubSelectedDisplay" style="display:none">
+                            <img id="clubSelectedLogo" src="" style="width:25px;height:25px;border-radius:4px;vertical-align:middle;margin-right:7px;"> 
+                            <span id="clubSelectedName" class="club-dropdown-name"></span>
+                        </span>
+                    </div>
+                    <span class="custom-select-arrow"><i class="fa fa-angle-down"></i></span>
+                    <div class="clubs-dropdown" id="clubsDropdown"></div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="password">Kalmar Sirri</label>
+                <input type="password" id="password" name="password" placeholder="Shigar da kalmar sirri" required minlength="6">
+                <span class="password-toggle" onclick="togglePassword('password')" title="Nuna/ɓoye kalmar sirri">👁️</span>
+            </div>
+            <div class="form-group">
+                <label for="confirmPassword">Tabbatar da Kalmar Sirri</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Sake rubuta kalmar sirri" required minlength="6">
+                <span class="password-toggle" onclick="togglePassword('confirmPassword')" title="Nuna/ɓoye kalmar sirri">👁️</span>
+            </div>
+            <button type="submit" class="submit-btn">Yi Rijista</button>
+        </form>
+    </div>
+    <div class="push-container" id="pushContainer"></div>
+    
+    <script type="module">
+    // ========== FIREBASE SETUP ==========
+    import { app, analytics, firebaseConfig } from './firebase.js';
+    import { getAuth, createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
+    import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";
+
+    // ========== GET USER IP ==========
+    let userIpAddress = "";
+    fetch("https://ipapi.co/json")
+        .then(res => res.json())
+        .then(data => {
+            userIpAddress = data.ip;
+            localStorage.setItem("user_ip", userIpAddress);
+        });
+
+    // ========== PRELOADER ==========
+    window.addEventListener('load', () => {
+        setTimeout(() => {
+            document.getElementById('preloader').classList.add('hide');
+        }, 600);
+    });
+
+    // ========== LAZY FADE-UP ==========
+    document.addEventListener('DOMContentLoaded', () => {
+        const fadeUps = document.querySelectorAll('.fade-up');
+        const io = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('visible');
+            });
+        }, { threshold: 0.22 });
+        fadeUps.forEach(el => io.observe(el));
+    });
+
+    // ========== CLUBS DATA ==========
+    const clubs = [
+        { name: "Real Madrid", logo: "https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg", id: "real-madrid" },
+        { name: "Manchester United", logo: "https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg", id: "man-united" },
+        { name: "Barcelona", logo: "https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg", id: "barcelona" },
+        { name: "Chelsea", logo: "https://upload.wikimedia.org/wikipedia/en/c/cc/Chelsea_FC.svg", id: "chelsea" },
+        { name: "Liverpool", logo: "https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg", id: "liverpool" },
+        { name: "Arsenal", logo: "https://upload.wikimedia.org/wikipedia/en/5/53/Arsenal_FC.svg", id: "arsenal" },
+        { name: "Manchester City", logo: "https://upload.wikimedia.org/wikipedia/en/e/eb/Manchester_City_FC_badge.svg", id: "man-city" },
+        { name: "AC Milan", logo: "https://upload.wikimedia.org/wikipedia/commons/d/d0/Logo_of_AC_Milan.svg", id: "ac-milan" },
+        { name: "Paris Saint-Germain", logo: "https://upload.wikimedia.org/wikipedia/en/a/a7/Paris_Saint-Germain_F.C..svg", id: "psg" },
+        { name: "Tottenham Hotspur", logo: "https://upload.wikimedia.org/wikipedia/en/b/b4/Tottenham_Hotspur.svg", id: "tottenham" },
+        { name: "Borussia Dortmund", logo: "https://upload.wikimedia.org/wikipedia/commons/6/67/Borussia_Dortmund_logo.svg", id: "dortmund" },
+        { name: "AS Roma", logo: "https://upload.wikimedia.org/wikipedia/en/f/f7/AS_Roma_logo_%282017%29.svg", id: "roma" },
+        { name: "Ajax", logo: "https://upload.wikimedia.org/wikipedia/en/7/79/Ajax_Amsterdam.svg", id: "ajax" },
+        { name: "Leicester City", logo: "https://upload.wikimedia.org/wikipedia/en/2/2d/Leicester_City_crest.svg", id: "leicester" },
+        { name: "Everton", logo: "https://upload.wikimedia.org/wikipedia/en/7/7c/Everton_FC_logo.svg", id: "everton" },
+        { name: "Valencia", logo: "https://upload.wikimedia.org/wikipedia/en/c/ce/Valenciacf.svg", id: "valencia" },
+        { name: "West Ham United", logo: "https://upload.wikimedia.org/wikipedia/en/c/c2/West_Ham_United_FC_logo.svg", id: "west-ham" },
+        { name: "Inter Milan", logo: "https://upload.wikimedia.org/wikipedia/commons/0/05/FC_Internazionale_Milano_2021.svg", id: "inter" },     
+        { name: "Atletico Madrid", logo: "at.png", id: "atletico" },
+        { name: "Bayern Munich", logo: "ba.png", id: "bayern" },
+        { name: "Napoli", logo: "na.png", id: "napoli" },
+        { name: "Juventus", logo: "ju.png", id: "juventus" },
+        { name: "Sevilla", logo: "se.png", id: "sevilla" },
+        { name: "Benfica", logo: "mo.png", id: "benfica" },
+        { name: "Lyon", logo: "lo.png", id: "lyon" },
+        { name: "Others", logo: "logo.png", id: "porto" },       
+    ];
+
+    // ========== CLUB SELECT LOGIC ==========
+    const clubSelectInput = document.getElementById('clubSelectInput');
+    const clubsDropdown = document.getElementById('clubsDropdown');
+    const supportTeamsInput = document.getElementById('supportTeams');
+    const supportTeamsLogoInput = document.getElementById('supportTeamsLogo');
+    const clubSelectedDisplay = document.getElementById('clubSelectedDisplay');
+    const clubSelectedLogo = document.getElementById('clubSelectedLogo');
+    const clubSelectedName = document.getElementById('clubSelectedName');
+    const clubSelectPlaceholder = document.getElementById('clubSelectPlaceholder');
+    let clubsDropdownOpen = false;
+    let selectedClub = null;
+
+    clubs.forEach(club => {
+        const div = document.createElement('div');
+        div.className = "club-dropdown-item";
+        div.setAttribute('data-value', club.name);
+        div.innerHTML = `<img src="${club.logo}" alt="${club.name}"> <span class="club-dropdown-name">${club.name}</span>`;
+        div.addEventListener('click', () => {
+            selectedClub = club;
+            supportTeamsInput.value = club.name;
+            supportTeamsLogoInput.value = club.logo;
+            clubSelectedLogo.src = club.logo;
+            clubSelectedName.textContent = club.name;
+            clubSelectedDisplay.style.display = "";
+            clubSelectPlaceholder.style.display = "none";
+            clubSelectInput.classList.add('selected');
+            clubsDropdown.style.display = "none";
+            clubsDropdownOpen = false;
+        });
+        clubsDropdown.appendChild(div);
+    });
+
+    function openClubsDropdown() {
+        clubsDropdown.style.display = "block";
+        clubsDropdownOpen = true;
+    }
+    function closeClubsDropdown() {
+        clubsDropdown.style.display = "none";
+        clubsDropdownOpen = false;
+    }
+    clubSelectInput.addEventListener('click', () => {
+        if (clubsDropdownOpen) closeClubsDropdown();
+        else openClubsDropdown();
+    });
+    clubSelectInput.addEventListener('keydown', (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            if (clubsDropdownOpen) closeClubsDropdown();
+            else openClubsDropdown();
+        }
+    });
+    document.addEventListener('mousedown', (e) => {
+        if (!clubSelectInput.contains(e.target) && !clubsDropdown.contains(e.target)) closeClubsDropdown();
+    });
+
+    // ========== PROFILE IMAGE UPLOAD (MULTI-SERVICE) ==========
+    const profileInput = document.getElementById('profileImageInput');
+    const profilePreview = document.getElementById('profilePreview');
+    const uploadBtn = document.getElementById('uploadBtn');
+    let uploadedImageBase64 = "";
+    let uploadedImageUrl = "";
+
+    // Helper: upload to Imgur
+    async function uploadToImgur(base64) {
+        try {
+            const formData = new FormData();
+            formData.append('image', base64);
+            const response = await fetch("https://api.imgur.com/3/image", {
+                method: "POST",
+                headers: { Authorization: "Client-ID 5acf7eff9c91660" },
+                body: formData
+            });
+            const data = await response.json();
+            if (data.success && data.data && data.data.link) {
+                return data.data.link;
+            }
+        } catch (err) {}
+        return null;
+    }
+
+    // Helper: upload to Catbox
+    async function uploadToCatbox(file) {
+        try {
+            const formData = new FormData();
+            formData.append('reqtype', 'fileupload');
+            formData.append('fileToUpload', file);
+            const response = await fetch("https://catbox.moe/user/api.php", {
+                method: "POST",
+                body: formData
+            });
+            const url = await response.text();
+            if (url && url.includes("https://")) return url.trim();
+        } catch (err) {}
+        return null;
+    }
+
+    // Try to upload image FIRST, before user submits form!
+    profileInput.addEventListener('change', async (event) => {
+        const file = event.target.files[0];
+        if (file && file.type.startsWith('image/')) {
+            // 1. Show preview from local
+            const reader = new FileReader();
+            reader.onload = e => {
+                profilePreview.src = e.target.result;
+                profilePreview.style.boxShadow = "0 0 0 4px #6c47ff66";
+                document.getElementById('profileImgDesc').innerText = "Hoton fuska ya shigo. Ana loda link...";
+                uploadedImageBase64 = e.target.result.split(",")[1];
+            };
+            reader.readAsDataURL(file);
+
+            // 2. Upload to Imgur first
+            let avatarUrl = await uploadToImgur(uploadedImageBase64);
+            if (!avatarUrl) {
+                // 3. If Imgur fails, try Catbox with file
+                avatarUrl = await uploadToCatbox(file);
+            }
+            if (avatarUrl) {
+                uploadedImageUrl = avatarUrl;
+                profilePreview.src = avatarUrl; // show uploaded link as preview
+                document.getElementById('profileImgDesc').innerText = "Hoton ya loda: Zaka iya sauya!";
+                showPush("An loda hoton fuska da nasara!", false);
+            } else {
+                uploadedImageUrl = "";
+                document.getElementById('profileImgDesc').innerText = "Kuskure: Hoton bai loda ba. Gwada sake loda wani.";
+                showPush("Kuskure wajen loda hoton fuska. Gwada sake loda wani.", true);
+            }
+        } else {
+            showPush("Kuskure: Saka hoton fuska mai inganci.", true);
+        }
+    });
+
+    uploadBtn.addEventListener('click', () => profileInput.click());
+
+    // ========== PASSWORD TOGGLE ==========
+    window.togglePassword = function(fieldId) {
+        const field = document.getElementById(fieldId);
+        const icon = field.nextElementSibling;
+        if (field.type === "password") {
+            field.type = "text";
+            icon.textContent = "🙄";
+        } else {
+            field.type = "password";
+            icon.textContent = "👁️";
+        }
+    };
+
+    // ========== PUSH NOTIFICATION ==========
+    function showPush(msg, isError = false) {
+        const push = document.getElementById('pushContainer');
+        push.textContent = "";
+        push.innerHTML = `<i class="fa ${isError ? 'fa-times-circle' : 'fa-check-circle'}" style="margin-right:10px; font-size:1.25em;"></i> ${msg}`;
+        push.className = `push-container ${isError ? "push-error" : "push-success"}`;
+        push.style.display = "flex";
+        setTimeout(() => { push.style.display = "none"; }, 4800);
+    }
+
+    // ========== LAZY CONTENT LOADER ==========
+    setTimeout(() => {
+        document.getElementById('registerContainer').style.opacity = "1";
+    }, 300);
+
+    // ========== REGISTER FORM HANDLER ==========
+    document.getElementById('registerForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        // Validate
+        const fullName = document.getElementById('fullName').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const supportTeams = document.getElementById('supportTeams').value.trim();
+        const supportTeamsLogo = document.getElementById('supportTeamsLogo').value.trim();
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+
+        if (!uploadedImageUrl) {
+            showPush("Dole ne ka loda hoton fuska! Ka loda hoton kafin ka cike fom.", true);
+            return;
+        }
+        if (!supportTeams) {
+            showPush("Dole ne ka zaɓi kungiyar da kake goyon baya.", true);
+            return;
+        }
+        if (!supportTeamsLogo) {
+            showPush("Dole ne a tura link ɗin logo na ƙungiya.", true);
+            return;
+        }
+        if (password.length < 6) {
+            showPush("Kalmar sirri ta kasance akalla haruffa 6.", true);
+            return;
+        }
+        if (password !== confirmPassword) {
+            showPush("Kalmar sirri da tabbaci ba su dace ba.", true);
+            return;
+        }
+
+        document.getElementById('preloader').classList.remove('hide');
+        showPush("Ana rijista, jira kadan...", false);
+
+        // 2. Register user with Firebase (no backend required)
+        try {
+            const auth = getAuth(app);
+            const db = getDatabase(app);
+            // Create user in Firebase Auth
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+
+            // Update Firebase user profile with displayName and photoURL
+            await updateProfile(user, {
+                displayName: fullName,
+                photoURL: uploadedImageUrl,
+            });
+
+            // Prepare userData for Realtime Database
+            const userData = {
+                fullName,
+                email,
+                supportTeams,
+                supportTeamsLogo,
+                avatarUrl: uploadedImageUrl,
+                userIpAddress: userIpAddress || localStorage.getItem("user_ip") || "",
+                createdAt: Date.now()
+            };
+
+            // Save to Realtime Database by UID
+            await set(ref(db, `users/${user.uid}`), userData);
+
+            document.getElementById('preloader').classList.add('hide');
+            showPush("An gama rijista cikin nasara! Ana turaka zuwa shafin gaba...", false);
+            setTimeout(() => {
+                window.location.href = "index.html";
+            }, 2200);
+
+        } catch (error) {
+            document.getElementById('preloader').classList.add('hide');
+            let errMsg = error.message || "Kuskure wajen rijista.";
+            if (error.code === "auth/email-already-in-use") {
+                errMsg = "Email ɗin nan ta riga ta yi rijista";
+            }
+            showPush(errMsg, true);
+            return;
+        }
+    });
+</script>
+</body>
+</html>
