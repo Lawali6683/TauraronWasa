@@ -1,64 +1,62 @@
-export default {
-  async fetch(request, env, ctx) {
-    if (request.method === 'OPTIONS') {
-      return new Response(null, {
-        status: 204,
-        headers: corsHeaders()
+export async function handleGetLink(request) {
+  if (request.method === 'OPTIONS') {
+    return new Response(null, {
+      status: 204,
+      headers: corsHeaders()
+    });
+  }
+
+  if (request.method !== 'POST') {
+    return new Response('Only POST allowed', {
+      status: 405,
+      headers: corsHeaders()
+    });
+  }
+
+  const contentType = request.headers.get('content-type') || '';
+  if (!contentType.includes('multipart/form-data')) {
+    return new Response('Expected multipart/form-data', {
+      status: 400,
+      headers: corsHeaders()
+    });
+  }
+
+  const formData = await request.formData();
+  const file = formData.get('file');
+
+  if (!file || typeof file.arrayBuffer !== 'function') {
+    return new Response('File missing or invalid', {
+      status: 400,
+      headers: corsHeaders()
+    });
+  }
+
+  try {
+    const link = await uploadToCatbox(file)
+      .catch(() => uploadToAnonfiles(file))
+      .catch(() => uploadToPixeldrain(file));
+
+    if (link) {
+      return new Response(JSON.stringify({ success: true, link }), {
+        status: 200,
+        headers: {
+          ...corsHeaders(),
+          'Content-Type': 'application/json'
+        }
       });
-    }
-
-    if (request.method !== 'POST') {
-      return new Response('Only POST allowed', {
-        status: 405,
-        headers: corsHeaders()
-      });
-    }
-
-    const contentType = request.headers.get('content-type') || '';
-    if (!contentType.includes('multipart/form-data')) {
-      return new Response('Expected multipart/form-data', {
-        status: 400,
-        headers: corsHeaders()
-      });
-    }
-
-    const formData = await request.formData();
-    const file = formData.get('file');
-
-    if (!file || typeof file.arrayBuffer !== 'function') {
-      return new Response('File missing or invalid', {
-        status: 400,
-        headers: corsHeaders()
-      });
-    }
-
-    try {
-      const link = await uploadToCatbox(file)
-        .catch(() => uploadToAnonfiles(file))
-        .catch(() => uploadToPixeldrain(file));
-
-      if (link) {
-        return new Response(JSON.stringify({ success: true, link }), {
-          status: 200,
-          headers: {
-            ...corsHeaders(),
-            'Content-Type': 'application/json'
-          }
-        });
-      } else {
-        return new Response('All upload services failed', {
-          status: 500,
-          headers: corsHeaders()
-        });
-      }
-    } catch (err) {
-      return new Response('Error: ' + err.message, {
+    } else {
+      return new Response('All upload services failed', {
         status: 500,
         headers: corsHeaders()
       });
     }
+  } catch (err) {
+    return new Response('Error: ' + err.message, {
+      status: 500,
+      headers: corsHeaders()
+    });
   }
-};
+}
 
 function corsHeaders() {
   return {
@@ -75,7 +73,7 @@ async function uploadToCatbox(file) {
 
   const res = await fetch('https://catbox.moe/user/api.php', {
     method: 'POST',
-    body
+    body,
   });
   const text = await res.text();
   if (text.startsWith('http')) return text;
@@ -88,7 +86,7 @@ async function uploadToAnonfiles(file) {
 
   const res = await fetch('https://api.anonfiles.com/upload', {
     method: 'POST',
-    body
+    body,
   });
   const data = await res.json();
   if (data.status && data.data?.file?.url?.full) return data.data.file.url.full;
@@ -101,7 +99,7 @@ async function uploadToPixeldrain(file) {
 
   const res = await fetch('https://pixeldrain.com/api/file', {
     method: 'PUT',
-    body
+    body,
   });
   const data = await res.json();
   if (data.success && data.id) return `https://pixeldrain.com/u/${data.id}`;
