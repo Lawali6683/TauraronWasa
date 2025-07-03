@@ -1,5 +1,5 @@
 export default {
-  async fetch(request, env, ctx) {    
+  async fetch(request, env, ctx) {
     if (request.method === 'OPTIONS') {
       return new Response(null, {
         status: 204,
@@ -57,7 +57,7 @@ export default {
         headers: corsHeaders()
       });
     }
-  },
+  }
 };
 
 function corsHeaders() {
@@ -67,6 +67,7 @@ function corsHeaders() {
     'Access-Control-Allow-Headers': 'Content-Type'
   };
 }
+
 async function uploadToCatbox(file) {
   const body = new FormData();
   body.append('reqtype', 'fileupload');
@@ -74,7 +75,7 @@ async function uploadToCatbox(file) {
 
   const res = await fetch('https://catbox.moe/user/api.php', {
     method: 'POST',
-    body,
+    body
   });
   const text = await res.text();
   if (text.startsWith('http')) return text;
@@ -87,7 +88,7 @@ async function uploadToAnonfiles(file) {
 
   const res = await fetch('https://api.anonfiles.com/upload', {
     method: 'POST',
-    body,
+    body
   });
   const data = await res.json();
   if (data.status && data.data?.file?.url?.full) return data.data.file.url.full;
@@ -100,7 +101,7 @@ async function uploadToPixeldrain(file) {
 
   const res = await fetch('https://pixeldrain.com/api/file', {
     method: 'PUT',
-    body,
+    body
   });
   const data = await res.json();
   if (data.success && data.id) return `https://pixeldrain.com/u/${data.id}`;
