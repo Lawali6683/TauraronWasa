@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="ha">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tabbatar da Link/Canja Kalmar Sirri - TauraronWasa</title>
+  <link href="https://fonts.googleapis.com/css?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #a865ff;
+      --secondary: #ffad97;
+      --bg1: #180022;
+      --bg2: #300040;
+      --accent: #fff176;
+      --push-bg: #22102d;
+      --push-border: #fff176;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(to bottom, var(--bg1), var(--bg2));
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      background-size: cover;
+      color: #ffffff;
+      min-height: 100vh;
+      position: relative;
+    }
+    .tauraronwasa-bg {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .tauraronwasa-bg svg {
+      width: 100vw;
+      height: 100vh;
+      display: block;
+    }
+    .container {
+      max-width: 360px;
+      margin: 60px auto 0 auto;
+      padding: 2.3rem 1.5rem 1.7rem 1.5rem;
+      background: rgba(24,0,34,0.80);
+      border-radius: 18px;
+      box-shadow: 0px 8px 32px #20004780;
+      border: 1.2px solid var(--primary);
+      position: relative;
+      z-index: 2;
+      animation: fadeUp .8s cubic-bezier(.38,.75,.32,1.2);
+      text-align: center;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(40px);}
+      to   { opacity: 1; transform: translateY(0);}
+    }
+    .container h2 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: 12px;
+      letter-spacing: 0.5px;
+    }
+    .container p {
+      color: #e0d7ec;
+      margin-bottom: 16px;
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+    .container input[type="password"] {
+      width: 100%;
+      padding: 11px 12px;
+      margin: 10px 0 8px 0;
+      border: 1.7px solid var(--primary);
+      border-radius: 6px;
+      background: rgba(255,255,255,0.07);
+      color: #fff;
+      font-size: 1.1rem;
+      outline: none;
+      transition: border 0.2s;
+      box-sizing: border-box;
+      font-family: inherit;
+      letter-spacing: 1.0px;
+    }
+    .container input[type="password"]:focus {
+      border-color: var(--accent);
+      background: rgba(255,255,255,0.13);
+    }
+    .container button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      border: none;
+      border-radius: 6px;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      color: #1e0032;
+      font-size: 1.07rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s, color 0.2s;
+      box-shadow: 0 2px 12px #7e00ff36;
+      margin-bottom: 5px;
+    }
+    .container button:hover {
+      background: linear-gradient(90deg, var(--secondary), var(--primary));
+      color: #fff;
+    }
+    .logo-block { margin-bottom: 18px; text-align: center;}
+    .logo-block img {
+      width: 80px;
+      filter: drop-shadow(0 2px 14px #a865ff99);
+      margin-bottom: 5px;
+    }
+    .push-container {
+      display: none;
+      position: fixed;
+      left: 50%;
+      top: 10%;
+      transform: translateX(-50%);
+      min-width: 320px;
+      max-width: 90vw;
+      background: var(--push-bg);
+      border: 2px solid var(--push-border);
+      color: #fff;
+      padding: 1.1rem 1.0rem;
+      border-radius: 13px;
+      z-index: 1111;
+      font-size: 1.06rem;
+      box-shadow: 0 4px 28px #14002b99;
+      animation: fadePush .48s;
+      text-align: center;
+    }
+    @keyframes fadePush {
+      from { opacity:0; transform:translateY(-30px);}
+      to   { opacity:1; transform:translateY(0);}
+    }
+    .push-close {
+      position: absolute;
+      top: 8px; right: 13px;
+      background: transparent;
+      color: #fff176;
+      border: none;
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+    #preloader {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(to bottom, var(--bg1), var(--bg2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      flex-direction: column;
+      transition: opacity 0.4s;
+    }
+    #preloader .loader {
+      width: 50px; height: 50px;
+      border: 6px solid #fff4;
+      border-top: 6px solid var(--accent);
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+      margin-bottom: 12px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg);}
+      100% { transform: rotate(360deg);}
+    }
+    #preloader span {
+      color: var(--accent);
+      font-size: 1.1rem;
+      font-weight: 500;
+      letter-spacing: 0.2px;
+    }
+    @media (max-width: 480px) {
+      .container { margin: 32px 5vw 0 5vw; padding: 1.25rem 0.6rem 0.6rem 0.6rem;}
+      .push-container { min-width: 200px;}
+      .container h2 { font-size: 1.15rem;}
+    }
+  </style>
+</head>
+<body>
+  <div class="tauraronwasa-bg" aria-hidden="true">
+    <svg viewBox="0 0 1920 1080" fill="none">
+      <circle cx="1550" cy="200" r="180" fill="#fff17622"/>
+      <circle cx="500" cy="900" r="120" fill="#a865ff22"/>
+      <g>
+        <circle cx="180" cy="150" r="2.2" fill="#fff"/>
+        <circle cx="400" cy="390" r="1.7" fill="#fff"/>
+        <circle cx="1330" cy="540" r="2.5" fill="#fff"/>
+        <circle cx="1000" cy="220" r="1.2" fill="#fff"/>
+        <circle cx="1700" cy="800" r="1.9" fill="#fff"/>
+        <circle cx="900" cy="910" r="1.5" fill="#fff"/>
+        <circle cx="1200" cy="800" r="1.3" fill="#fff"/>
+        <circle cx="400" cy="650" r="1.9" fill="#fff"/>
+        <circle cx="1800" cy="420" r="2.1" fill="#fff"/>
+      </g>
+    </svg>
+  </div>
+  <div id="preloader">
+    <div class="loader"></div>
+    <span>Ana lodin...</span>
+  </div>
+  <div class="logo-block">
+    <img src="logo.png" alt="TauraronWasa " loading="lazy">
+  </div>
+  <div class="container" id="mainContainer">
+    <h2>Ana tantance link ɗinka...</h2>
+    <p>Da fatan za a jira, ana duba sahihancin link ɗin ka...</p>
+  </div>
+  <div class="push-container" id="pushContainer" role="alert">
+    <button class="push-close" id="closePush" aria-label="Rufe">×</button>
+    <span id="pushMsg"></span>
+  </div>
+  <script type="module">
+    // Preloader logic
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        document.getElementById('preloader').style.opacity = "0";
+        setTimeout(() => document.getElementById('preloader').style.display = "none", 400);
+      }, 350);
+    });
+
+    // Fade-up effect using IntersectionObserver
+    document.addEventListener('DOMContentLoaded', () => {
+      const obs = new window.IntersectionObserver((entries, obsr) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.style.opacity = "1";
+            entry.target.style.transform = "none";
+            obsr.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.16 });
+      document.querySelectorAll('.container').forEach(el => {
+        el.style.opacity = "0";
+        el.style.transform = "translateY(40px)";
+        obs.observe(el);
+      });
+    });
+
+    // Push Container Feedback
+    function showPush(msg, timeout = 0) {
+      const push = document.getElementById('pushContainer');
+      document.getElementById('pushMsg').innerHTML = msg;
+      push.style.display = "block";
+      setTimeout(() => { push.focus && push.focus(); }, 100);
+      if (timeout > 0) setTimeout(() => { push.style.display = "none"; }, timeout);
+    }
+    document.getElementById('closePush').onclick = () => {
+      document.getElementById('pushContainer').style.display = "none";
+    };
+
+    // Main logic (Firebase password/email verification)
+    import { app, firebaseConfig } from './firebase.js';
+    import { getAuth, applyActionCode, verifyPasswordResetCode, confirmPasswordReset } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+
+    const auth = getAuth(app);
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const oobCode = urlParams.get('oobCode');
+    const mode = urlParams.get('mode');
+    const mainContainer = document.getElementById('mainContainer');
+
+    if (oobCode) {
+      if (mode === 'verifyEmail') {
+        verifyEmail(oobCode);
+      } else if (mode === 'resetPassword') {
+        resetPassword(oobCode);
+      } else {
+        showError('Wani kuskure ya faru. Don Allah a sake gwadawa.');
+      }
+    } else {
+      showError('Link ɗin da aka turo ba daidai bane ko kuma ya ƙare. Don Allah a nemi sabon link.');
+    }
+
+    function verifyEmail(oobCode) {
+      applyActionCode(auth, oobCode)
+        .then(() => {
+          mainContainer.innerHTML = `
+            <h2>An Gama!</h2>
+            <p>An tabbatar da imel ɗinka cikin nasara. Ana tura ka zuwa shafin shiga...</p>`;
+          showPush("An tabbatar da imel ɗinka cikin nasara!", 3000);
+          setTimeout(() => {
+            window.location.href = 'login.html';
+          }, 3200);
+        })
+        .catch(() => {
+          showError('Wannan link ɗin ya ƙare ko bai dace ba. Don Allah a sake saka rigista.');
+          setTimeout(() => {
+            window.location.href = 'register.html';
+          }, 3200);
+        });
+    }
+
+    function resetPassword(oobCode) {
+      verifyPasswordResetCode(auth, oobCode)
+        .then(() => {
+          mainContainer.innerHTML = `
+            <h2>Canja Kalmar Sirri</h2>
+            <p>Shigar da sabon kalmar sirri sau biyu.</p>
+            <input type="password" id="newPassword" placeholder="Sabon Kalmar Sirri">
+            <input type="password" id="confirmPassword" placeholder="Maimaicin Kalmar Sirri">
+            <button id="resetPasswordButton">Ajiye Sabuwar Kalmar Sirri</button>`;
+          document.getElementById("resetPasswordButton").addEventListener("click", async () => {
+            const newPassword = document.getElementById("newPassword").value.trim();
+            const confirmPassword = document.getElementById("confirmPassword").value.trim();
+            if (!newPassword || !confirmPassword) {
+              showPush("Don Allah a cika duka filayen.", 0);
+              return;
+            }
+            if (newPassword.length < 6) {
+              showPush("Kalmar sirri dole ta zama akalla haruffa 8.", 0);
+              return;
+            }
+            if (newPassword !== confirmPassword) {
+              showPush("Kalmar sirri ba su dace ba.", 0);
+              return;
+            }
+            try {
+              await confirmPasswordReset(auth, oobCode, newPassword);
+              mainContainer.innerHTML = `
+                <h2>An Gama!</h2>
+                <p>An canja kalmar sirrinka cikin nasara. Ana tura ka zuwa shafin shiga...</p>`;
+              showPush("An canja kalmar sirrinka cikin nasara!", 3000);
+              setTimeout(() => {
+                window.location.href = 'login.html';
+              }, 3200);
+            } catch (e) {
+              showPush("Kuskure yayin canja kalmar sirri. Don Allah a sake gwadawa.", 0);
+            }
+          });
+        })
+        .catch(() => {
+          showError('Wannan link ɗin ya ƙare ko bai dace ba. Don Allah a sake nemi sabon link.');
+          setTimeout(() => {
+            window.location.href = 'forget.html';
+          }, 3100);
+        });
+    }
+
+    function showError(message) {
+      mainContainer.innerHTML = `
+        <h2>Kuskure</h2>
+        <p>${message}</p>`;
+      showPush(message, 0);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="ha">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TauraronWasa - Shiga</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins:400,600&display=swap">
+    <link rel="icon" href="logo.png" type="image/png">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(to bottom, #180022, #300040);
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-size: cover;
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        .container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 1s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(40px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+        
+        
+        .login-card {
+            background: rgba(34,0,54,0.97);
+            backdrop-filter: blur(3px);
+            box-shadow: 0 8px 32px 0 rgba(34,0,54,0.2);
+            border-radius: 22px;
+            padding: 2.5rem 2rem 2rem 2rem;
+            max-width: 350px;
+            width: 90%;
+            
+            flex-direction: column;
+            align-items: center;
+            gap: 1.1rem;
+        }
+        
+        .logo-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+            user-select: none;
+        }
+        .logo-box img {
+            width: 62px;
+            height: 62px;
+            border-radius: 50%;
+            background: #fff2;
+            box-shadow: 0 5px 20px 0 #5722bb44;
+            object-fit: cover;
+        }
+        .logo-box span {
+            font-size: 1.4rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            color: #bda4ff;
+            text-shadow: 0 2px 8px #10002544;
+        }
+        .login-title {
+            font-size: 1.18rem;
+            font-weight: 600;
+            margin-bottom: 0.1rem;
+            color: #fff;
+            text-align: center;
+        }
+        form {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+        label {
+            font-size: 0.99rem;
+            color: #d1bfff;
+            margin-bottom: 0.2rem;
+            font-weight: 500;
+        }
+        input[type="email"], input[type="password"] {
+            width: 85%;
+            padding: 11px 38px 11px 12px;
+            border-radius: 10px;
+            border: none;
+            font-size: 1rem;
+            background: #2a1150;
+            color: #fff;
+            outline: none;
+            transition: box-shadow 0.2s;
+            box-shadow: 0 2px 6px #0001;
+            border: 0.1px solid #3f2266;
+        }
+        input[type="email"]:focus, input[type="password"]:focus {
+            border-color: #a57aff;
+            background: #23003b;
+        }
+        .btn-submit {
+            padding: 0.7rem 0;
+            border-radius: 9px;
+            border: none;
+            background: linear-gradient(98deg,#bda4ff 45%,#8a5aff 100%);
+            color: #180022;
+            font-size: 1.07rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 1px 15px 0 #a57aff22;
+            transition: background 0.2s, transform 0.14s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .btn-submit:active {
+            background: #6f41b9;
+            color: #fff;
+            transform: scale(0.98);
+        }
+        .forgot-link {
+            color: #bda4ff;
+            font-size: 0.98rem;
+            text-decoration: underline;
+            text-align: center;
+            display: block;
+            margin-top: 0.2rem;
+            cursor: pointer;
+        }
+        .msg-container {
+            width: 100%;
+            min-height: 26px;
+            margin-bottom: -0.5rem;
+        }
+        .msg {
+            padding: 0.6rem 1rem;
+            background: #32004c;
+            border-radius: 8px;
+            border-left: 4px solid #bda4ff;
+            color: #fff;
+            font-size: 0.98rem;
+            box-shadow: 0 2px 8px #0002;
+            margin-bottom: 0.2rem;
+            animation: fadeUp 0.6s;
+        }
+        .msg.success {
+            background: #173a24;
+            border-left-color: #67ea9c;
+            color: #99ffcb;
+        }
+        .msg.error {
+            background: #3a1725;
+            border-left-color: #ff6b6b;
+            color: #ffeaea;
+        }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(24px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+        @media (max-width: 500px) {
+            .login-card {
+                padding: 1.35rem 0.7rem 1.5rem 0.7rem;
+                max-width: 99vw;
+            }
+            .logo-box img { width: 52px; height: 52px;}
+            .logo-box span { font-size: 1.12rem;}
+        }
+        /* Decorative background shape */
+        .decor-bg {
+            position: fixed;
+            top: -15vw; right: -25vw;
+            width: 60vw; height: 60vw;
+            background: radial-gradient(circle, #3d0474bb 40%, #30004000 80%);
+            filter: blur(15px);
+            z-index: 0;
+            pointer-events: none;
+        }
+        .decor-bg2 {
+            position: fixed;
+            bottom: -20vw; left: -30vw;
+            width: 65vw; height: 65vw;
+            background: radial-gradient(circle, #7422b855 40%, #30004000 80%);
+            filter: blur(30px);
+            z-index: 0;
+            pointer-events: none;
+        }
+        /* ===== Inline Loader for Button ===== */
+        .btn-submit .loader {
+            border: 4px solid #fff;
+            border-top: 4px solid transparent;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+        .btn-submit.loading .loader {
+            display: block;
+        }
+        .btn-submit.loading span {
+            display: none;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg);}
+        }
+    </style>
+</head>
+<body>
+    <div class="decor-bg"></div>
+    <div class="decor-bg2"></div>
+    
+    <div class="container">
+        <div class="login-card" data-fade>
+            <div class="logo-box">
+                <img src="https://i.imgur.com/CgvdgMA.png" alt="TauraronWasa Logo">
+                <span>TauraronWasa</span>
+            </div>
+            <div class="login-title">Login</div>
+            <div class="msg-container" id="msg-container"></div>
+            <form id="login-form" autocomplete="on">
+                <div class="input-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" placeholder="Shigar da imel ɗinka" autocomplete="email" required>
+                </div>
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Shigar da kalmar sirri" autocomplete="current-password" required>
+                </div>
+                <button type="submit" class="btn-submit" id="submitBtn">
+                    <span>Shiga</span>
+                    <div class="loader"></div>
+                </button>
+                <a href="forget.html" class="forgot-link">Ka manta kalmar sirri? Danna nan</a>
+            </form>
+        </div>
+    </div>
+    <script type="module">
+    import { app, analytics, firebaseConfig } from './firebase.js';
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
+
+    // Loader logic: show on load, hide after short delay
+    document.addEventListener("DOMContentLoaded", () => {
+        // Since we are not using the full-page preloader, we can remove this.
+        // The fade-in effect is handled by the main container's animation.
+    });
+
+    // IntersectionObserver for fade-up effect
+    const fadeEls = document.querySelectorAll('[data-fade]');
+    const fadeObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if(entry.isIntersecting) {
+                entry.target.style.transition = 'opacity 0.7s, transform 0.7s';
+                entry.target.style.opacity = 1;
+                entry.target.style.transform = 'translateY(0)';
+            } else {
+                entry.target.style.opacity = 0;
+                entry.target.style.transform = 'translateY(30px)';
+            }
+        });
+    }, { threshold: 0.7 });
+
+    fadeEls.forEach(el => {
+        el.style.opacity = 0;
+        el.style.transform = 'translateY(30px)';
+        fadeObserver.observe(el);
+    });
+
+    // Helper to show messages
+    function showMsg(msg, type="error") {
+        const msgContainer = document.getElementById("msg-container");
+        msgContainer.innerHTML = `<div class="msg ${type}">${msg}</div>`;
+    }
+
+    function clearMsg() {
+        document.getElementById("msg-container").innerHTML = "";
+    }
+
+    // Lazy loading for images
+    document.querySelectorAll('img[data-src]').forEach(img => {
+        const observer = new IntersectionObserver((entries, obs) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    img.src = img.dataset.src;
+                    obs.disconnect();
+                }
+            });
+        });
+        observer.observe(img);
+    });
+
+    // Form logic + loading screen
+    const form = document.getElementById('login-form');
+    const submitBtn = document.getElementById('submitBtn');
+
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        clearMsg();
+
+        const email = form.email.value.trim();
+        const password = form.password.value;
+        let focusInput = null;
+
+        // Basic validation
+        if (!email) {
+            showMsg("Don Allah, shigar da imel ɗinka.", "error");
+            focusInput = form.email;
+        } else if (!/^[^@]+@[^@]+\.[^@]+$/.test(email)) {
+            showMsg("Adreshin imel ɗinka ba daidai bane.", "error");
+            focusInput = form.email;
+        } else if (!password) {
+            showMsg("Don Allah, shigar da kalmar sirri.", "error");
+            focusInput = form.password;
+        } else if (password.length < 6) {
+            showMsg("Kalmar sirri ba za ta kasance ƙasa da haruffa 6 ba.", "error");
+            focusInput = form.password;
+        }
+
+        if (focusInput) {
+            focusInput.focus();
+            return;
+        }
+
+        // Show loading state on button
+        submitBtn.classList.add('loading');
+        submitBtn.disabled = true;
+
+        const auth = getAuth(app);
+
+        try {
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            
+            // Success!
+            submitBtn.classList.remove('loading');
+            submitBtn.disabled = false;
+            showMsg("An shiga asusun ka cikin nasara! Ana tura ka zuwa gida...", "success");
+            
+            setTimeout(() => window.location.href = "index.html", 1200);
+        }
+        catch (error) {
+            submitBtn.classList.remove('loading');
+            submitBtn.disabled = false;
+            let msg = "An samu matsala wajen shiga. ";
+            switch(error.code) {
+                case "auth/wrong-password":
+                    msg = "Kalmar sirri da ka shigar ba daidai bane. Idan ka manta, danna 'Ka manta kalmar sirri?'.";
+                    form.password.value = "";
+                    form.password.focus();
+                    break;
+                case "auth/user-not-found":
+                    msg = "Ba a samu wannan adreshin imel ba. Ka tabbatar da imel ɗinka ko ka ƙirƙiri asusu.";
+                    form.email.focus();
+                    break;
+                case "auth/invalid-email":
+                    msg = "Adreshin imel da ka shigar ba daidai bane.";
+                    form.email.focus();
+                    break;
+                case "auth/too-many-requests":
+                    msg = "An rufe shiga na ɗan lokaci saboda yawan ƙoƙari mara nasara. Da fatan za a jira kaɗan.";
+                    break;
+                default:
+                    msg = "An samu kuskure: " + (error.message || "Matsala wajen shiga.");
+                    break;
+            }
+            showMsg(msg, "error");
+        }
+    });
+
+    // Automatic content loader for future extension
+    window.addEventListener('DOMContentLoaded', () => {
+        // Lazy load sections if needed.
+    });
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="ha">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>TauraronWasa Status View</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap">
+    <style>
+        :root {
+            --primary-color: #ffcb05;
+            --background-color: black;
+            --text-color: #ffffff;
+            --overlay-color: rgba(24, 0, 34, 0.7);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            overflow: hidden;
+        }
+
+        .status-container {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .status-post {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.5s ease-in-out;
+            will-change: transform;
+        }
+
+        .status-post.active {
+            display: flex;
+        }
+        
+        .status-post .overlay {
+            display: none;
+        }
+
+        .status-post .post-content {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 20px;
+            box-sizing: border-box;
+            background: linear-gradient(to top, var(--background-color) 0%, transparent 50%);
+        }
+        
+        .status-post.has-media .post-content {
+            background: linear-gradient(to top, var(--overlay-color) 0%, transparent 50%);
+        }
+
+        .post-content.centered {
+            justify-content: center;
+            align-items: center;
+            background-color: var(--background-color);
+        }
+
+        .status-post .media-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: var(--background-color);
+            z-index: 1;
+        }
+        
+        .status-post .media-element {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* Gyara a nan */
+        }
+        
+        .status-post video, .status-post audio {
+            display: none;
+        }
+
+        .status-post video.active, .status-post audio.active {
+            display: block;
+        }
+
+        .status-post .post-text {
+            color: var(--text-color);
+            font-size: 1.2rem;
+            max-height: 5em;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+        
+        .status-post .text-container-with-media {
+            position: relative;
+            width: 100%;
+            z-index: 3;
+        }
+
+        .post-text-container {
+            position: relative;
+            width: 100%;
+        }
+        
+        .read-more-btn {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 5px;
+            display: none;
+            align-self: flex-start;
+        }
+
+        .status-post .text-more-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: var(--background-color);
+            padding: 20px;
+            box-sizing: border-box;
+            display: none;
+            flex-direction: column;
+            color: var(--text-color);
+            overflow-y: auto;
+            transform: translateY(100%);
+            transition: transform 0.5s ease;
+            z-index: 10;
+        }
+
+        .status-post .text-more-overlay.show {
+            display: flex;
+            transform: translateY(0);
+        }
+
+        .status-post .text-more-overlay .close-btn {
+            position: sticky;
+            top: 0;
+            left: 0;
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 2rem;
+            cursor: pointer;
+            padding: 10px;
+            text-align: right;
+        }
+
+        .status-post .game-post {
+            width: 100%;
+            text-align: center;
+            background: var(--background-color);
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .status-post .game-post .match-teams {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .status-post .game-post .team-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            width: 40%;
+            text-align: center;
+        }
+
+        .status-post .game-post .team-logo {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+        }
+
+        .status-post .game-post .team-name {
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+
+        .status-post .game-post .match-vs {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .status-post .game-post .vote-box {
+            background-color: #300040;
+            border: 2px solid var(--primary-color);
+            color: var(--text-color);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            margin-top: 10px;
+            min-width: 100px;
+        }
+
+        .status-post .game-post .vote-box.voted {
+            background-color: var(--primary-color);
+            color: var(--background-color);
+        }
+        
+        .status-post .game-post hr {
+            border: 1px solid var(--primary-color);
+            width: 80%;
+            margin: 20px auto;
+        }
+
+        .status-post .game-post .game-time {
+            font-size: 1rem;
+            color: #aaa;
+            margin-top: 10px;
+        }
+
+        .status-post .post-author {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 3;
+            cursor: pointer;
+        }
+
+        .status-post .post-author .profile-image {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid var(--primary-color);
+            object-fit: cover;
+        }
+
+        .status-post .post-author .team-logo {
+            position: absolute;
+            bottom: -5px;
+            right: -5px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--background-color);
+            padding: 2px;
+        }
+
+        .status-post .post-author .author-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--text-color);
+        }
+
+        .status-post .app-logo {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 3;
+        }
+
+        .status-post .app-logo img {
+            width: 40px;
+        }
+
+        .status-post .actions-container {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            z-index: 3;
+        }
+
+        .status-post .action-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--primary-color);
+            cursor: pointer;
+        }
+
+        .status-post .action-item .icon {
+            font-size: 2rem;
+        }
+
+        .status-post .action-item .count {
+            font-size: 0.8rem;
+            margin-top: 5px;
+            color: var(--text-color);
+        }
+
+        .status-post .action-item .love-icon.loved {
+            color: #f00;
+            animation: bounce 0.5s ease-in-out;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        .love-flyer {
+            position: absolute;
+            font-size: 3rem;
+            color: red;
+            pointer-events: none;
+            opacity: 0;
+            animation: flyup 2s ease-out forwards;
+            z-index: 5;
+        }
+
+        @keyframes flyup {
+            0% {
+                transform: translate(0, 0) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(calc(var(--rand-x) * 1px), -500px) scale(0.5);
+                opacity: 0;
+            }
+        }
+        
+        .audio-player-container {
+            width: 100%;
+            padding: 10px 20px;
+            box-sizing: border-box;
+            background-color: var(--background-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 3;
+        }
+        
+        .audio-player-container audio {
+            width: 100%;
+            height: 20px;
+        }
+        
+        .youtube-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+            height: 0;
+            overflow: hidden;
+        }
+        .youtube-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+        
+        /* Loader and Error States */
+        .loader-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            background-color: var(--background-color);
+            color: var(--primary-color);
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 100;
+        }
+
+        .loader-container .loader {
+            border: 5px solid #300040;
+            border-top: 5px solid var(--primary-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loader-container p {
+            margin-top: 20px;
+        }
+        
+        /* Fullscreen Viewers */
+        .fullscreen-viewer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.95);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .fullscreen-viewer.active {
+            display: flex;
+        }
+
+        .fullscreen-viewer .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 2rem;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="loader-container" id="loader-container">
+        <div class="loader"></div>
+        <p>Ana ɗauko posts...</p>
+    </div>
+    <div class="status-container" id="status-container">
+    </div>
+
+    <audio id="bg-audio" loop autoplay></audio>
+
+  <script type="module">
+    import { app, analytics, firebaseConfig } from './firebase.js';
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
+    import { getDatabase, ref, get, set, push, update, remove, child, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";
+
+    const db = getDatabase(app);
+    const auth = getAuth(app);
+    const statusContainer = document.getElementById('status-container');
+    const loaderContainer = document.getElementById('loader-container');
+    const bgAudio = document.getElementById('bg-audio');
+    let posts = [];
+    let currentIndex = 0;
+    let startY = 0;
+    let isSwiping = false;
+    let isAnimating = false;
+    const POST_VIEWED_KEY = "viewed_posts";
+    let viewedPosts = JSON.parse(localStorage.getItem(POST_VIEWED_KEY)) || {};
+    let userUid = null;
+    let allFetchedPosts = [];
+    let isBgAudioPlaying = true;
+    const backgroundMusicList = ['1mizi.mp3', '2mizi.mp3', '3mizi.mp3', '4mizi.mp3'];
+    let currentBgMusicIndex = 0;
+
+    function playNextBackgroundMusic() {
+        if (!isBgAudioPlaying) return;
+        const randomIndex = Math.floor(Math.random() * backgroundMusicList.length);
+        bgAudio.src = backgroundMusicList[randomIndex];
+        bgAudio.play().catch(e => console.error("Background music playback failed:", e));
+    }
+
+    bgAudio.addEventListener('ended', playNextBackgroundMusic);
+
+    async function fetchAllPosts() {
+        try {
+            const postingSnapshot = await get(ref(db, 'Posting'));
+            const allPosts = [];
+
+            if (postingSnapshot.exists()) {
+                postingSnapshot.forEach(postIdSnap => {
+                    allPosts.push({ ...postIdSnap.val(), postType: 'Posting', postId: postIdSnap.key });
+                });
+            }
+
+            allFetchedPosts = allPosts;
+            processAndRenderPosts();
+
+        } catch (error) {
+            console.error("Error fetching posts:", error);
+            loaderContainer.innerHTML = `<p>An samu matsala wajen ɗauko posts.</p>`;
+        }
+    }
+
+    function processAndRenderPosts() {
+        const validPosts = allFetchedPosts.filter(post => 
+            post.photoLink1 || post.imageLink || post.videoLink || post.audioLink || post.text || post.game1logo
+        );
+
+        let newPosts = validPosts.filter(post => !viewedPosts[post.postId]);
+
+        if (newPosts.length === 0) {
+            // Idan babu sabbin posts, sai a nuna na yanzu amma a cire wanda aka riga aka gani
+            posts = validPosts;
+            currentIndex = 0; // Komawa farko
+            viewedPosts = {}; // Sake sabon tarihin kallon posts
+            localStorage.setItem(POST_VIEWED_KEY, JSON.stringify(viewedPosts));
+        } else {
+            posts = newPosts;
+        }
+
+        posts.sort((a, b) => (b.love || b.like || 0) - (a.love || a.like || 0));
+        renderPosts();
+        loaderContainer.style.display = 'none';
+    }
+
+    function renderPosts() {
+        statusContainer.innerHTML = '';
+        posts.forEach((post, index) => {
+            const postElement = document.createElement('div');
+            postElement.className = 'status-post';
+            postElement.dataset.postId = post.postId;
+            postElement.dataset.postType = post.postType;
+            postElement.innerHTML = generatePostHTML(post, index);
+            statusContainer.appendChild(postElement);
+        });
+        showPost(currentIndex);
+    }
+
+    function generatePostHTML(post, index) {
+        let mediaHtml = '';
+        let textHtml = '';
+        let postContentClass = '';
+        let hasMedia = false;
+        
+        // Render media (image, video)
+        if (post.photoLink1 || post.imageLink) {
+            mediaHtml = `<div class="media-container"><img src="${post.photoLink1 || post.imageLink}" class="media-element"></div>`;
+            hasMedia = true;
+        } else if (post.videoLink) {
+            const isYouTube = post.videoLink.includes('youtu.be') || post.videoLink.includes('youtube.com');
+            if (isYouTube) {
+                const videoId = post.videoLink.split('v=')[1] || post.videoLink.split('/').pop();
+                mediaHtml = `
+                    <div class="media-container">
+                        <div class="youtube-container">
+                            <iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&showinfo=0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                        </div>
+                    </div>
+                `;
+            } else {
+                mediaHtml = `<div class="media-container"><video src="${post.videoLink}" class="media-element" playsinline muted loop></video></div>`;
+            }
+            hasMedia = true;
+        }
+
+        // Render text or audio on top of the media or as a standalone post
+        if (post.text) {
+            textHtml = `
+                <div class="post-text-container">
+                    <div class="post-text" id="post-text-${index}">${post.text}</div>
+                    <button class="read-more-btn">Kara Karantawa</button>
+                </div>
+                <div class="text-more-overlay" id="text-more-overlay-${index}">
+                    <button class="close-btn"><i class="fa-solid fa-xmark"></i></button>
+                    <p>${post.text}</p>
+                </div>
+            `;
+        } else if (post.audioLink) {
+            // Gyara wajen nuna audio a inda text yake
+            textHtml = `
+                <div class="audio-player-container">
+                    <audio src="${post.audioLink}" controls></audio>
+                </div>
+            `;
+        }
+
+        const seeCount = post.see || 0;
+        const loveCount = post.like || 0; // An canza love zuwa like saboda an cire wasu post types
+        const commentCount = post.totalComment || 0;
+        const loveIcon = `<i class="fa-solid fa-heart love-icon"></i>`;
+        const commentIcon = `<i class="fa-solid fa-comment comment-icon"></i>`;
+        const seeIcon = `<i class="fa-solid fa-eye see-icon"></i>`;
+
+        const actionsHtml = `
+            <div class="actions-container">
+                <div class="action-item see-action">
+                    <span class="icon">${seeIcon}</span>
+                    <span class="count">${seeCount}</span>
+                </div>
+                <div class="action-item comment-action">
+                    <span class="icon">${commentIcon}</span>
+                    <span class="count">${commentCount}</span>
+                </div>
+                <div class="action-item love-action">
+                    <span class="icon">${loveIcon}</span>
+                    <span class="count">${loveCount}</span>
+                </div>
+            </div>
+        `;
+
+        return `
+            ${mediaHtml}
+            <div class="post-content ${postContentClass} ${hasMedia ? 'has-media' : ''}">
+                <div class="app-logo">
+                    <img src="https://i.imgur.com/CgvdgMA.png" alt="Logo">
+                </div>
+                ${textHtml}
+                ${actionsHtml}
+            </div>
+        `;
+    }
+
+    function showPost(index) {
+        if (isAnimating || index < 0 || index >= posts.length) return;
+        isAnimating = true;
+        const allPosts = document.querySelectorAll('.status-post');
+        const newPost = allPosts[index];
+        const oldPost = allPosts[currentIndex];
+
+        if (!newPost) {
+            isAnimating = false;
+            return;
+        }
+        
+        if (oldPost) {
+            const oldMedia = oldPost.querySelector('.media-element');
+            if (oldMedia && (oldMedia.tagName === 'VIDEO' || oldMedia.tagName === 'AUDIO')) {
+                oldMedia.pause();
+            }
+        }
+        
+        const newMedia = newPost.querySelector('.media-element');
+        if (newMedia) {
+            if (newMedia.tagName === 'VIDEO') {
+                newMedia.play().catch(e => console.error("Media playback error:", e));
+                if (isBgAudioPlaying) {
+                    bgAudio.pause();
+                }
+            } else if (newMedia.tagName === 'AUDIO') {
+                newMedia.play().catch(e => console.error("Audio playback error:", e)); // Tabbatar cewa an fara kunna audio
+                if (isBgAudioPlaying) {
+                    bgAudio.pause();
+                }
+            }
+        } else {
+            if (isBgAudioPlaying) {
+                bgAudio.play().catch(e => console.error("Background music playback failed:", e));
+            }
+        }
+
+        allPosts.forEach((post, i) => {
+            post.style.transform = `translateY(${100 * (i - index)}%)`;
+            if (i === index) {
+                post.classList.add('active');
+                updateSeeCount(post);
+                viewedPosts[post.dataset.postId] = true;
+                localStorage.setItem(POST_VIEWED_KEY, JSON.stringify(viewedPosts));
+            } else {
+                post.classList.remove('active');
+            }
+        });
+        
+        currentIndex = index;
+        setTimeout(() => {
+            isAnimating = false;
+            checkTextLength();
+        }, 500);
+    }
+
+    statusContainer.addEventListener('touchstart', (e) => {
+        if (isAnimating) return;
+        startY = e.touches[0].clientY;
+        isSwiping = true;
+    });
+
+    statusContainer.addEventListener('touchmove', (e) => {
+        if (!isSwiping || isAnimating) return;
+        const currentY = e.touches[0].clientY;
+        const diffY = currentY - startY;
+        if (Math.abs(diffY) > 50) {
+            if (diffY < 0) {
+                showPost(currentIndex + 1);
+            } else {
+                showPost(currentIndex - 1);
+            }
+            isSwiping = false;
+        }
+    });
+
+    statusContainer.addEventListener('touchend', () => {
+        isSwiping = false;
+    });
+
+    async function updateSeeCount(postElement) {
+        const postId = postElement.dataset.postId;
+        const postType = postElement.dataset.postType;
+        let postRef;
+        
+        if (postType === 'Posting') {
+            postRef = ref(db, `Posting/${postId}`);
+        }
+        
+        if (postRef) {
+            runTransaction(postRef, (currentData) => {
+                if (currentData) {
+                    if (!currentData.see) currentData.see = 0;
+                    currentData.see++;
+                }
+                return currentData;
+            });
+        }
+    }
+    
+    document.addEventListener('click', async (e) => {
+        const loveBtn = e.target.closest('.love-action');
+        if (loveBtn) {
+            const postEl = loveBtn.closest('.status-post');
+            const postId = postEl.dataset.postId;
+            const postType = postEl.dataset.postType;
+
+            if (!userUid) {
+                return;
+            }
+            
+            let postRef, likeKey, likePath;
+            if (postType === 'Posting') {
+                postRef = ref(db, `Posting/${postId}`);
+                likeKey = 'like';
+                likePath = `Posting/${postId}/likes/${userUid}`;
+            }
+
+            if (postRef) {
+                const likedByUser = await get(child(ref(db), likePath));
+                if (!likedByUser.exists()) {
+                    runTransaction(postRef, (currentData) => {
+                        if (currentData) {
+                            if (!currentData[likeKey]) currentData[likeKey] = 0;
+                            currentData[likeKey]++;
+                        }
+                        return currentData;
+                    });
+                    set(child(ref(db), likePath), true);
+                    const loveIcon = loveBtn.querySelector('.love-icon');
+                    loveIcon.classList.add('loved');
+                    const loveEmojis = ['💕', '💞', '💓', '💖', '💗', '💘'];
+                    for (let i = 0; i < 10; i++) {
+                        const flyer = document.createElement('span');
+                        flyer.className = 'love-flyer';
+                        flyer.textContent = loveEmojis[Math.floor(Math.random() * loveEmojis.length)];
+                        flyer.style.left = `${e.clientX}px`;
+                        flyer.style.top = `${e.clientY}px`;
+                        flyer.style.setProperty('--rand-x', Math.random() * 200 - 100);
+                        document.body.appendChild(flyer);
+                        setTimeout(() => flyer.remove(), 2000);
+                    }
+                }
+            }
+        }
+    });
+
+    document.addEventListener('ended', (e) => {
+        if (e.target.tagName === 'AUDIO' && e.target.closest('.status-post')) {
+            const playingAudio = document.querySelector('audio[controls]:not(:paused)');
+            if (!playingAudio) {
+                if (isBgAudioPlaying) {
+                    playNextBackgroundMusic();
+                }
+            }
+        }
+    });
+
+    function checkTextLength() {
+        const activePost = document.querySelector('.status-post.active');
+        if (!activePost) return;
+        const postText = activePost.querySelector('.post-text');
+        const readMoreBtn = activePost.querySelector('.read-more-btn');
+        if (postText && readMoreBtn) {
+            if (postText.scrollHeight > postText.clientHeight) {
+                readMoreBtn.style.display = 'block';
+            } else {
+                readMoreBtn.style.display = 'none';
+            }
+        }
+    }
+
+    document.addEventListener('click', (e) => {
+        const readMoreBtn = e.target.closest('.read-more-btn');
+        if (readMoreBtn) {
+            const activePost = readMoreBtn.closest('.status-post');
+            const overlay = activePost.querySelector('.text-more-overlay');
+            if (overlay) {
+                overlay.classList.add('show');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        const closeBtn = e.target.closest('.text-more-overlay .close-btn');
+        if (closeBtn) {
+            closeBtn.closest('.text-more-overlay').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+    });
+
+    // Gyara don tabbatar da audio na kunnuwa lokacin da post ya bayyana
+    const audioElements = document.querySelectorAll('audio');
+    audioElements.forEach(audio => {
+        audio.addEventListener('play', () => {
+            if (isBgAudioPlaying) {
+                bgAudio.pause();
+            }
+        });
+        audio.addEventListener('pause', () => {
+            const playingAudio = document.querySelector('audio[controls]:not(:paused)');
+            if (!playingAudio && isBgAudioPlaying) {
+                bgAudio.play().catch(e => console.error("Background music playback failed:", e));
+            }
+        });
+    });
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            userUid = user.uid;
+        } else {
+            userUid = null;
+        }
+        fetchAllPosts();
+    });
+
+    playNextBackgroundMusic();
+</script>
+</body>
+</html>
