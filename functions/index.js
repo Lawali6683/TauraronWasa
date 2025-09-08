@@ -1,4 +1,3 @@
-// /functions/index.js
 
 import { handleChampions } from "./api/champions.js";
 import { handleEropa } from "./api/eropa.js";
