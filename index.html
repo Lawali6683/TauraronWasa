@@ -328,7 +328,7 @@ header#site1-header {
     transform: translateX(-50%);
     padding: 12px 32px 12px 32px;
     font-weight: 700;
-    font-size: clamp(1rem, 2vw, 1.2rem);
+    font-size: clamp(1rem, 2vw, 1rem);
     color: #fff;
     background: linear-gradient(135deg, #ff512f 0%, #dd2476 100%);
     border-radius: 0 0 18px 18px;
@@ -337,7 +337,7 @@ header#site1-header {
     box-shadow: 0 7px 18px 0 #18002233;
     clip-path: polygon(0 0, 100% 0, 90% 100%, 10% 100%);
     z-index: 10;
-    line-height: 1.3;
+    line-height: 1.0;
     min-width: 230px;
     text-align: center;
     border-bottom: 2px solid #fff5;
@@ -449,7 +449,7 @@ header#site1-header {
 }
 
 .sarki-congrats {
-    font-size: clamp(0.89rem, 1.4vw, 1.19rem);
+    font-size: clamp(0.89rem, 1.4vw, 1rem);
     margin-bottom: 0.12em;
     color: #f7f7f7;
     text-shadow: 1px 1px 7px #180022;
@@ -460,7 +460,7 @@ header#site1-header {
     display: flex;
     align-items: center;
     gap: 0.35rem;
-    font-size: clamp(0.9rem, 1.2vw, 1.18rem);
+    font-size: clamp(0.9rem, 1.2vw, 1rem);
     font-weight: 600;
     color: #fff;
     margin-bottom: 0.15em;
@@ -470,8 +470,8 @@ header#site1-header {
 }
 
 .sarki-score-logo {
-    width: 20px;
-    height: 20px;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
     background: #fff;
     object-fit: cover;
@@ -482,8 +482,8 @@ header#site1-header {
 
 .sarki-score-team {
     font-weight: 700;
-    font-size: clamp(0.8rem, 1.2vw, 1rem);
-  
+    font-size: clamp(0.8rem, 1.2vw, 10px;);
+  line-height: 1.0;
     margin: 0 0.1em;
     color: #ffcb05;
     white-space: nowrap;
@@ -587,7 +587,7 @@ header#site1-header {
     border-radius: 50%;
     border: 2.6px solid #fff;
     top: -5px;    
-    right: -5px;    
+    right: 0px;    
     background: #fff;
     object-fit: cover;
     box-shadow: 0 2px 9px 0 #ffcb050a;
@@ -852,7 +852,7 @@ header#site1-header {
 
 /* ✍️☀️Site 5 CSS ya fara daga nan (gyarawa da karin zamani) */
 #site5-kaitsayepost {
-    width: 95%;
+    width: 100%;
     max-width: 800px;
     margin: 0 auto 0.4rem auto;
     min-height: 170px;
@@ -861,8 +861,9 @@ header#site1-header {
 }
 
 .kaitsaye-post-container {
-    width: 98%;
-    margin-bottom: 2.5rem; 
+  
+    width: 96%;
+     margin-bottom: 2rem;
     padding: 0;
     position: relative;
     overflow: hidden;
@@ -899,7 +900,7 @@ header#site1-header {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.7rem;
+    gap: 2px;
     padding: 0.48rem 0.9rem 0.42rem 0.9rem;
     position: relative;
     min-height: 52px;
@@ -1309,6 +1310,8 @@ header#site1-header {
         transform: rotate(360deg);
     }
 }
+
+
 
 /* Push Notification Container Style */
 .site5-push-container {
@@ -2183,9 +2186,9 @@ color: green;
 
 /* 🚦✔️Site 8 CSS ya fara daga nan */
 #site8-posting {
-    width: 90%;
+    width: 98%;
     max-width: 700px;
-    margin: 0 auto 1.6rem auto;
+    margin: 0 auto 1rem auto;
     min-height: 70px;
     box-sizing: border-box;               
 }
@@ -2193,8 +2196,9 @@ color: green;
 .no-posts {
     text-align: center;
     color: #888;
-    font-size: 1.2rem;
-    padding: 20px;
+    font-size: 1rem;
+    padding: 2px;
+    
 }
 
 .posting-feed {
@@ -2203,17 +2207,10 @@ color: green;
     gap: 1.2rem;
 }
 
-.posting-card {
-    width: 100%;
-    border-radius: 1px;
-    box-shadow: 0 1px 12px rgba(0,0,0,0.13);
-    padding: 1.0rem 1.3rem 1.2rem 1.3rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.rem;
-    position: relative;          
+.posting-card {      
     border-bottom: 2px solid;
     border-image: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet) 1;
+    
 }
 
  .posting-card.first-post {
@@ -2247,10 +2244,10 @@ color: green;
 }
 
 .posting-text-below-logo {
-    font-size: 1.02rem;
+    font-size: 1rem;
     font-weight: 500;
     color: inherit;   
-    line-height: 1.62;
+    line-height: 1.4;
     margin: 0.5rem 0;
     white-space: pre-wrap; 
 }
@@ -2260,25 +2257,29 @@ color: green;
     color: green;
     font-weight: 700;
     cursor: pointer;
-    font-size: 1.05em;
+    font-size: 1.1em;
     text-decoration: underline;
     margin-left: 0.3em;
 }
 
-.posting-media {
-    width: 100%;
+
+.posting-media {            
+width: 100%;    
+    border-bottom: 2px solid yellow;
+    padding-bottom: 0.5rem;
     margin: 0.5rem 0 0.2rem 0;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-wrap: wrap;
     gap: 0.15rem;
-    border-bottom: 2px solid yellow;
-    padding-bottom: 0.5rem;
+    
 }
+
 
 .posting-img,
 .posting-video {
+            
     width: 100%;
     height: auto;
     object-fit: contain;
@@ -3453,8 +3454,8 @@ function sarkiFormatNum(n) {
 
 
 // ✍️☀️ SITE5 MODERN FIXED JS (KaiTsaye + post)
-// ==== PUSH NOTIFICATION CONTAINER (MODERN) ====
 
+// ==== PUSH NOTIFICATION CONTAINER (MODERN) ====
 function showSite5Push(msg, icon = "fa-circle-check", timeout = 2600) {
     const c = document.getElementById('site5-push-container');
     if (!c) {
@@ -3472,12 +3473,12 @@ function showSite5Push(msg, icon = "fa-circle-check", timeout = 2600) {
 
 // ==== DOM ELEMENTS ====
 const site5 = document.getElementById('site5-kaitsayepost');
-const kaitsayeRef = ref(db, "KaiTsayePost"); // Important: This path must match your Firebase structure
-const KAITSAYE_KEY = "tw_kaitsaye_modern"; // Key for localStorage
-let currentPlayingAudio = null; // Don audio post
-let currentRediyoAudio = null; // Don rediyo audio
-let mediaSessionInitialized = false; // Don sarrafa Media Session API initialization
-let lastFetchedPostId = null; // Don adana postid na ƙarshe da aka karɓa daga Firebase
+const kaitsayeRef = ref(db, "KaiTsayePost");
+const KAITSAYE_KEY = "tw_kaitsaye_modern";
+let currentPlayingAudio = null;
+let currentRediyoAudio = null;
+let mediaSessionInitialized = false;
+let lastFetchedPostId = null;
 
 // ==== UTILS ====
 function formatCount(num) {
@@ -3486,6 +3487,7 @@ function formatCount(num) {
     if (num >= 1e3) return (num / 1e3).toFixed(1).replace(/\.0$/, "") + "k";
     return num;
 }
+
 function getYouTubeVideoId(url) {
     let videoId = null;
     const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i;
@@ -3496,7 +3498,12 @@ function getYouTubeVideoId(url) {
     return videoId;
 }
 
-// ==== SHOW LOADING ====
+function formatTime(t) {
+    t = Math.floor(t);
+    return `${Math.floor(t / 60)}:${(t % 60).toString().padStart(2, '0')}`;
+}
+
+// ==== SHOW LOADING & EMPTY STATE ====
 function showKaitsayeLoading() {
     site5.innerHTML = `<div class="kaitsaye-post-container" style="min-height:100%;display:flex;justify-content:center;align-items:center;">
         <div style="text-align:center;width:100%;">
@@ -3506,7 +3513,6 @@ function showKaitsayeLoading() {
     </div>`;
 }
 
-// ==== SHOW EMPTY STATE ====
 function showKaitsayeEmptyState() {
     site5.innerHTML = `<div class="kaitsaye-post-container" style="min-height:100%;display:flex;justify-content:center;align-items:center;">
         <div style="text-align:center;width:100%;">
@@ -3534,7 +3540,6 @@ function initializeKaitsayePostListener() {
         if (currentPostId !== lastFetchedPostId) {
             console.log("An gano sabon post ko farkon lodi. ID:", currentPostId);
             if (lastFetchedPostId !== null) {
-                // Clear old post-specific data, but not all of it
                 const oldViewKey = `kaitsaye-view-${lastFetchedPostId}`;
                 const oldLovedKey = `site5-loved-${lastFetchedPostId}`;
                 const oldAudioKey = `audio-position-${lastFetchedPostId}`;
@@ -3553,11 +3558,13 @@ function initializeKaitsayePostListener() {
         renderAndCachePost(postFromFirebase);
     });
 }
+
 function pushNewPostNotification(p) {
     if (!p.rediyoKaiTsayeAudioLink) {
         showSite5Push("An samu sabon post!", "fa-circle-check", 2600);
     }
 }
+
 function renderAndCachePost(p) {
     if (p && (p.text || p.photoLink || p.videoLink || p.audioPostLink || p.rediyoKaiTsayeAudioLink || p.onlineLink1)) {
         site5.innerHTML = "";
@@ -3567,6 +3574,7 @@ function renderAndCachePost(p) {
         showKaitsayeEmptyState();
     }
 }
+
 function clearAllPostSpecificLocalStorage() {
     const keysToRemove = [];
     for (let i = 0; i < localStorage.length; i++) {
@@ -3582,17 +3590,17 @@ function clearAllPostSpecificLocalStorage() {
 // ==== RENDER SINGLE POST ====
 function renderKaitsayePost(p) {
     const posttime = p.posttime ? new Date(p.posttime).toLocaleString('ha-NG', { hour12: true }) : "";
-    const topBar = `
-        <div class="kaitsaye-top-bar">
-            <img src="https://i.imgur.com/CgvdgMA.png" alt="logo" class="kaitsaye-top-bar-logo">
-            <div class="kaitsaye-top-title">KaiTsaye</div>
-            <div class="kaitsaye-top-bar-time"><i class="fa-regular fa-clock"></i> <span>${posttime}</span></div>
-        </div>
-    `;
+    const topBar = `<div class="kaitsaye-top-bar">
+        <img src="https://i.imgur.com/CgvdgMA.png" alt="logo" class="kaitsaye-top-bar-logo">
+        <div class="kaitsaye-top-title">KaiTsaye</div>
+        <div class="kaitsaye-top-bar-time"><i class="fa-regular fa-clock"></i> <span>${posttime}</span></div>
+    </div>`;
+
     let text = "";
     if (p.text && typeof p.text === "string" && p.text.trim().length) {
         text = `<div class="kaitsaye-post-text" style="white-space: pre-wrap;">${p.text}</div>`;
     }
+
     let gameButtonsHtml = "";
     const daysOfWeek = ['Lahadi', 'Litinin', 'Talata', 'Laraba', 'Alhamis', 'Juma\'a', 'Asabar'];
     for (let i = 1; i <= 3; ++i) {
@@ -3615,129 +3623,116 @@ function renderKaitsayePost(p) {
                     gameTimeFormatted = `${dayName} ${day} ${month} ${year} ${time}`;
                 }
             }
-            gameButtonsHtml += `
-                <button class="kaitsaye-game-match-btn" onclick="window.open('${onlineLink}','_blank')">
-                    <div class="team-info">
-                        ${logo1 ? `<img src="${logo1}" alt="Logo Team 1" class="team-logo">` : ''}
-                        <span>${team1 || 'Kungiya 1'}</span>
-                    </div>
-                    <span class="vs-text">VS</span>
-                    <div class="team-info">
-                        ${logo2 ? `<img src="${logo2}" alt="Logo Team 2" class="team-logo">` : ''}
-                        <span>${team2 || 'Kungiya 2'}</span>
-                    </div>
-                    <div class="game-time-display">${gameTimeFormatted || ''}</div>
-                </button>
-            `;
+            gameButtonsHtml += `<button class="kaitsaye-game-match-btn" onclick="window.open('${onlineLink}','_blank')">
+                <div class="team-info">
+                    ${logo1 ? `<img src="${logo1}" alt="Logo Team 1" class="team-logo">` : ''}
+                    <span>${team1 || 'Kungiya 1'}</span>
+                </div>
+                <span class="vs-text">VS</span>
+                <div class="team-info">
+                    ${logo2 ? `<img src="${logo2}" alt="Logo Team 2" class="team-logo">` : ''}
+                    <span>${team2 || 'Kungiya 2'}</span>
+                </div>
+                <div class="game-time-display">${gameTimeFormatted || ''}</div>
+            </button>`;
         }
     }
     let gameLinksSection = "";
     if (gameButtonsHtml) {
         gameLinksSection = `<div class="kaitsaye-game-matches">${gameButtonsHtml}</div>`;
     }
+
     let media = "";
     if (p.rediyoKaiTsayeAudioLink && typeof p.rediyoKaiTsayeAudioLink === "string" && p.rediyoKaiTsayeAudioLink.trim().length) {
         const hasImage = p.photoLink && typeof p.photoLink === "string" && p.photoLink.trim().length;
-        media = `
-            <div class="rediyo-kai-tsaye-player ${hasImage ? 'has-image' : ''}" data-audio="${p.rediyoKaiTsayeAudioLink}" data-postid="${p.postid}">
-                ${hasImage ? `<img src="${p.photoLink}" alt="Radio Background" class="rediyo-background-image">` : ''}
-                <div class="rediyo-kai-tsaye-overlay">
-                    <div class="rediyo-kai-tsaye-controls ${hasImage ? 'center-overlay' : ''}">
-                        <button class="rediyo-kai-tsaye-button" title="Kunna Rediyo">
-                            <i class="fa-solid fa-play"></i>
-                        </button>
-                        ${!hasImage ? `<div class="rediyo-kai-tsaye-title">Kai Tsaye Rediyo</div>` : ''}
-                    </div>
+        media = `<div class="rediyo-kai-tsaye-player ${hasImage ? 'has-image' : ''}" data-audio="${p.rediyoKaiTsayeAudioLink}" data-postid="${p.postid}">
+            ${hasImage ? `<img src="${p.photoLink}" alt="Radio Background" class="rediyo-background-image">` : ''}
+            <div class="rediyo-kai-tsaye-overlay">
+                <div class="rediyo-kai-tsaye-controls ${hasImage ? 'center-overlay' : ''}">
+                    <button class="rediyo-kai-tsaye-button" title="Kunna Rediyo">
+                        <i class="fa-solid fa-play"></i>
+                    </button>
+                    ${!hasImage ? `<div class="rediyo-kai-tsaye-title">Kai Tsaye Rediyo</div>` : ''}
                 </div>
             </div>
-        `;
+        </div>`;
     } else if (p.videoLink && typeof p.videoLink === "string" && p.videoLink.trim().length) {
         let videoId = getYouTubeVideoId(p.videoLink);
         if (videoId) {
-            media = `
-                <div class="kaitsaye-video-container" data-youtube-id="${videoId}">
-                    <img src="https://i.ytimg.com/vi/${videoId}/hqdefault.jpg" alt="Video Thumbnail" class="video-thumbnail">
-                    <div class="video-overlay">
-                        <i class="fa-solid fa-play video-play-btn" title="Kunna bidiyo"></i>
-                        <button class="video-fullscreen-btn" title="Cikakken allo"><i class="fa-regular fa-square"></i></button>
-                    </div>
+            media = `<div class="kaitsaye-video-container" data-youtube-id="${videoId}">
+                <img src="https://i.ytimg.com/vi/${videoId}/hqdefault.jpg" alt="Video Thumbnail" class="video-thumbnail">
+                <div class="video-overlay">
+                    <i class="fa-solid fa-play video-play-btn" title="Kunna bidiyo"></i>
+                    <button class="video-fullscreen-btn" title="Cikakken allo"><i class="fa-regular fa-square"></i></button>
                 </div>
-            `;
+            </div>`;
         } else {
-            media = `
-                <div class="kaitsaye-video-container">
-                    <video class="site5-kaitsaye-video" src="${p.videoLink}" playsinline></video>
-                    <div class="video-overlay">
-                        <i class="fa-solid fa-play video-play-btn" title="Kunna bidiyo"></i>
-                        <button class="video-fullscreen-btn" data-videourl="${p.videoLink}" title="Cikakken allo"><i class="fa-regular fa-square"></i></button>
-                    </div>
+            media = `<div class="kaitsaye-video-container">
+                <video class="site5-kaitsaye-video" src="${p.videoLink}" playsinline></video>
+                <div class="video-overlay">
+                    <i class="fa-solid fa-play video-play-btn" title="Kunna bidiyo"></i>
+                    <button class="video-fullscreen-btn" data-videourl="${p.videoLink}" title="Cikakken allo"><i class="fa-regular fa-square"></i></button>
                 </div>
-            `;
+            </div>`;
         }
     } else if (p.audioPostLink && typeof p.audioPostLink === "string" && p.audioPostLink.trim().length) {
         const hasPhoto = p.photoLink && p.photoLink.trim().length;
-        let audioPlayerHtml = `
-            <div class="kaitsaye-audio-player-controls">
+        let audioPlayerHtml = `<div class="kaitsaye-audio-player-controls">
                 <button class="audio-play-btn" title="Kunne"><i class="fa-solid fa-play"></i></button>
                 <div class="audio-progress-container">
                     <div class="audio-progress-bar"></div>
                     <input type="range" class="audio-seek-slider" value="0" min="0" max="100" step="0.1">
                 </div>
                 <span class="audio-time">0:00</span>
-            </div>
-        `;
+            </div>`;
         if (hasPhoto) {
-            media = `
-                <div class="kaitsaye-audio-player-with-image" data-audio="${p.audioPostLink}" data-postid="${p.postid}">
-                    <img src="${p.photoLink}" alt="Audio Post Image" class="kaitsaye-audio-image">
-                    <div class="kaitsaye-audio-player-overlay">
-                        ${audioPlayerHtml}
-                    </div>
-                </div>`;
-        } else {
-            media = `
-                <div class="kaitsaye-audio-player-box" data-audio="${p.audioPostLink}" data-postid="${p.postid}">
+            media = `<div class="kaitsaye-audio-player-with-image" data-audio="${p.audioPostLink}" data-postid="${p.postid}">
+                <img src="${p.photoLink}" alt="Audio Post Image" class="kaitsaye-audio-image">
+                <div class="kaitsaye-audio-player-overlay">
                     ${audioPlayerHtml}
                 </div>
-            `;
+            </div>`;
+        } else {
+            media = `<div class="kaitsaye-audio-player-box" data-audio="${p.audioPostLink}" data-postid="${p.postid}">
+                ${audioPlayerHtml}
+            </div>`;
         }
     } else if (p.photoLink && typeof p.photoLink === "string" && p.photoLink.trim().length) {
         media = `<img src="${p.photoLink}" alt="post-image" class="site5-kaitsaye-image">`;
     }
+
     let mediaBox = "";
     if (media) {
         mediaBox = `<div class="kaitsaye-post-media-box">${media}</div>`;
     }
-    const actionsBar = `
-        <div class="kaitsaye-actions-bar">
-            <button class="kaitsaye-action-btn view" title="See"><i class="fa-regular fa-eye"></i> <span class="kaitsaye-action-badge">${formatCount(p.see || 0)}</span></button>
-            <button class="kaitsaye-action-btn comment" title="Comment"><i class="fa-regular fa-comment"></i> <span class="kaitsaye-action-badge">${formatCount(p.totalComment || 0)}</span></button>
-            <button class="kaitsaye-action-btn love${localStorage.getItem(`site5-loved-${p.postid}`) === "true" ? " active" : ""}" title="Like/Love"><i class="fa-solid fa-heart"></i> <span class="kaitsaye-action-badge">${formatCount(p.love || 0)}</span></button>
-           
-        </div>
-    `;
+
+    const actionsBar = `<div class="kaitsaye-actions-bar">
+        <button class="kaitsaye-action-btn view" title="See"><i class="fa-regular fa-eye"></i> <span class="kaitsaye-action-badge">${formatCount(p.see || 0)}</span></button>
+        <button class="kaitsaye-action-btn comment" title="Comment"><i class="fa-regular fa-comment"></i> <span class="kaitsaye-action-badge">${formatCount(p.totalComment || 0)}</span></button>
+        <button class="kaitsaye-action-btn love${localStorage.getItem(`site5-loved-${p.postid}`) === "true" ? " active" : ""}" title="Like/Love"><i class="fa-solid fa-heart"></i> <span class="kaitsaye-action-badge">${formatCount(p.love || 0)}</span></button>
+    </div>`;
+
     let contentArr = [];
     if (text) contentArr.push(text);
     if (gameLinksSection) contentArr.push(gameLinksSection);
     if (mediaBox) contentArr.push(mediaBox);
+
     const c = document.createElement('div');
     c.className = "kaitsaye-post-container";
     c.setAttribute('data-postid', p.postid);
-    c.innerHTML = `
-        ${topBar}
-        <div class="kaitsaye-content">${contentArr.join("")}</div>
-        ${actionsBar}
-    `;
+    c.innerHTML = `${topBar}<div class="kaitsaye-content">${contentArr.join("")}</div>${actionsBar}`;
+
     setTimeout(() => {
         if (p.rediyoKaiTsayeAudioLink) {
             setupRediyoPlayer(c, p.rediyoKaiTsayeAudioLink, p.postid);
         } else if (p.audioPostLink) {
             setupAudioPlayer(c, p.postid);
         }
-        setupVideoPlayers(c); // This will handle both YouTube and native videos
+        setupVideoPlayers(c);
         setupKaitsayeActions(c, p);
         setupKaitsayeIntersection(c, p);
     }, 40);
+
     return c;
 }
 
@@ -3747,7 +3742,6 @@ let kaitsayeVideoFullscreenViewer = null;
 function setupVideoPlayers(container) {
     const videoContainer = container.querySelector('.kaitsaye-video-container');
     if (!videoContainer) return;
-
     const videoId = videoContainer.dataset.youtubeId;
     const nativeVideo = videoContainer.querySelector('video');
     const thumbnail = videoContainer.querySelector('.video-thumbnail');
@@ -3756,20 +3750,15 @@ function setupVideoPlayers(container) {
     const videoOverlay = videoContainer.querySelector('.video-overlay');
 
     if (videoId) {
-        // Handle YouTube video
-        // Clicking thumbnail or play button will load the YouTube iframe inline
         const loadAndPlayYouTube = () => {
             loadYouTubeIframe(videoContainer, videoId);
         };
-
         if (playBtn) {
             playBtn.onclick = loadAndPlayYouTube;
         }
         if (thumbnail) {
             thumbnail.onclick = loadAndPlayYouTube;
         }
-
-        // Fullscreen button still opens in full screen directly
         if (fullscreenBtn) {
             fullscreenBtn.onclick = () => {
                 const videoSrc = `https://www.youtube.com/embed/${videoId}?autoplay=1&fs=1&modestbranding=1&playsinline=1&color=white`;
@@ -3777,13 +3766,10 @@ function setupVideoPlayers(container) {
             };
         }
     } else if (nativeVideo) {
-        // Handle native video
-        setupVideoAutoPlay(container); // Autoplay/pause on scroll for native videos
-
+        setupVideoAutoPlay(container);
         const toggleNativeVideoPlay = () => {
             handleKaitsayeVideoPlay(nativeVideo, playBtn);
         };
-
         if (playBtn) {
             playBtn.onclick = toggleNativeVideoPlay;
         }
@@ -3792,39 +3778,32 @@ function setupVideoPlayers(container) {
                 handleKaitsayeVideoFullscreen(nativeVideo.src, false);
             };
         }
-        nativeVideo.onclick = toggleNativeVideoPlay; // Clicking video itself plays/pauses
+        nativeVideo.onclick = toggleNativeVideoPlay;
         nativeVideo.onplay = () => {
             if (playBtn) playBtn.classList.add('playing');
-            if (videoOverlay) videoOverlay.style.display = 'none'; // Hide overlay on play
+            if (videoOverlay) videoOverlay.style.display = 'none';
         };
         nativeVideo.onpause = () => {
             if (playBtn) playBtn.classList.remove('playing');
-            if (videoOverlay) videoOverlay.style.display = 'flex'; // Show overlay on pause
+            if (videoOverlay) videoOverlay.style.display = 'flex';
         };
     }
 }
 
-// Function to load YouTube iframe inline
 function loadYouTubeIframe(videoContainer, videoId) {
-    // Check if iframe is already loaded to prevent multiple loads
     if (videoContainer.querySelector('iframe.site5-kaitsaye-video')) {
         return;
     }
-
     const thumbnail = videoContainer.querySelector('.video-thumbnail');
     const videoOverlay = videoContainer.querySelector('.video-overlay');
-
     if (thumbnail) thumbnail.style.display = 'none';
-    if (videoOverlay) videoOverlay.style.display = 'none'; // Hide overlay including play button and fullscreen icon
-
+    if (videoOverlay) videoOverlay.style.display = 'none';
     const iframe = document.createElement('iframe');
-    iframe.className = 'site5-kaitsaye-video'; // Re-use class for consistency
+    iframe.className = 'site5-kaitsaye-video';
     iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&fs=1&modestbranding=1&playsinline=1&color=white`;
     iframe.setAttribute('frameborder', '0');
     iframe.setAttribute('allowfullscreen', 'true');
     iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen');
-
-    // Remove any previous placeholder elements before appending the iframe
     while (videoContainer.firstChild) {
         videoContainer.removeChild(videoContainer.firstChild);
     }
@@ -3852,7 +3831,6 @@ function handleKaitsayeVideoFullscreen(videoSrc, isYouTube) {
             }
         });
     }
-
     let mediaElement;
     if (isYouTube) {
         const iframe = document.createElement('iframe');
@@ -3870,11 +3848,9 @@ function handleKaitsayeVideoFullscreen(videoSrc, isYouTube) {
         video.setAttribute('playsinline', 'true');
         mediaElement = video;
     }
-
     const closeBtn = document.createElement('button');
     closeBtn.className = 'kaitsaye-video-fullscreen-close-btn';
-    closeBtn.innerHTML = '<i class="fa-solid fa-xmark"></i>'; // Changed to Xmark as requested
-
+    closeBtn.innerHTML = '<i class="fa-solid fa-xmark"></i>';
     closeBtn.onclick = function() {
         if (document.fullscreenElement) {
             document.exitFullscreen();
@@ -3884,22 +3860,18 @@ function handleKaitsayeVideoFullscreen(videoSrc, isYouTube) {
             kaitsayeVideoFullscreenViewer.innerHTML = '';
         }
     };
-
     kaitsayeVideoFullscreenViewer.innerHTML = '';
     kaitsayeVideoFullscreenViewer.appendChild(closeBtn);
     kaitsayeVideoFullscreenViewer.appendChild(mediaElement);
     kaitsayeVideoFullscreenViewer.classList.add('active');
     document.body.style.overflow = 'hidden';
-
     if (kaitsayeVideoFullscreenViewer.requestFullscreen) {
         kaitsayeVideoFullscreenViewer.requestFullscreen().catch(err => {
             console.log(`Error attempting to enable fullscreen: ${err.message} (${err.name})`);
         });
     }
-
-    // Autoplay the video element if it's not a YouTube iframe
     if (!isYouTube) {
-      mediaElement.play().catch(e => console.error("Fullscreen video play error:", e));
+        mediaElement.play().catch(e => console.error("Fullscreen video play error:", e));
     }
 }
 
@@ -3913,14 +3885,12 @@ function setupAudioPlayer(container, postId) {
     const timeEl = box.querySelector('.audio-time');
     const audio = new Audio(audioUrl);
     const LOCALSTORAGE_AUDIO_POSITION_KEY = `audio-position-${postId}`;
-    function formatTime(t) {
-        t = Math.floor(t);
-        return `${Math.floor(t / 60)}:${(t % 60).toString().padStart(2, '0')}`;
-    }
+
     const savedTime = localStorage.getItem(LOCALSTORAGE_AUDIO_POSITION_KEY);
     if (savedTime) {
         audio.currentTime = parseFloat(savedTime);
     }
+    
     window.addEventListener('clear-storage', (e) => {
         if (e.detail.postId === postId) {
             audio.pause();
@@ -3928,6 +3898,7 @@ function setupAudioPlayer(container, postId) {
             btn.innerHTML = '<i class="fa-solid fa-play"></i>';
         }
     });
+
     audio.onended = () => {
         btn.innerHTML = '<i class="fa-solid fa-play"></i>';
         if (seekSlider) seekSlider.value = 0;
@@ -4157,12 +4128,10 @@ function updateMediaSession(audioElement, title, postId) {
 // ==== VIDEO AUTOPLAY (MODERN) ====
 function setupVideoAutoPlay(container) {
     const videoElement = container.querySelector('.site5-kaitsaye-video');
-    if (!videoElement || videoElement.tagName !== 'VIDEO') return; // Ensure it's a native video element
-
+    if (!videoElement || videoElement.tagName !== 'VIDEO') return;
     videoElement.preload = "auto";
     videoElement.muted = true;
     videoElement.playsInline = true;
-
     const videoObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
@@ -4197,22 +4166,20 @@ function setupKaitsayeIntersection(container, p) {
                 localStorage.setItem(LOCAL_VIEW_KEY, "true");
                 const seeRef = ref(db, `KaiTsayePost/see`);
                 runTransaction(seeRef, (currentVal) => {
-                        return (currentVal || 0) + 1;
-                    })
-                    .then((result) => {
-                        const newSeeCount = result.snapshot.val();
-                        if (viewBtnBadge) {
-                            viewBtnBadge.textContent = formatCount(newSeeCount);
-                        }
-                        p.see = newSeeCount;
-                    })
-                    .catch(error => {
-                        console.error("Firebase transaction for 'see' failed:", error);
-                        localStorage.removeItem(LOCAL_VIEW_KEY);
-                        if (viewBtnBadge) {
-                            viewBtnBadge.textContent = formatCount((p.see || 0) + 1);
-                        }
-                    });
+                    return (currentVal || 0) + 1;
+                }).then((result) => {
+                    const newSeeCount = result.snapshot.val();
+                    if (viewBtnBadge) {
+                        viewBtnBadge.textContent = formatCount(newSeeCount);
+                    }
+                    p.see = newSeeCount;
+                }).catch(error => {
+                    console.error("Firebase transaction for 'see' failed:", error);
+                    localStorage.removeItem(LOCAL_VIEW_KEY);
+                    if (viewBtnBadge) {
+                        viewBtnBadge.textContent = formatCount((p.see || 0) + 1);
+                    }
+                });
                 observer.unobserve(entry.target);
                 observer.disconnect();
             }
@@ -4222,7 +4189,8 @@ function setupKaitsayeIntersection(container, p) {
     });
     observer.observe(container);
 }
-// ==== ACTIONS (LOVE, COMMENT, DOWNLOAD) + ALERTS AS PUSH ====
+
+// ==== ACTIONS (LOVE, COMMENT, DOWNLOAD) ====
 function setupKaitsayeActions(container, p) {
     const loveBtn = container.querySelector('.kaitsaye-action-btn.love');
     const loveBadge = loveBtn ? loveBtn.querySelector('.kaitsaye-action-badge') : null;
@@ -4238,20 +4206,18 @@ function setupKaitsayeActions(container, p) {
                 return;
             }
             loveBtn.classList.add('active');
-            localStorage.setItem(`${LOCAL_LOVED_PREFIX}${p.postid}`, "true");
+            localStorage.setItem(`${LOCAL_LOVED_KEY_PREFIX}${p.postid}`, "true");
             let currentLoveCount = parseInt(loveBadge.textContent.replace(/[mk]/g, '')) || (p.love || 0);
             if (loveBadge) loveBadge.textContent = formatCount(currentLoveCount + 1);
             const loveRef = ref(db, `KaiTsayePost/love`);
-            runTransaction(loveRef, (val) => (val || 0) + 1)
-                .then(() => {
-                    showSite5Push("Mun Gode da Like😀!", "fa-heart", 1800);
-                })
-                .catch(error => {
-                    console.error("Love transaction failed:", error);
-                    loveBtn.classList.remove('active');
-                    localStorage.removeItem(`${LOCAL_LOVED_KEY_PREFIX}${p.postid}`);
-                    if (loveBadge) loveBadge.textContent = formatCount(currentLoveCount);
-                });
+            runTransaction(loveRef, (val) => (val || 0) + 1).then(() => {
+                showSite5Push("Mun Gode da Like😀!", "fa-heart", 1800);
+            }).catch(error => {
+                console.error("Love transaction failed:", error);
+                loveBtn.classList.remove('active');
+                localStorage.removeItem(`${LOCAL_LOVED_KEY_PREFIX}${p.postid}`);
+                if (loveBadge) loveBadge.textContent = formatCount(currentLoveCount);
+            });
         };
     }
     const commentBtn = container.querySelector('.kaitsaye-action-btn.comment');
@@ -4261,7 +4227,7 @@ function setupKaitsayeActions(container, p) {
                 if (user) {
                     window.location.href = `comment.html?postId=${p.postid}`;
                 } else {
-                    showSite5Push("Dole ka yi login domin yin comments!", "fa-user-lock");
+                    showSite5Push("Dole ka yi rigista ko login domin shiga wannan shafin!", "fa-user-lock");
                 }
             });
         };
@@ -4290,15 +4256,18 @@ function setupKaitsayeActions(container, p) {
         };
     }
 }
+
 // ==== RECOVERY IF OFFLINE ====
 function loadKaitsayeLocal() {
     showKaitsayeLoading();
     initializeKaitsayePostListener();
 }
+
 // ==== MAIN ENTRY POINT ====
 window.addEventListener("DOMContentLoaded", () => {
     loadKaitsayeLocal();
 });
+
 // ==== UPLOAD BUTTON DEMO ====
 window.site5UploadBtnClick = function() {
     showSite5Push("Kai Tsaye A Yau... ka jira.", "fa-spinner");
@@ -4309,24 +4278,20 @@ window.site5UploadBtnClick = function() {
 
 
 // 🚦✔️Site 6 JS ya fara daga nan
-
-const API_TOKEN = "b75541b8a8cc43719195871aa2bd419e";
-const API_BASE = "https://api.football-data.org/v4";
+const WORKER_URL = "https://worker33.lawaliharuna943.workers.dev/site6";
+const WORKER_API_KEY = "@haruna66";
 const WASANNIN_KEY = "site6_tw_wasanninyau";
 const LABARI_KEY = "site6_labariGame";
 const MAX_GAMES_PER_VIEW = 4;
-
 const site6Section = document.getElementById('site6-wasanninyau');
 const site6Navbar = document.getElementById('site6-navbar');
 const site6PrevDay = document.getElementById('site6-prevDay');
 const site6NextDay = document.getElementById('site6-nextDay');
 const site6DateDisplay = document.getElementById('site6-dateDisplay');
 const site6Loader = document.getElementById('site6-loader');
-
 let site6DayOffset = 0; // 0 = today, 1 = tomorrow, etc.
 let site6GamesAll = [];
 let site6ScrollIndex = 0;
-
 // Date helpers
 function site6GetDateString(offsetDays=0) {
     const target = new Date();
@@ -4342,22 +4307,31 @@ function site6FormatDateDisplay(offsetDays=0) {
     const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
     return `${days[target.getDay()]}, ${target.toLocaleString('en-US',{month:'long'})} ${target.getDate()} ${target.getFullYear()}`;
 }
-
 // Loader helpers
 function site6ShowLoader(show=true) {
     site6Loader.style.display = show ? "block" : "none";
     site6Section.style.display = show ? "none" : "block";
 }
-
-// API fetch
+// API fetch via Worker
 async function site6FetchGames(offsetDays=0) {
     site6ShowLoader(true);
     const dateStr = site6GetDateString(offsetDays);
     try {
-        const res = await fetch(`${API_BASE}/matches?dateFrom=${dateStr}&dateTo=${dateStr}`, {
-            headers: { "X-Auth-Token": API_TOKEN }
+        const res = await fetch(WORKER_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "x-api-key": WORKER_API_KEY
+            },
+            body: JSON.stringify({
+                dateFrom: dateStr,
+                dateTo: dateStr
+            })
         });
-        if (!res.ok) throw new Error("API error");
+        if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(`API Error: ${errorData.message}`);
+        }
         const data = await res.json();
         // Normalize data
         site6GamesAll = (data.matches || []).map(site6NormalizeGameData);
@@ -4365,12 +4339,12 @@ async function site6FetchGames(offsetDays=0) {
         site6ScrollIndex = 0;
         site6RenderGames();
     } catch (e) {
+        console.error('Fetching games failed:', e);
         site6GamesAll = [];
-        site6Section.innerHTML = "";
+        site6Section.innerHTML = `<p style="text-align:center; color: red;">Kuskure ya faru wajen karbar wasanni.<br>Muna kokarin gyarawa.</p>`;
     }
     site6ShowLoader(false);
 }
-
 // Data normalizer
 function site6NormalizeGameData(game) {
     return {
@@ -4387,31 +4361,26 @@ function site6NormalizeGameData(game) {
         score: game.score?.fullTime ? `${game.score.fullTime.home} - ${game.score.fullTime.away}` : "",
     };
 }
-
 // Game cards renderer (scroller)
 function site6RenderGames() {
     site6Navbar.style.display = site6GamesAll.length ? "flex" : "none";
     if (!site6GamesAll.length) {
-        site6Section.innerHTML = "";
+        site6Section.innerHTML = `<p style="text-align:center;">Babu wasannin da aka samu a wannan ranar.</p>`;
         return;
     }
     // Only show 4 at a time
     const viewGames = site6GamesAll.slice(site6ScrollIndex, site6ScrollIndex+MAX_GAMES_PER_VIEW);
-
     const scroller = document.createElement('div');
     scroller.className = "wasanni-scroller";
     viewGames.forEach(g => scroller.appendChild(site6RenderGameCard(g)));
-
     site6Section.innerHTML = "";
     site6Section.appendChild(scroller);
-
     // Hide nav buttons if at edge
     site6PrevDay.disabled = site6DayOffset <= -4;
-    site6NextDay.disabled = site6DayOffset >= 4;    
+    site6NextDay.disabled = site6DayOffset >= 4;
     if (site6GamesAll.length <= MAX_GAMES_PER_VIEW) {
         scroller.style.justifyContent = 'center';
     }
-
     // Scroll nav for more than 4 games
     if (site6GamesAll.length > MAX_GAMES_PER_VIEW) {
         // Next/prev game batch
@@ -4421,7 +4390,6 @@ function site6RenderGames() {
         });
     }
 }
-
 // Individual game card
 function site6RenderGameCard(game) {
     const c = document.createElement('div');
@@ -4448,35 +4416,40 @@ function site6RenderGameCard(game) {
     c.onclick = () => site6OnGameClick(game);
     return c;
 }
-
 // On game click
-function site6OnGameClick(game) {    
+function site6OnGameClick(game) {
     localStorage.setItem(LABARI_KEY, JSON.stringify(game));
     window.location = "labarinWasa.html";
 }
-
 // Format game time for user's timezone
 function site6FormatGameTime(ts) {
-    let date = new Date(ts);
-    // Get user's timezone offset and format
-    let opts = { hour: '2-digit', minute: '2-digit', day: 'numeric', month: 'short', year: 'numeric' };
-    return date.toLocaleString(undefined, opts);
+    const date = new Date(ts);
+    // Yi amfani da Intl.DateTimeFormat don fassara lokacin zuwa na'urar mai amfani
+    const formatter = new Intl.DateTimeFormat(navigator.language, {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true, // Wannan zai nuna 12-hour format (e.g., 03:30 PM)
+        timeZoneName: 'short' // Wannan zai nuna sunan timezone (e.g., GMT, WAT)
+    });
+    return formatter.format(date);
 }
-
 // Navigation controls
 site6PrevDay.onclick = function() {
-    site6DayOffset--;
-    site6UpdateDay();
+    if (site6DayOffset > -4) {
+        site6DayOffset--;
+        site6UpdateDay();
+    }
 };
 site6NextDay.onclick = function() {
-    site6DayOffset++;
-    site6UpdateDay();
+    if (site6DayOffset < 4) {
+        site6DayOffset++;
+        site6UpdateDay();
+    }
 };
 function site6UpdateDay() {
     site6DateDisplay.innerHTML = `<i class="fa fa-futbol"></i> ${site6DayOffset === 0 ? "Today" : site6DayOffset === 1 ? "Tomorrow" : site6FormatDateDisplay(site6DayOffset)} <i class="fa fa-futbol"></i>`;
     site6FetchGames(site6DayOffset);
 }
-
 // Scroller navigation
 function site6ScrollNext() {
     if (site6ScrollIndex + MAX_GAMES_PER_VIEW < site6GamesAll.length) {
@@ -4490,10 +4463,9 @@ function site6ScrollPrev() {
         site6RenderGames();
     }
 }
-
 // Initialization
 function site6Init() {
-    site6DateDisplay.innerHTML = `<i class="fa fa-futbol"></i> Today ${site6FormatDateDisplay(0)} <i class="fa fa-futbol"></i>`;    
+    site6DateDisplay.innerHTML = `<i class="fa fa-futbol"></i> Today ${site6FormatDateDisplay(0)} <i class="fa fa-futbol"></i>`;
     const cached = localStorage.getItem(WASANNIN_KEY);
     if (cached) {
         try {
@@ -4504,22 +4476,21 @@ function site6Init() {
     site6FetchGames(0);
 }
 document.addEventListener("DOMContentLoaded", site6Init);
-
-
 // 🚦✔️Site 6 JS ya kare daga nan
 
 
 
 
-
 // 🚦✔️Site 7 JS ya fara daga nan
+
 const site7Container = document.getElementById('site7-wasaninmasuzabi');
+
 const ZABI_KEY = "tw_wasaninmasuzabi"; // Key for localStorage for posts
+
 const wasaniZabiRef = ref(db, "wasaniMasuZabi");
-
 let aite7_userid = null; // Set this with your firebase auth logic
-
 // Helper: Format counts for k/m/b
+
 function aite7_numFormat(num) {
     num = Number(num) || 0;
     if (num >= 1e9) return (num / 1e9).toFixed(1).replace(/\.0$/, '') + 'b';
@@ -4527,8 +4498,8 @@ function aite7_numFormat(num) {
     if (num >= 1e3) return (num / 1e3).toFixed(1).replace(/\.0$/, '') + 'k';
     return num;
 }
-
 // Helper: Save & Load LocalStorage
+
 function aite7_saveLocal(data) {
     localStorage.setItem(ZABI_KEY, JSON.stringify(data));
 }
@@ -4537,15 +4508,17 @@ function aite7_loadLocal() {
     try {
         const d = localStorage.getItem(ZABI_KEY);
         return d ? JSON.parse(d) : [];
-    } catch { return []; }
+    } catch {
+        return [];
+    }
 }
-
 // Helper: Set UserID from firebase auth
+
 function aite7_setUserId(userId) {
     aite7_userid = userId;
 }
-
 // Helper: Audio player controls per post
+
 function aite7_audioPlayer(audioUrl, postId) {
     const wrap = document.createElement('div');
     wrap.className = "aite7-audio-player-wrap";
@@ -4553,11 +4526,9 @@ function aite7_audioPlayer(audioUrl, postId) {
     audio.src = audioUrl;
     audio.preload = "metadata";
     audio.style.display = "none";
-
     let playing = false;
     let seeked = false;
     let lastTime = parseFloat(localStorage.getItem(`aite7_audio_${postId}`)) || 0;
-
     const btn = document.createElement('button');
     btn.className = "aite7-audio-btn";
     btn.innerHTML = `<i class="fa-solid fa-play"></i>`; // Font Awesome Play icon
@@ -4569,7 +4540,6 @@ function aite7_audioPlayer(audioUrl, postId) {
             audio.pause();
         }
     };
-
     const progress = document.createElement('input');
     progress.type = "range";
     progress.className = "aite7-audio-progress";
@@ -4577,42 +4547,35 @@ function aite7_audioPlayer(audioUrl, postId) {
     progress.min = 0;
     progress.max = 100;
     progress.step = 0.1;
-
     const timeLabel = document.createElement('span');
     timeLabel.className = "aite7-audio-time";
     timeLabel.textContent = "00:00";
-
     audio.onloadedmetadata = () => {
         if (lastTime > 0 && lastTime < audio.duration) audio.currentTime = lastTime;
         progress.max = 100;
         progress.value = audio.currentTime / audio.duration * 100 || 0;
         timeLabel.textContent = aite7_timeFmt(audio.currentTime, audio.duration);
     };
-
     audio.ontimeupdate = () => {
         progress.value = audio.currentTime / audio.duration * 100 || 0;
         timeLabel.textContent = aite7_timeFmt(audio.currentTime, audio.duration);
         localStorage.setItem(`aite7_audio_${postId}`, audio.currentTime);
     };
-
     progress.oninput = e => {
         if (audio.duration) {
             audio.currentTime = e.target.value / 100 * audio.duration;
             seeked = true;
         }
     };
-
     audio.onplay = () => {
         btn.innerHTML = `<i class="fa-solid fa-pause"></i>`; // Font Awesome Pause icon
         playing = true;
     };
-
     audio.onpause = () => {
         btn.innerHTML = `<i class="fa-solid fa-play"></i>`; // Font Awesome Play icon
         playing = false;
         lastTime = audio.currentTime;
     };
-
     audio.onended = () => {
         btn.innerHTML = `<i class="fa-solid fa-play"></i>`; // Font Awesome Play icon
         playing = false;
@@ -4620,19 +4583,19 @@ function aite7_audioPlayer(audioUrl, postId) {
         audio.currentTime = 0;
         localStorage.removeItem(`aite7_audio_${postId}`);
     };
-
     wrap.append(btn, progress, timeLabel, audio);
     return wrap;
 }
-
 // Helper: Time format
+
 function aite7_timeFmt(current, duration) {
-    const c = Math.floor(current || 0), d = Math.floor(duration || 0);
+    const c = Math.floor(current || 0),
+        d = Math.floor(duration || 0);
     const fm = (v) => v < 10 ? '0' + v : v;
     return `${fm(Math.floor(c / 60))}:${fm(c % 60)}` + (duration ? ` / ${fm(Math.floor(d / 60))}:${fm(d % 60)}` : '');
 }
-
 // Helper: Download file (for both image and audio)
+
 function aite7_downloadFile(url, name) {
     const link = document.createElement('a');
     link.href = url;
@@ -4642,8 +4605,8 @@ function aite7_downloadFile(url, name) {
     document.body.removeChild(link);
     aite7_pushNotify("An sauke fayil ɗin zuwa gallery naka!");
 }
-
 // Helper: Push notification (simple top bar)
+
 function aite7_pushNotify(msg) {
     let bar = document.getElementById('aite7-notify-bar');
     if (!bar) {
@@ -4659,20 +4622,12 @@ function aite7_pushNotify(msg) {
     }
     bar.textContent = msg;
     bar.style.opacity = "1";
-    setTimeout(() => { bar.style.opacity = "0"; }, 3000);
+    setTimeout(() => {
+        bar.style.opacity = "0";
+    }, 3000);
 }
-
-// Helper: Comments navigation
-
-function aite7_openComments(post) {
-
-    if (!post || !post.postCode) return;
-
-    // Amfani da query parameter don tura postCode a cikin URL
-    window.location.href = "wanniComent.html?postCode=" + post.postCode;
-}
-
 // Helper: See count update
+
 function aite7_incrementSee(post) {
     if (!post || !post.postCode) return;
     const viewKey = `aite7_view_${post.postCode}_${aite7_userid || 'guest'}`;
@@ -4683,12 +4638,11 @@ function aite7_incrementSee(post) {
         sessionStorage.setItem(viewKey, "1"); // Mark as viewed for this session
     }
 }
-
 // Helper: Like update
+
 function aite7_likePost(post, btn, icon, countLabel) {
     const key = "aite7_like_" + post.postCode + (aite7_userid || 'guest');
     if (localStorage.getItem(key)) {
-        
         return;
     }
     localStorage.setItem(key, "1");
@@ -4702,68 +4656,75 @@ function aite7_likePost(post, btn, icon, countLabel) {
     countLabel.textContent = aite7_numFormat(currentCount);
     countLabel.dataset.currentCount = currentCount; // Update the stored count in dataset
 }
-
 // Helper: Scroll left/right
-function aite7_scrollBy(scroller, dir = 1) {
-    scroller.scrollBy({ left: dir * 350, behavior: "smooth" });
-}
 
+function aite7_scrollBy(scroller, dir = 1) {
+    scroller.scrollBy({
+        left: dir * 350,
+        behavior: "smooth"
+    });
+}
 // Function to open image in fullscreen/modal with download and close options
+
 function aite7_viewImage(imageUrl, postId) {
     const modal = document.createElement('div');
     modal.className = "aite7-image-modal";
     modal.onclick = (e) => {
         if (e.target === modal) modal.remove(); // Close if clicked outside image
     };
-
     const img = document.createElement('img');
     img.src = imageUrl;
     img.alt = "Post Image";
-
     const closeBtn = document.createElement('button');
     closeBtn.className = "aite7-modal-close-btn";
     closeBtn.innerHTML = `<i class="fa-solid fa-times-circle"></i>`; // Font Awesome X icon
     closeBtn.onclick = () => modal.remove();
-
     const downloadBtn = document.createElement('button');
     downloadBtn.className = "aite7-modal-download-btn";
     downloadBtn.innerHTML = `<i class="fa-solid fa-download"></i> Download`;
     downloadBtn.onclick = () => aite7_downloadFile(imageUrl, `image_${postId}.jpg`);
-
     modal.append(img, closeBtn, downloadBtn);
     document.body.appendChild(modal);
 }
+// Function to handle login requirement for specific actions
 
-
+function aite7_handleLoginRequired(post) {
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            window.location.href = `wanniComent.html?postCode=${post.postCode}`;
+        } else {
+            aite7_pushNotify("Dole ka yi rigista ko login domin shiga wannan shafin!", "fa-user-lock");
+        }
+    });
+}
 // Main render function
+
 function aite7_render(posts) {
     site7Container.innerHTML = "";
-    if (!posts || !posts.length) { site7Container.style.display = "none"; return; }
+    if (!posts || !posts.length) {
+        site7Container.style.display = "none";
+        return;
+    }
     site7Container.style.display = "block";
-
     // Title bar
     const titleBar = document.createElement('div');
     titleBar.className = "aite7-title-bar";
     titleBar.innerHTML = `<span>💠</span><span>⚽Wasanni Masu Zafi⚽</span><span>💠</span>`;
     site7Container.appendChild(titleBar);
-
     // Scroller container
     const scrollerWrap = document.createElement('div');
     scrollerWrap.className = "aite7-scroller-container";
     site7Container.appendChild(scrollerWrap);
-
     // Scroller
     const scroller = document.createElement('div');
     scroller.className = "aite7-scroller";
     scrollerWrap.appendChild(scroller);
-
     // Left/Right scroll buttons
     const leftBtn = document.createElement('button');
     leftBtn.className = "aite7-scroll-btn aite7-left";
     leftBtn.innerHTML = `<i class="fa-solid fa-angle-left"></i>`;
     leftBtn.onclick = () => aite7_scrollBy(scroller, -1);
     scrollerWrap.appendChild(leftBtn);
-
     const rightBtn = document.createElement('button');
     rightBtn.className = "aite7-scroll-btn aite7-right";
     rightBtn.innerHTML = `<i class="fa-solid fa-angle-right"></i>`;
@@ -4776,118 +4737,93 @@ function aite7_render(posts) {
     }
     scroller.addEventListener('scroll', updateScrollBtns);
     setTimeout(updateScrollBtns, 500);
-
     // Render posts
     posts.forEach((post, idx) => {
         if (!post || !post.postCode) return;
         const card = document.createElement('div');
         card.className = "aite7-card";
         card.setAttribute("data-post", post.postCode);
-
-      // Teams section
+        // Teams section
         const teamsDiv = document.createElement('div');
         teamsDiv.className = "aite7-teams";
-
         // Home Team Column
         const homeTeamCol = document.createElement('div');
         homeTeamCol.className = "aite7-team-col";
-
         const team1Logo = document.createElement('img');
         team1Logo.className = "aite7-game-logo";
         team1Logo.src = post.game1logo || "";
         team1Logo.alt = "Home Team Logo";
         homeTeamCol.appendChild(team1Logo);
-
         const team1Name = document.createElement('span');
         team1Name.className = "aite7-game-name";
         team1Name.textContent = post.game1Name || "";
         homeTeamCol.appendChild(team1Name);
         teamsDiv.appendChild(homeTeamCol);
-
         const vsSpan = document.createElement('span');
         vsSpan.className = "aite7-vs-label";
         vsSpan.textContent = "VS";
         teamsDiv.appendChild(vsSpan);
-
         // Away Team Column
         const awayTeamCol = document.createElement('div');
         awayTeamCol.className = "aite7-team-col";
-
         const team2Logo = document.createElement('img'); // Logo yanzu yana farko
         team2Logo.className = "aite7-game-logo";
         team2Logo.src = post.game2logo || "";
         team2Logo.alt = "Away Team Logo";
         awayTeamCol.appendChild(team2Logo);
-
         const team2Name = document.createElement('span');
         team2Name.className = "aite7-game-name";
         team2Name.textContent = post.game2Name || "";
         awayTeamCol.appendChild(team2Name);
         teamsDiv.appendChild(awayTeamCol);
-
         card.appendChild(teamsDiv);
-                
-
         // Match Time
         const matchTimeDiv = document.createElement('div');
         matchTimeDiv.className = "aite7-game-time";
         matchTimeDiv.textContent = post.payGameTime || "";
         card.appendChild(matchTimeDiv);
-
         // Score Bar / Vote Boxes
         const scoreBarDiv = document.createElement('div');
         scoreBarDiv.className = "aite7-score-bar";
-
         // Home Vote Box
         const homeVoteBox = document.createElement('div');
         homeVoteBox.className = "aite7-vote-box";
         homeVoteBox.dataset.side = "home";
-
         const homeTeamSpan = document.createElement('span');
         homeTeamSpan.innerHTML = `<i class="fa-solid fa-user-ninja aite7-team-icon"></i> <span class="aite7-box-count" data-current-count="${post.game1box || 0}">${aite7_numFormat(post.game1box || 0)}</span>`;
         homeVoteBox.appendChild(homeTeamSpan);
-
         const homeIndicator = document.createElement('span');
         homeIndicator.className = "aite7-vote-indicator";
         homeVoteBox.appendChild(homeIndicator);
-        
         const homeCheckMark = document.createElement('span');
         homeCheckMark.className = "aite7-check-mark";
         homeCheckMark.innerHTML = `<i class="fa-solid fa-check"></i>`;
         homeCheckMark.style.display = 'none'; // Hide by default
         homeVoteBox.appendChild(homeCheckMark);
-
         // Away Vote Box
         const awayVoteBox = document.createElement('div');
         awayVoteBox.className = "aite7-vote-box";
         awayVoteBox.dataset.side = "away";
-
         const awayTeamSpan = document.createElement('span');
         awayTeamSpan.innerHTML = `<i class="fa-solid fa-user-ninja aite7-team-icon"></i> <span class="aite7-box-count" data-current-count="${post.game2box || 0}">${aite7_numFormat(post.game2box || 0)}</span>`;
         awayVoteBox.appendChild(awayTeamSpan);
-
         const awayIndicator = document.createElement('span');
         awayIndicator.className = "aite7-vote-indicator";
         awayVoteBox.appendChild(awayIndicator);
-
         const awayCheckMark = document.createElement('span');
         awayCheckMark.className = "aite7-check-mark";
         awayCheckMark.innerHTML = `<i class="fa-solid fa-check"></i>`;
         awayCheckMark.style.display = 'none'; // Hide by default
         awayVoteBox.appendChild(awayCheckMark);
-
         // Divider
         const dividerDiv = document.createElement('div');
         dividerDiv.className = "aite7-divider";
         dividerDiv.textContent = "➖➖➖";
-
         scoreBarDiv.append(homeVoteBox, dividerDiv, awayVoteBox);
         card.appendChild(scoreBarDiv);
-
         // Check local storage for vote status and apply styles
         const votedKey = `aite7_voted_${post.postCode}_${aite7_userid || 'guest'}`;
         const votedSide = localStorage.getItem(votedKey);
-
         if (votedSide) {
             homeVoteBox.classList.add('disabled');
             awayVoteBox.classList.add('disabled');
@@ -4899,21 +4835,17 @@ function aite7_render(posts) {
                 awayCheckMark.style.display = 'flex';
             }
         }
-
         // Add click listeners for vote boxes
         homeVoteBox.onclick = (e) => {
             e.stopPropagation();
             if (homeVoteBox.classList.contains('disabled')) {
-                
                 return;
             }
             // Disable both boxes
             homeVoteBox.classList.add('voted', 'disabled');
             awayVoteBox.classList.add('disabled');
             homeCheckMark.style.display = 'flex';
-
             localStorage.setItem(votedKey, 'home'); // Store vote
-            
             // Increment Firebase
             const homeBoxRef = ref(db, `wasaniMasuZabi/${post.postCode}/game1box`);
             const currentHomeCount = Number(homeTeamSpan.querySelector('.aite7-box-count').dataset.currentCount);
@@ -4925,16 +4857,13 @@ function aite7_render(posts) {
         awayVoteBox.onclick = (e) => {
             e.stopPropagation();
             if (awayVoteBox.classList.contains('disabled')) {
-                
                 return;
             }
             // Disable both boxes
             awayVoteBox.classList.add('voted', 'disabled');
             homeVoteBox.classList.add('disabled');
             awayCheckMark.style.display = 'flex';
-
             localStorage.setItem(votedKey, 'away'); // Store vote
-
             // Increment Firebase
             const awayBoxRef = ref(db, `wasaniMasuZabi/${post.postCode}/game2box`);
             const currentAwayCount = Number(awayTeamSpan.querySelector('.aite7-box-count').dataset.currentCount);
@@ -4942,8 +4871,6 @@ function aite7_render(posts) {
             awayTeamSpan.querySelector('.aite7-box-count').textContent = aite7_numFormat(currentAwayCount + 1);
             awayTeamSpan.querySelector('.aite7-box-count').dataset.currentCount = currentAwayCount + 1;
         };
-
-
         // Poster / Image
         const posterDiv = document.createElement('div');
         posterDiv.className = "aite7-poster";
@@ -4958,44 +4885,31 @@ function aite7_render(posts) {
             posterDiv.appendChild(posterImg);
         }
         card.appendChild(posterDiv);
-
-
-
-
-       // Content (Text or Audio)
-const contentDiv = document.createElement('div');
-contentDiv.className = "aite7-content";
-
-if (post.test) {
-    // Saita text
-    contentDiv.textContent = post.test;
-
-    // Create 'read more' inline link
-    const readMoreBtn = document.createElement('a');
-    readMoreBtn.href = "#";
-    readMoreBtn.className = "aite7-read-more";
-    readMoreBtn.textContent = " Kara Karantawa..";
-
-    readMoreBtn.onclick = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        aite7_openComments(post);
-    };
-
-    // Add 'read more' inline (inside the content div)
-    contentDiv.appendChild(readMoreBtn);
-} else if (post.audioLink) {
-    contentDiv.appendChild(aite7_audioPlayer(post.audioLink, post.postCode));
-}
-
-card.appendChild(contentDiv);
-
-
-
+        // Content (Text or Audio)
+        const contentDiv = document.createElement('div');
+        contentDiv.className = "aite7-content";
+        if (post.test) {
+            // Saita text
+            contentDiv.textContent = post.test;
+            // Create 'read more' inline link
+            const readMoreBtn = document.createElement('a');
+            readMoreBtn.href = "#";
+            readMoreBtn.className = "aite7-read-more";
+            readMoreBtn.textContent = " Kara Karantawa..";
+            readMoreBtn.onclick = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                aite7_handleLoginRequired(post);
+            };
+            // Add 'read more' inline (inside the content div)
+            contentDiv.appendChild(readMoreBtn);
+        } else if (post.audioLink) {
+            contentDiv.appendChild(aite7_audioPlayer(post.audioLink, post.postCode));
+        }
+        card.appendChild(contentDiv);
         // Meta Info
         const metaInfoDiv = document.createElement('div');
         metaInfoDiv.className = "aite7-meta-info";
-
         // Like Button
         const likeItem = document.createElement('span');
         likeItem.className = "aite7-icon-item";
@@ -5008,34 +4922,27 @@ card.appendChild(contentDiv);
             aite7_likePost(post, likeItem, likeItem.querySelector('i'), likeItem.querySelector('.aite7-count'));
         };
         metaInfoDiv.appendChild(likeItem);
-
         // Comments Count
         const commentItem = document.createElement('span');
         commentItem.className = "aite7-icon-item";
         commentItem.innerHTML = `<i class="fa-regular fa-comment"></i> <span></span> <span class="aite7-count" data-current-count="${post.totalComment || 0}">${aite7_numFormat(post.totalComment || 0)}</span>`;
         commentItem.onclick = (e) => {
             e.stopPropagation();
-            aite7_openComments(post);
+            aite7_handleLoginRequired(post);
         };
         metaInfoDiv.appendChild(commentItem);
-
         // See Count
         const seeItem = document.createElement('span');
         seeItem.className = "aite7-icon-item";
         seeItem.innerHTML = `<i class="fa-solid fa-eye"></i> <span></span> <span class="aite7-count" data-current-count="${post.see || 0}">${aite7_numFormat(post.see || 0)}</span>`;
         seeItem.onclick = (e) => {
             e.stopPropagation();
-          
-            
-          
-
             let currentCount = Number(seeItem.querySelector('.aite7-count').dataset.currentCount);
             currentCount++;
             seeItem.querySelector('.aite7-count').textContent = aite7_numFormat(currentCount);
             seeItem.querySelector('.aite7-count').dataset.currentCount = currentCount;
         };
         metaInfoDiv.appendChild(seeItem);
-
         // Download Button (for image or audio)
         if (post.audioLink || post.photalinlink) {
             const downloadItem = document.createElement('span');
@@ -5048,12 +4955,9 @@ card.appendChild(contentDiv);
             };
             metaInfoDiv.appendChild(downloadItem);
         }
-
         card.appendChild(metaInfoDiv);
-
         // Append to scroller
         scroller.appendChild(card);
-
         // Increment see if scrolled into view (using Intersection Observer)
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
@@ -5062,11 +4966,12 @@ card.appendChild(contentDiv);
                     observer.unobserve(entry.target); // Stop observing once seen
                 }
             });
-        }, { threshold: 0.8 }); // 80% of card visible
+        }, {
+            threshold: 0.8
+        }); // 80% of card visible
         observer.observe(card);
     });
 }
-
 // Firebase listener
 onValue(wasaniZabiRef, (snap) => {
     if (!snap.exists()) {
@@ -5081,7 +4986,6 @@ onValue(wasaniZabiRef, (snap) => {
     aite7_saveLocal(list);
     aite7_render(list);
 });
-
 // Sync localStorage if Firebase data changes (useful for multiple tabs)
 window.addEventListener('storage', function(e) {
     if (e.key === ZABI_KEY) {
@@ -5094,13 +4998,11 @@ window.addEventListener('storage', function(e) {
         aite7_render(list); // Re-render to reflect changes
     }
 });
-
 // Initial load from localStorage if any
 const cached = aite7_loadLocal();
 if (cached && cached.length) aite7_render(cached);
 
 // 🚦✔️Site 7 JS ya kare daga nan
-
 
 
 //🚦✔️Site 8 ya fara daganan
@@ -5109,107 +5011,39 @@ const site8 = document.getElementById('site8-posting');
 const postingRef = ref(db, "Posting");
 const POSTING_KEY = "tw_posting";
 const site8Logo = "https://i.imgur.com/CgvdgMA.png";
-const SITE8_LEARNMORE_TEXT = "Kara Karantawa.."; 
+const SITE8_LEARNMORE_TEXT = "Kara Karantawa..";
 const SITE8_COMMENTS_PAGE = "viewsComent.html";
 const MAX_TEXT_LENGTH_PREVIEW = 300;
-const SEEN_POSTS_DAILY_KEY = "tauraronwasa_seen_posts_daily";
-const SEEN_POSTS_SESSION_KEY = "tauraronwasa_seen_posts_session";
+const SEEN_POSTS_KEY = "tauraronwasa_seen_posts";
 
-function site8_getTodayDateString() {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const day = String(today.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-}
-
-function site8_getDailySeenPosts() {
-    const todayStr = site8_getTodayDateString();
-    let storedData = localStorage.getItem(SEEN_POSTS_DAILY_KEY);
-    let dailySeen = { date: '', posts: {} }; // Changed 'posts' to an object to store timestamps
+function site8_getSeenPosts() {
+    let storedData = localStorage.getItem(SEEN_POSTS_KEY);
+    let seenPosts = {};
     try {
         if (storedData) {
-            dailySeen = JSON.parse(storedData);
+            seenPosts = JSON.parse(storedData);
         }
     } catch (e) {
-        console.error("Error parsing daily seen posts from localStorage:", e);
-        dailySeen = { date: '', posts: {} };
+        console.error("Error parsing seen posts from localStorage:", e);
+        seenPosts = {};
     }
-    // Reset if date is different (new day)
-    if (dailySeen.date !== todayStr) {
-        dailySeen = {
-            date: todayStr,
-            posts: {}
-        };
-        localStorage.setItem(SEEN_POSTS_DAILY_KEY, JSON.stringify(dailySeen));
-    }
-    return dailySeen;
+    return seenPosts;
 }
 
-function site8_addDailySeenPost(postId) {
-    const todayStr = site8_getTodayDateString();
-    let dailySeen = site8_getDailySeenPosts();
-    if (dailySeen.date !== todayStr) { // Re-check in case getDailySeenPosts reset it
-        dailySeen = { date: todayStr, posts: {} };
-    }
-    
-    const now = Date.now();
-    const twentyFourHoursAgo = now - (24 * 60 * 60 * 1000);
-
-    // Only add if not seen within 24 hours
-    if (!dailySeen.posts[postId] || dailySeen.posts[postId] < twentyFourHoursAgo) {
-        dailySeen.posts[postId] = now;
-        localStorage.setItem(SEEN_POSTS_DAILY_KEY, JSON.stringify(dailySeen));
+function site8_addSeenPost(postId) {
+    let seenPosts = site8_getSeenPosts();
+    if (!seenPosts[postId]) {
+        seenPosts[postId] = true;
+        localStorage.setItem(SEEN_POSTS_KEY, JSON.stringify(seenPosts));
         return true;
     }
-    return false;    
+    return false;
 }
-
-function site8_getSessionSeenPosts() {
-    let storedData = sessionStorage.getItem(SEEN_POSTS_SESSION_KEY);
-    let sessionSeen = [];
-    try {
-        if (storedData) {
-            sessionSeen = JSON.parse(storedData);
-        }
-    } catch (e) {
-        console.error("Error parsing session seen posts from sessionStorage:", e);
-        sessionSeen = [];
-    }
-    return new Set(sessionSeen);
-}
-
-function site8_addSessionSeenPost(postId) {
-    let sessionSeen = site8_getSessionSeenPosts();
-    if (!sessionSeen.has(postId)) {
-        sessionSeen.add(postId);
-        sessionStorage.setItem(SEEN_POSTS_SESSION_KEY, JSON.stringify(Array.from(sessionSeen)));
-    }
-}
-
-const incrementedPostsInSession = new Set(); // Wannan zai hana karuwar "see" fiye da daya a kowane zaman
 
 function site8_incrementSee(postid) {
-    // Idan an riga an kara "see" a wannan zaman, kada a sake karawa
-    if (incrementedPostsInSession.has(postid)) {
+    if (!site8_addSeenPost(postid)) {
         return;
     }
-
-    const dailySeenPostsData = site8_getDailySeenPosts();
-    const sessionSeenPosts = site8_getSessionSeenPosts();
-
-    // Check if seen within 24 hours (using localStorage)
-    const now = Date.now();
-    const twentyFourHoursAgo = now - (24 * 60 * 60 * 1000);
-    if (dailySeenPostsData.posts[postid] && dailySeenPostsData.posts[postid] >= twentyFourHoursAgo) {
-        return;
-    }
-
-    // Check if seen in current session (using sessionStorage)
-    if (sessionSeenPosts.has(postid)) {
-        return;
-    }
-
     const postRef = ref(db, `Posting/${postid}`);
     runTransaction(postRef, (currentPost) => {
         if (currentPost) {
@@ -5222,10 +5056,10 @@ function site8_incrementSee(postid) {
     .then((snapshot) => {
         if (snapshot.committed) {
             console.log(`See count for ${postid} incremented. New count: ${snapshot.snapshot.val().see}`);
-            site8_addDailySeenPost(postid);
-            site8_addSessionSeenPost(postid);
-            incrementedPostsInSession.add(postid);
-            
+            const seeCountElement = document.querySelector(`.posting-card[data-postid="${postid}"] .see-count`);
+            if (seeCountElement) {
+                seeCountElement.textContent = site8_formatCount(snapshot.snapshot.val().see);
+            }
         } else {
             console.log(`Transaction for ${postid} aborted or failed. It might have been updated by another user or didn't exist.`);
         }
@@ -5269,25 +5103,20 @@ function site8_renderPostingCard(p) {
     if (!p.text && !p.photoLink1 && !p.videoLink && !p.audioLink) {
         return null;
     }
-
     let text = p.text || "";
     let previewText = text;
     let hasLearnMore = false;
-
     if (text.length > MAX_TEXT_LENGTH_PREVIEW) {
         previewText = text.substring(0, MAX_TEXT_LENGTH_PREVIEW);
         hasLearnMore = true;
     }
-    
     let mediaHtml = "";
     let logoTextHtml = `<div class="posting-text-below-logo" data-fulltext="${encodeURIComponent(text)}">${previewText}${hasLearnMore ? `<span class="posting-learnmore">${SITE8_LEARNMORE_TEXT}</span>` : ""}</div>`;
     let audioControllerHtml = "";
-
     if (p.videoLink) {
         const isYoutube = /youtube\.com|youtu\.be/.test(p.videoLink);
         let ytId = isYoutube ? site8_getYouTubeVideoId(p.videoLink) : null;
         let videoSrc = p.videoLink;
-
         if (isYoutube && ytId) {
             videoSrc = `https://www.youtube.com/embed/${ytId}?controls=0&modestbranding=1&rel=0&showinfo=0&autoplay=0&enablejsapi=1`;
             mediaHtml = `
@@ -5339,9 +5168,7 @@ function site8_renderPostingCard(p) {
     const c = document.createElement('div');
     c.className = "posting-card";
     c.dataset.postid = p.postid;
-
     const likedClass = localStorage.getItem(`liked_${p.postid}`) ? " active" : "";
-
     c.innerHTML = `
         <div class="posting-logo-row">
             <img class="posting-logo-img" src="${site8Logo}" alt="logo">
@@ -5353,7 +5180,6 @@ function site8_renderPostingCard(p) {
             <span class="posting-action posting-action-see" title="See">
                 <i class="fa-regular fa-eye"></i> <span class="see-count">${site8_formatCount(p.see || 0)}</span>
             </span>
-            
             <span class="posting-action posting-action-comments" title="Comment" data-postid="${p.postid}">
                 <i class="fa-regular fa-comment"></i> <span class="comment-count">${site8_formatCount(p.totalComment || 0)}</span>
             </span>
@@ -5370,10 +5196,9 @@ function site8_renderPostingCard(p) {
     if (timestampElement && p.postingTime) {
         timestampElement.textContent = site8_formatTimestamp(p.postingTime);
     }
-    
+
     const learnMoreBtn = c.querySelector('.posting-learnmore');
     const postTextElement = c.querySelector('.posting-text-below-logo');
-
     if (learnMoreBtn && postTextElement) {
         learnMoreBtn.addEventListener('click', () => {
             const fullText = decodeURIComponent(postTextElement.dataset.fulltext);
@@ -5388,7 +5213,6 @@ function site8_renderPostingCard(p) {
             const iframe = videoContainer.querySelector('.youtube-iframe');
             this.classList.add('hidden');
             iframe.classList.remove('hidden');
-            // Autoplay the video
             const youtubeSrc = iframe.src;
             if (!youtubeSrc.includes('autoplay=1')) {
                 iframe.src = youtubeSrc + '&autoplay=1';
@@ -5396,10 +5220,18 @@ function site8_renderPostingCard(p) {
         });
     }
 
-    c.querySelector('.posting-action-comments').onclick = function() {
-        const postIdToPass = this.dataset.postid;
-        window.location.href = `${SITE8_COMMENTS_PAGE}?postid=${postIdToPass}`;
-    };
+    const commentBtn = c.querySelector('.posting-action-comments');
+    if (commentBtn) {
+        commentBtn.onclick = function() {
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    window.location.href = `comment.html?postId=${p.postid}`;
+                } else {
+                    showSite5Push("Dole ka yi rigista ko login domin shiga wannan shafin!", "fa-user-lock");
+                }
+            });
+        };
+    }
 
     const likeButton = c.querySelector('.posting-action-like');
     if (likeButton) {
@@ -5417,7 +5249,6 @@ function site8_renderPostingCard(p) {
         let fileUrl = p.photoLink1 || p.photoLink2 || p.audioLink || p.videoLink || "";
         if (!fileUrl) return site8_showPush("Babu file da za a sauke.");
         if (site8_getYouTubeVideoId(fileUrl)) {
-            // site8_showPush("Ba a iya sauke YouTube videos."); // Can remove this if you don't want a message
             return;
         }
         let fileName = `tauraronwasa-file.${fileUrl.split('.').pop().split('?')[0]}`;
@@ -5447,7 +5278,6 @@ function site8_renderPostingCard(p) {
         };
     }
 
-    // Video fullscreen logic
     const videoFullscreenBtn = c.querySelector('.video-fullscreen-btn');
     if (videoFullscreenBtn) {
         videoFullscreenBtn.onclick = function() {
@@ -5455,13 +5285,12 @@ function site8_renderPostingCard(p) {
             site8_openVideoFullscreen(videoUrl);
         };
     }
+
     return c;
 }
 
-// Global video fullscreen elements
 let videoFullscreenViewer = null;
 let currentFullScreenVideo = null;
-
 function site8_openVideoFullscreen(videoSrc) {
     if (!videoFullscreenViewer) {
         videoFullscreenViewer = document.createElement('div');
@@ -5473,16 +5302,13 @@ function site8_openVideoFullscreen(videoSrc) {
             </div>
         `;
         document.body.appendChild(videoFullscreenViewer);
-
         const closeBtn = videoFullscreenViewer.querySelector('.site8-video-fullscreen-close-btn');
         closeBtn.onclick = site8_closeVideoFullscreen;
-        
         document.addEventListener('keydown', function(e) {
             if (e.key === "Escape" && videoFullscreenViewer.classList.contains('active')) {
                 site8_closeVideoFullscreen();
             }
         });
-        
         window.addEventListener('orientationchange', function() {
             if (videoFullscreenViewer.classList.contains('active')) {
                 const iframe = videoFullscreenViewer.querySelector('.site8-fullscreen-video-frame');
@@ -5496,9 +5322,7 @@ function site8_openVideoFullscreen(videoSrc) {
     } else {
         videoFullscreenViewer.querySelector('.site8-fullscreen-video-frame').src = videoSrc;
     }
-
     videoFullscreenViewer.classList.add('active');
-    
     const iframe = videoFullscreenViewer.querySelector('.site8-fullscreen-video-frame');
     if (iframe && iframe.requestFullscreen) {
         iframe.requestFullscreen().catch(err => {
@@ -5509,13 +5333,11 @@ function site8_openVideoFullscreen(videoSrc) {
 
 function site8_closeVideoFullscreen() {
     if (videoFullscreenViewer) {
-        // Stop the video before closing
         const iframe = videoFullscreenViewer.querySelector('.site8-fullscreen-video-frame');
         if (iframe) {
             iframe.src = "";
         }
         videoFullscreenViewer.classList.remove('active');
-        
         if (document.fullscreenElement) {
             document.exitFullscreen();
         }
@@ -5529,28 +5351,26 @@ const site8_renderPostingFeed = (feedList) => {
         scroller.innerHTML = "<div class='no-posts'>Babu wani rubutu a halin yanzu.</div>";
         return;
     }
-
     const feedContainer = document.createElement('div');
     feedContainer.className = "posting-feed";
-
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const postId = entry.target.dataset.postid;
+                site8_incrementSee(postId);
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.5 });
     feedList.forEach(post => {
         const card = site8_renderPostingCard(post);
         if (card) {
             feedContainer.appendChild(card);
             if (post.postid) {
-                const observer = new IntersectionObserver((entries) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            site8_incrementSee(post.postid);
-                            observer.unobserve(entry.target);
-                        }
-                    });
-                }, { threshold: 0.5 });
                 observer.observe(card);
             }
         }
     });
-
     if (feedContainer.children.length === 0) {
         scroller.innerHTML = "<div class='no-posts'>Babu wani rubutu a halin yanzu.</div>";
     } else {
@@ -5566,12 +5386,10 @@ function site8_formatTimestamp(timestamp) {
     const diffMin = Math.round(diffSec / 60);
     const diffHr = Math.round(diffMin / 60);
     const diffDay = Math.round(diffHr / 24);
-
     if (diffSec < 60) return `${diffSec}s ago`;
     if (diffMin < 60) return `${diffMin}m ago`;
     if (diffHr < 24) return `${diffHr}h ago`;
     if (diffDay < 7) return `${diffDay}d ago`;
-
     return date.toLocaleDateString('ha-NG', {
         year: 'numeric',
         month: 'short',
@@ -5591,7 +5409,7 @@ function site8_likePost(postid) {
     })
     .then((snapshot) => {
         if (snapshot.committed) {
-            site8_showPush("Mun Gode da 'Like'😀!");
+        site8_showPush("Mun Gode da 'Like'😀!");
             const likeCountElement = document.querySelector(`.posting-card[data-postid="${postid}"] .like-count`);
             if (likeCountElement) {
                 likeCountElement.textContent = site8_formatCount(snapshot.snapshot.val().like);
@@ -5616,7 +5434,6 @@ function site8_downloadFile(fileUrl, fileName) {
 }
 
 let imageViewer = null;
-
 function site8_openImageViewer(src) {
     if (!imageViewer) {
         imageViewer = document.createElement('div');
@@ -5672,55 +5489,40 @@ onValue(postingRef, (snap) => {
         site8.innerHTML = "<div class='no-posts'>Babu wani rubutu a halin yanzu.</div>";
         for (let i = 0; i < localStorage.length; i++) {
             const key = localStorage.key(i);
-            if (key.startsWith('liked_') || key.startsWith('audio_current_time_') || key === POSTING_KEY || key === SEEN_POSTS_DAILY_KEY) {
+            if (key.startsWith('liked_') || key.startsWith('audio_current_time_') || key === POSTING_KEY || key === SEEN_POSTS_KEY) {
                 localStorage.removeItem(key);
             }
         }
-        // Clear session storage for seen posts when no posts exist
-        sessionStorage.removeItem(SEEN_POSTS_SESSION_KEY);
         return;
     }
-
     const firebasePosts = snap.val();
     const firebasePostIds = new Set(Object.keys(firebasePosts));
     const feedList = Object.values(firebasePosts).reverse().filter(post => {
         return post.postid && (post.text || post.photoLink1 || post.videoLink || post.audioLink);
     });
-    
-    // Wannan layin yana nan, yana tabbatar da cewa totalComment yana wajen
     feedList.forEach(post => {
         if (!post.totalComment) {
             post.totalComment = 0;
         }
     });
-
     site8_renderPostingFeed(feedList);
     localStorage.setItem(POSTING_KEY, JSON.stringify(feedList));
-
     let storedPosts = JSON.parse(localStorage.getItem(POSTING_KEY) || "[]");
     let updatedStoredPosts = storedPosts.filter(post => firebasePostIds.has(post.postid));
     localStorage.setItem(POSTING_KEY, JSON.stringify(updatedStoredPosts));
-
     for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
         if ((key.startsWith('liked_') || key.startsWith('audio_current_time_')) && !firebasePostIds.has(key.split('_')[1])) {
             localStorage.removeItem(key);
         }
     }
-
-    // Update daily seen data to only keep valid post IDs
-    let dailySeenData = site8_getDailySeenPosts(); // This already handles date reset if needed
-    for (const postId in dailySeenData.posts) {
+    let seenPostsData = site8_getSeenPosts();
+    for (const postId in seenPostsData) {
         if (!firebasePostIds.has(postId)) {
-            delete dailySeenData.posts[postId];
+            delete seenPostsData[postId];
         }
     }
-    localStorage.setItem(SEEN_POSTS_DAILY_KEY, JSON.stringify(dailySeenData));
-
-    // Clear session storage if any post IDs are no longer valid (optional, but good for cleanup)
-    let sessionSeenData = site8_getSessionSeenPosts();
-    let updatedSessionSeenData = new Set(Array.from(sessionSeenData).filter(postId => firebasePostIds.has(postId)));
-    sessionStorage.setItem(SEEN_POSTS_SESSION_KEY, JSON.stringify(Array.from(updatedSessionSeenData)));
+    localStorage.setItem(SEEN_POSTS_KEY, JSON.stringify(seenPostsData));
 });
 
 // 🚦✔️Site 8 JS ya kare daga nan
@@ -5796,7 +5598,7 @@ if ('serviceWorker' in navigator) {
 }
 
 // PUSH NOTIFICATION SUBSCRIPTION
-const applicationServerKey = 'BJfsL_FHbYFYs1HeIAmhM_owTuMGfX5g4iQQDaZBxsbShqxliC_vwn4tiuFwkiLQ4m_64NWZSYr_mxo8QXUJ5eY';
+const applicationServerKey = 'BHKKgIF0DdjV9XXxXGI7MXQA_scnU0OxDP80OtZSlZyD02gSJY6aRYPxOS32bBP-wgjWAJr5VP4pDMYat38LGYc';
 
 async function push1SubscribeUser() {
   if (!('serviceWorker' in navigator)) return;
