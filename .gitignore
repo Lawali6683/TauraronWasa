@@ -1,0 +1,17 @@
+# Directories da files da ba a so a tura GitHub
+
+# Wannan shine directory na dependencies (packages)
+# da ake girka wa da npm ko yarn.
+node_modules/
+
+# Files na Cloudflare da Wrangler ke ƙirƙira a lokacin build. 
+.wrangler/ 
+
+# Muhimman sirri kamar API keys. 
+.env 
+.DS_Store
+
+# Logs da sauran files na temporary.
+ npm-debug.log* 
+ yarn-debug.log*
+
