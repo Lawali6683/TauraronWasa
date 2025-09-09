@@ -3,11 +3,7 @@ export async function handleSearch(request) {
   return handleRequest(request);
 }
 
-export default {
-  async fetch(request, env, ctx) {
-    return handleRequest(request);
-  }
-};
+
 
 // ✅ Main request handler
 async function handleRequest(request) {
@@ -20,7 +16,7 @@ async function handleRequest(request) {
   const WORKER_API_KEY = headers.get("x-api-key");
   const contentType = headers.get("content-type") || "";
 
-  // API Key check
+  // 🔑 API Key check
   if (WORKER_API_KEY !== "@haruna66") {
     return new Response(
       JSON.stringify({ error: true, message: "Invalid API Key" }),
@@ -28,7 +24,7 @@ async function handleRequest(request) {
     );
   }
 
-  // Tabbatar da POST + JSON
+  // ✅ Tabbatar da POST + JSON
   if (request.method !== "POST" || !contentType.includes("application/json")) {
     return new Response(
       JSON.stringify({ error: true, message: "Invalid Request Method or Content-Type" }),
@@ -40,11 +36,18 @@ async function handleRequest(request) {
     const requestBody = await request.json();
     const { query } = requestBody;
 
+    if (!query) {
+      return new Response(
+        JSON.stringify({ error: true, message: "Query parameter missing" }),
+        { status: 400, headers: corsHeaders() }
+      );
+    }
+
     const FOOTBALL_API_TOKEN = "b75541b8a8cc43719195871aa2bd419e";
     const TRANSLATE_API_KEY = "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";
     const TRANSLATE_API_URL = "https://openrouter.ai/api/v1/chat/completions";
 
-    // ✅ Fassarar rubutu zuwa Hausa
+    // ✅ Fassara rubutu zuwa Hausa
     const translateText = async (text) => {
       if (!text) return "";
       try {
@@ -55,7 +58,7 @@ async function handleRequest(request) {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            model: "openai/gpt-4o",
+            model: "openai/gpt-4o-mini",
             messages: [
               {
                 role: "user",
@@ -71,7 +74,7 @@ async function handleRequest(request) {
       }
     };
 
-    // ✅ Bincike a API na football-data.org
+    // ✅ Bincike daga football-data.org
     const searchFootballData = async (query) => {
       const knownComps = {
         "champions league": "CL",
@@ -165,7 +168,7 @@ async function handleRequest(request) {
       return null;
     };
 
-    // ✅ Binciken fallback idan babu result daga football-data.org
+    // ✅ Fallback search idan babu sakamako daga football-data.org
     const fallbackSearch = async (query) => {
       const TEAM_API = "https://www.thesportsdb.com/api/v1/json/3/search_all_teams.php?t=";
       const PLAYER_API = "https://www.thesportsdb.com/api/v1/json/3/searchplayers.php?p=";
