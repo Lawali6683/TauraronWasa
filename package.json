@@ -2,18 +2,18 @@
   "name": "TauraronWasa",
   "version": "1.0.0",
   "description": "Wannan aikin API ne na kwallon kafa wanda aka gina shi da Cloudflare Pages Functions.",
-  "main": "src/index.js",
+  "private": true,
   "scripts": {
-    "start": "npx wrangler dev",
-    "deploy": "npx wrangler deploy"
+    "start": "npx wrangler pages dev",
+    "deploy": "npx wrangler pages deploy"
   },
   "keywords": [
     "cloudflare",
     "pages",
-    "workers",
+    "functions",
     "api",
     "football-data"
   ],
-  "author": "Sunan Ka",
+  "author": "Haruna Lawali",
   "license": "ISC"
 }
