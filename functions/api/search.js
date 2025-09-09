@@ -3,15 +3,15 @@ export async function handleSearch(request) {
   return handleRequest(request);
 }
 
-
 export default {
   async fetch(request, env, ctx) {
     return handleRequest(request);
   }
 };
 
+// ✅ Main request handler
 async function handleRequest(request) {
-  
+  // Preflight (CORS)
   if (request.method === "OPTIONS") {
     return new Response(null, { status: 204, headers: corsHeaders() });
   }
@@ -20,7 +20,7 @@ async function handleRequest(request) {
   const WORKER_API_KEY = headers.get("x-api-key");
   const contentType = headers.get("content-type") || "";
 
-  
+  // API Key check
   if (WORKER_API_KEY !== "@haruna66") {
     return new Response(
       JSON.stringify({ error: true, message: "Invalid API Key" }),
@@ -28,7 +28,7 @@ async function handleRequest(request) {
     );
   }
 
-  
+  // Tabbatar da POST + JSON
   if (request.method !== "POST" || !contentType.includes("application/json")) {
     return new Response(
       JSON.stringify({ error: true, message: "Invalid Request Method or Content-Type" }),
@@ -40,13 +40,11 @@ async function handleRequest(request) {
     const requestBody = await request.json();
     const { query } = requestBody;
 
-    
     const FOOTBALL_API_TOKEN = "b75541b8a8cc43719195871aa2bd419e";
-    const TRANSLATE_API_KEY =
-      "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";
+    const TRANSLATE_API_KEY = "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";
     const TRANSLATE_API_URL = "https://openrouter.ai/api/v1/chat/completions";
 
-    
+    // ✅ Fassarar rubutu zuwa Hausa
     const translateText = async (text) => {
       if (!text) return "";
       try {
@@ -61,20 +59,19 @@ async function handleRequest(request) {
             messages: [
               {
                 role: "user",
-                content: `Ka fassara wannan zuwa hausa, wadda kowa zai gane ba tare da wani karin bayani ba. Kada ka rubuta wani jawabi ko misali, ka dawo da fassara kawai. ${text}`,
+                content: `Ka fassara wannan zuwa Hausa kawai: ${text}`,
               },
             ],
           }),
         });
         const translateData = await translateRes.json();
         return translateData?.choices?.[0]?.message?.content || text;
-      } catch (e) {
-        console.error("Translation failed:", e);
+      } catch {
         return text;
       }
     };
 
-   
+    // ✅ Bincike a API na football-data.org
     const searchFootballData = async (query) => {
       const knownComps = {
         "champions league": "CL",
@@ -88,23 +85,19 @@ async function handleRequest(request) {
         npfl: "",
       };
 
-     
       for (const name in knownComps) {
-        if (query.includes(name)) {
-          if (knownComps[name]) {
-            const url = `https://api.football-data.org/v4/competitions/${knownComps[name]}/matches`;
-            const res = await fetch(url, {
-              headers: { "X-Auth-Token": FOOTBALL_API_TOKEN },
-            });
-            if (res.ok) {
-              const data = await res.json();
-              return { type: "competition_matches", data, code: knownComps[name], name };
-            }
+        if (query.includes(name) && knownComps[name]) {
+          const url = `https://api.football-data.org/v4/competitions/${knownComps[name]}/matches`;
+          const res = await fetch(url, {
+            headers: { "X-Auth-Token": FOOTBALL_API_TOKEN },
+          });
+          if (res.ok) {
+            const data = await res.json();
+            return { type: "competition_matches", data, code: knownComps[name], name };
           }
         }
       }
 
-     
       if (
         ["today", "yau", "yau aka buga", "today's matches", "wasannin yau"].some((t) =>
           query.includes(t)
@@ -119,7 +112,6 @@ async function handleRequest(request) {
         }
       }
 
-    
       const teamMap = {
         "real madrid": 86,
         barcelona: 81,
@@ -142,7 +134,6 @@ async function handleRequest(request) {
         }
       }
 
-     
       if (query.includes("buffon")) {
         const url =
           "https://api.football-data.org/v4/persons/2019/matches?status=FINISHED";
@@ -153,7 +144,6 @@ async function handleRequest(request) {
         }
       }
 
-     
       if (["table", "tebur", "standings"].some((t) => query.includes(t))) {
         const url = "https://api.football-data.org/v4/competitions/DED/standings";
         const res = await fetch(url, { headers: { "X-Auth-Token": FOOTBALL_API_TOKEN } });
@@ -163,7 +153,6 @@ async function handleRequest(request) {
         }
       }
 
-     
       if (["top 10", "masu kwallo", "scorers"].some((t) => query.includes(t))) {
         const url = "https://api.football-data.org/v4/competitions/SA/scorers?limit=10";
         const res = await fetch(url, { headers: { "X-Auth-Token": FOOTBALL_API_TOKEN } });
@@ -176,7 +165,7 @@ async function handleRequest(request) {
       return null;
     };
 
-   
+    // ✅ Binciken fallback idan babu result daga football-data.org
     const fallbackSearch = async (query) => {
       const TEAM_API = "https://www.thesportsdb.com/api/v1/json/3/search_all_teams.php?t=";
       const PLAYER_API = "https://www.thesportsdb.com/api/v1/json/3/searchplayers.php?p=";
@@ -212,7 +201,7 @@ async function handleRequest(request) {
       return { type: "none" };
     };
 
-    
+    // ✅ Run search
     let result = await searchFootballData(query.toLowerCase());
     if (!result) {
       result = await fallbackSearch(query);
@@ -234,7 +223,7 @@ async function handleRequest(request) {
   }
 }
 
-
+// ✅ Common headers
 function corsHeaders() {
   return {
     "Content-Type": "application/json",
