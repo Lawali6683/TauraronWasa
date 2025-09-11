@@ -1,3 +1,4 @@
+
 export async function onRequest(context) {
     const { request, env } = context;
 
@@ -59,37 +60,27 @@ export async function onRequest(context) {
         if (!targetMatchday) {
             const leagueResponse = await fetch(`https://api.football-data.org/v4/competitions/${PL_CODE}`, { headers: { "X-Auth-Token": FOOTBALL_API_TOKEN } });
             
-            if (leagueResponse.ok) {
-                const leagueData = await leagueResponse.json();
-                targetMatchday = leagueData?.currentSeason?.currentMatchday || 1;
-            } else {
-                console.error("Failed to fetch league data to determine current matchday.");
-                targetMatchday = 1; // Komawa ga default idan API ya kasa
+            if (!leagueResponse.ok) {
+                const errorText = await leagueResponse.text();
+                console.error(`Error fetching league data: ${leagueResponse.status} - ${errorText}`);
+                throw new Error(`Kasa loda bayanan gasar: ${leagueResponse.statusText}`);
             }
+            
+            const leagueData = await leagueResponse.json();
+            targetMatchday = leagueData?.currentSeason?.currentMatchday || 1;
         }
 
-        // Neman bayanai gaba daya
+        // Neman bayanai gaba daya ta amfani da Promise.all
         const [matchesResponse, eredivisieTableResponse, plScorersResponse] = await Promise.all([
             fetch(`https://api.football-data.org/v4/competitions/${PL_CODE}/matches?matchday=${targetMatchday}`, { headers: { "X-Auth-Token": FOOTBALL_API_TOKEN } }),
             fetch(`https://api.football-data.org/v4/competitions/${DED_CODE}/standings`, { headers: { "X-Auth-Token": FOOTBALL_API_TOKEN } }),
             fetch(`https://api.football-data.org/v4/competitions/${PL_CODE}/scorers?limit=10`, { headers: { "X-Auth-Token": FOOTBALL_API_TOKEN } }),
         ]);
 
-        if (!matchesResponse.ok) {
-            const errorText = await matchesResponse.text();
-            console.error(`Error fetching Premier League matches: ${matchesResponse.status} - ${errorText}`);
-            const response = new Response(
-                JSON.stringify({ error: true, message: `Failed to fetch Premier League matches: ${matchesResponse.statusText}` }), {
-                    status: matchesResponse.status,
-                    headers: { "Content-Type": "application/json" }
-                }
-            );
-            return withCORSHeaders(response, origin);
-        }
-
-        matchesData = await matchesResponse.json();
-        const eredivisieTableData = eredivisieTableResponse.ok ? await eredivisieTableResponse.json() : null;
-        const plScorersData = plScorersResponse.ok ? await plScorersResponse.json() : null;
+        // Sarrafa dukkan martanin da aka samu
+        const matchesData = matchesResponse.ok ? await matchesResponse.json() : { matches: [] };
+        const eredivisieTableData = eredivisieTableResponse.ok ? await eredivisieTableResponse.json() : { standings: [] };
+        const plScorersData = plScorersResponse.ok ? await plScorersResponse.json() : { scorers: [] };
 
         const finalData = {
             currentMatchday: targetMatchday,
@@ -105,13 +96,14 @@ export async function onRequest(context) {
         });
 
         return withCORSHeaders(response, origin);
+
     } catch (e) {
         console.error("Server error in premier.js:", e.message, e.stack);
         const errorResponse = new Response(
             JSON.stringify({
                 error: true,
-                message: "Server error while fetching data.",
-                details: e.message,
+                message: `Server error while fetching data: ${e.message}`,
+                details: e.stack,
             }), {
                 status: 500,
                 headers: { "Content-Type": "application/json" },
