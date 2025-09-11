@@ -1,7 +1,7 @@
 export async function onRequest(context) {
     const { request, env } = context;
-    const origin = request.headers.get("Origin");
 
+    const origin = request.headers.get("Origin");
     const ALLOWED_ORIGINS = [
         "https://tauraronwasa.pages.dev",
         "https://leadwaypeace.pages.dev",
@@ -55,20 +55,38 @@ export async function onRequest(context) {
         let targetMatchday = requestedMatchday;
         let matchesData, tableData, scorersData;
 
-        // Fetch standings and discover the current matchday if none is specified
+        // Idan babu matchday da aka nema, nema ta amfani da ranar yanzu
         if (!targetMatchday) {
-            const tableResponse = await fetch(`https://api.football-data.org/v4/competitions/${PL_CODE}/standings`, { headers: { "X-Auth-Token": FOOTBALL_API_TOKEN } });
-            tableData = tableResponse.ok ? await tableResponse.json() : null;
-            targetMatchday = tableData?.standings?.[0]?.table?.[0]?.playedGames + 1 || 1;
-        } else {
-            // If matchday is specified, fetch the standings as well
-            const tableResponse = await fetch(`https://api.football-data.org/v4/competitions/${PL_CODE}/standings`, { headers: { "X-Auth-Token": FOOTBALL_API_TOKEN } });
-            tableData = tableResponse.ok ? await tableResponse.json() : null;
+            const now = new Date();
+            const allMatchesResponse = await fetch(`https://api.football-data.org/v4/competitions/${PL_CODE}/matches?season=2024`, { headers: { "X-Auth-Token": FOOTBALL_API_TOKEN } });
+            
+            if (allMatchesResponse.ok) {
+                const allMatchesData = await allMatchesResponse.json();
+                const allMatches = allMatchesData?.matches || [];
+                
+                // Nemi matchday na gaba ko na yanzu
+                const upcomingOrCurrentMatch = allMatches.find(match => new Date(match.utcDate) >= now);
+                if (upcomingOrCurrentMatch) {
+                    targetMatchday = upcomingOrCurrentMatch.matchday;
+                } else {
+                    // Idan babu wasanni na gaba, dauki matchday na karshe
+                    const lastMatch = allMatches[allMatches.length - 1];
+                    if (lastMatch) {
+                        targetMatchday = lastMatch.matchday;
+                    } else {
+                        targetMatchday = 1; // Idan komai ya kasa, koma kan matchday 1
+                    }
+                }
+            } else {
+                console.error("Failed to fetch all matches to determine current matchday.");
+                targetMatchday = 1; // Komawa ga default idan API ya kasa
+            }
         }
 
-        // Fetch all data concurrently
-        const [matchesResponse, scorersResponse] = await Promise.all([
+        // Neman bayanai gaba daya
+        const [matchesResponse, tableResponse, scorersResponse] = await Promise.all([
             fetch(`https://api.football-data.org/v4/competitions/${PL_CODE}/matches?matchday=${targetMatchday}`, { headers: { "X-Auth-Token": FOOTBALL_API_TOKEN } }),
+            fetch(`https://api.football-data.org/v4/competitions/DED/standings`, { headers: { "X-Auth-Token": FOOTBALL_API_TOKEN } }),
             fetch(`https://api.football-data.org/v4/competitions/${PL_CODE}/scorers?limit=10`, { headers: { "X-Auth-Token": FOOTBALL_API_TOKEN } }),
         ]);
 
@@ -85,6 +103,7 @@ export async function onRequest(context) {
         }
 
         matchesData = await matchesResponse.json();
+        tableData = tableResponse.ok ? await tableResponse.json() : null;
         scorersData = scorersResponse.ok ? await scorersResponse.json() : null;
 
         const finalData = {
@@ -101,13 +120,12 @@ export async function onRequest(context) {
         });
 
         return withCORSHeaders(response, origin);
-
     } catch (e) {
         console.error("Server error in premier.js:", e.message, e.stack);
         const errorResponse = new Response(
             JSON.stringify({
                 error: true,
-                message: "Server error while fetching Premier League data.",
+                message: "Server error while fetching data.",
                 details: e.message,
             }), {
                 status: 500,
