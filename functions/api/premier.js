@@ -48,45 +48,30 @@ export async function onRequest(context) {
 
     try {
         const requestBody = await request.json();
-        const requestedMatchday = requestBody?.matchday;
+        let requestedMatchday = requestBody?.matchday;
         const FOOTBALL_API_TOKEN = "b75541b8a8cc43719195871aa2bd419e";
         const PL_CODE = "PL";
+        const DED_CODE = "DED";
         
         let targetMatchday = requestedMatchday;
-        let matchesData, tableData, scorersData;
-
-        // Idan babu matchday da aka nema, nema ta amfani da ranar yanzu
+        
+        // Idan babu matchday da aka nema, dawo da matchday na yanzu ta amfani da wani request daban
         if (!targetMatchday) {
-            const now = new Date();
-            const allMatchesResponse = await fetch(`https://api.football-data.org/v4/competitions/${PL_CODE}/matches?season=2024`, { headers: { "X-Auth-Token": FOOTBALL_API_TOKEN } });
+            const leagueResponse = await fetch(`https://api.football-data.org/v4/competitions/${PL_CODE}`, { headers: { "X-Auth-Token": FOOTBALL_API_TOKEN } });
             
-            if (allMatchesResponse.ok) {
-                const allMatchesData = await allMatchesResponse.json();
-                const allMatches = allMatchesData?.matches || [];
-                
-                // Nemi matchday na gaba ko na yanzu
-                const upcomingOrCurrentMatch = allMatches.find(match => new Date(match.utcDate) >= now);
-                if (upcomingOrCurrentMatch) {
-                    targetMatchday = upcomingOrCurrentMatch.matchday;
-                } else {
-                    // Idan babu wasanni na gaba, dauki matchday na karshe
-                    const lastMatch = allMatches[allMatches.length - 1];
-                    if (lastMatch) {
-                        targetMatchday = lastMatch.matchday;
-                    } else {
-                        targetMatchday = 1; // Idan komai ya kasa, koma kan matchday 1
-                    }
-                }
+            if (leagueResponse.ok) {
+                const leagueData = await leagueResponse.json();
+                targetMatchday = leagueData?.currentSeason?.currentMatchday || 1;
             } else {
-                console.error("Failed to fetch all matches to determine current matchday.");
+                console.error("Failed to fetch league data to determine current matchday.");
                 targetMatchday = 1; // Komawa ga default idan API ya kasa
             }
         }
 
         // Neman bayanai gaba daya
-        const [matchesResponse, tableResponse, scorersResponse] = await Promise.all([
+        const [matchesResponse, eredivisieTableResponse, plScorersResponse] = await Promise.all([
             fetch(`https://api.football-data.org/v4/competitions/${PL_CODE}/matches?matchday=${targetMatchday}`, { headers: { "X-Auth-Token": FOOTBALL_API_TOKEN } }),
-            fetch(`https://api.football-data.org/v4/competitions/DED/standings`, { headers: { "X-Auth-Token": FOOTBALL_API_TOKEN } }),
+            fetch(`https://api.football-data.org/v4/competitions/${DED_CODE}/standings`, { headers: { "X-Auth-Token": FOOTBALL_API_TOKEN } }),
             fetch(`https://api.football-data.org/v4/competitions/${PL_CODE}/scorers?limit=10`, { headers: { "X-Auth-Token": FOOTBALL_API_TOKEN } }),
         ]);
 
@@ -103,15 +88,15 @@ export async function onRequest(context) {
         }
 
         matchesData = await matchesResponse.json();
-        tableData = tableResponse.ok ? await tableResponse.json() : null;
-        scorersData = scorersResponse.ok ? await scorersResponse.json() : null;
+        const eredivisieTableData = eredivisieTableResponse.ok ? await eredivisieTableResponse.json() : null;
+        const plScorersData = plScorersResponse.ok ? await plScorersResponse.json() : null;
 
         const finalData = {
             currentMatchday: targetMatchday,
             totalMatchdays: matchesData?.resultSet?.last || 38,
             matches: matchesData?.matches || [],
-            leagueTable: tableData?.standings?.[0]?.table || [],
-            scorers: scorersData?.scorers || [],
+            leagueTable: eredivisieTableData?.standings?.[0]?.table || [],
+            scorers: plScorersData?.scorers || [],
         };
 
         const response = new Response(JSON.stringify(finalData), {
