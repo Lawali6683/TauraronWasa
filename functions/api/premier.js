@@ -1,8 +1,8 @@
-
 export async function onRequest(context) {
-    const { request, env } = context;
 
+    const { request, env } = context;
     const origin = request.headers.get("Origin");
+
     const ALLOWED_ORIGINS = [
         "https://tauraronwasa.pages.dev",
         "https://leadwaypeace.pages.dev",
@@ -50,13 +50,14 @@ export async function onRequest(context) {
     try {
         const requestBody = await request.json();
         let requestedMatchday = requestBody?.matchday;
+
         const FOOTBALL_API_TOKEN = "b75541b8a8cc43719195871aa2bd419e";
         const PL_CODE = "PL";
-        const DED_CODE = "DED";
+        const DED_CODE = "DED"; // An ajiye shi, amma an yi amfani da PL_CODE don teburin
         
         let targetMatchday = requestedMatchday;
         
-        // Idan babu matchday da aka nema, dawo da matchday na yanzu ta amfani da wani request daban
+        // Idan babu matchday da aka nema, dawo da matchday na yanzu
         if (!targetMatchday) {
             const leagueResponse = await fetch(`https://api.football-data.org/v4/competitions/${PL_CODE}`, { headers: { "X-Auth-Token": FOOTBALL_API_TOKEN } });
             
@@ -71,22 +72,25 @@ export async function onRequest(context) {
         }
 
         // Neman bayanai gaba daya ta amfani da Promise.all
-        const [matchesResponse, eredivisieTableResponse, plScorersResponse] = await Promise.all([
+        // An gyara layin na biyu daga DED_CODE zuwa PL_CODE
+        const [matchesResponse, plTableResponse, plScorersResponse] = await Promise.all([
             fetch(`https://api.football-data.org/v4/competitions/${PL_CODE}/matches?matchday=${targetMatchday}`, { headers: { "X-Auth-Token": FOOTBALL_API_TOKEN } }),
-            fetch(`https://api.football-data.org/v4/competitions/${DED_CODE}/standings`, { headers: { "X-Auth-Token": FOOTBALL_API_TOKEN } }),
+            fetch(`https://api.football-data.org/v4/competitions/${PL_CODE}/standings`, { headers: { "X-Auth-Token": FOOTBALL_API_TOKEN } }),
             fetch(`https://api.football-data.org/v4/competitions/${PL_CODE}/scorers?limit=10`, { headers: { "X-Auth-Token": FOOTBALL_API_TOKEN } }),
         ]);
 
         // Sarrafa dukkan martanin da aka samu
         const matchesData = matchesResponse.ok ? await matchesResponse.json() : { matches: [] };
-        const eredivisieTableData = eredivisieTableResponse.ok ? await eredivisieTableResponse.json() : { standings: [] };
+        // An canza sunan variable da kuma data source
+        const plTableData = plTableResponse.ok ? await plTableResponse.json() : { standings: [] };
         const plScorersData = plScorersResponse.ok ? await plScorersResponse.json() : { scorers: [] };
 
         const finalData = {
             currentMatchday: targetMatchday,
             totalMatchdays: matchesData?.resultSet?.last || 38,
             matches: matchesData?.matches || [],
-            leagueTable: eredivisieTableData?.standings?.[0]?.table || [],
+            // An gyara wannan layin domin ya nuna teburin Premier League
+            leagueTable: plTableData?.standings?.[0]?.table || [],
             scorers: plScorersData?.scorers || [],
         };
 
@@ -96,7 +100,6 @@ export async function onRequest(context) {
         });
 
         return withCORSHeaders(response, origin);
-
     } catch (e) {
         console.error("Server error in premier.js:", e.message, e.stack);
         const errorResponse = new Response(
@@ -119,6 +122,7 @@ function withCORSHeaders(response, origin) {
         "https://leadwaypeace.pages.dev",
         "http://localhost:8080",
     ];
+
     if (ALLOWED_ORIGINS.includes(origin)) {
         response.headers.set("Access-Control-Allow-Origin", origin);
     } else {
