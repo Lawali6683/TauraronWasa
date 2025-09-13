@@ -30,8 +30,7 @@ export async function onRequest(context) {
         const response = new Response(
             JSON.stringify({ error: true, message: "Invalid API Key" }), {
                 status: 401,
-                headers: { "Content-Type": "application/json"
-                },
+                headers: { "Content-Type": "application/json" },
             }
         );
         return withCORSHeaders(response, origin);
@@ -41,8 +40,7 @@ export async function onRequest(context) {
         const response = new Response(
             JSON.stringify({ error: true, message: "Invalid Request Method or Content-Type" }), {
                 status: 400,
-                headers: { "Content-Type": "application/json"
-                },
+                headers: { "Content-Type": "application/json" },
             }
         );
         return withCORSHeaders(response, origin);
@@ -52,19 +50,15 @@ export async function onRequest(context) {
         const requestBody = await request.json();
         const { stage } = requestBody;
 
-        // An inganta API tokens da URLs don aiki daidai da Champions League
         const FOOTBALL_API_TOKEN = "b75541b8a8cc43719195871aa2bd419e";
         const CL_CODE = "CL";
         const BASE_API_URL = "https://api.football-data.org/v4";
-
         const apiHeaders = { "X-Auth-Token": FOOTBALL_API_TOKEN };
 
-        // An ƙara buƙatun API don dukkan bayanan da ake buƙata
         const matchesUrl = `${BASE_API_URL}/competitions/${CL_CODE}/matches${stage ? `?stage=${stage}` : ""}`;
         const standingsUrl = `${BASE_API_URL}/competitions/${CL_CODE}/standings`;
         const scorersUrl = `${BASE_API_URL}/competitions/${CL_CODE}/scorers?limit=10`;
 
-        // An tattara dukkan buƙatun tare don saurin aiki
         const [matchesRes, standingsRes, scorersRes] = await Promise.all([
             fetch(matchesUrl, { headers: apiHeaders }),
             fetch(standingsUrl, { headers: apiHeaders }),
@@ -75,11 +69,17 @@ export async function onRequest(context) {
         const standingsData = standingsRes.ok ? await standingsRes.json() : { standings: [] };
         const scorersData = scorersRes.ok ? await scorersRes.json() : { scorers: [] };
 
+        // **Sabon gyara a nan: An tsara bayanan teburin groups don su dace da shafin HTML**
+        const groupedStandings = {};
+        if (standingsData.standings && standingsData.standings.length > 0) {
+            standingsData.standings.forEach(group => {
+                groupedStandings[group.group] = group.table;
+            });
+        }
+        
         // Zato (Simulated) bayanan Assists da Man of the Match
-        // Domin API na Football-Data baya samar da waɗannan bayanan
         const assistsData = {
             assists: [
-                // Misali data na masu taimakawa
                 { player: { name: 'Kevin De Bruyne', photo: 'https://i.imgur.com/gTf7kH2.png' }, team: { name: 'Manchester City', crest: 'https://i.imgur.com/G5d0lJ2.png' }, assists: 8 },
                 { player: { name: 'Lionel Messi', photo: 'https://i.imgur.com/712W7pX.png' }, team: { name: 'Paris Saint-Germain', crest: 'https://i.imgur.com/rP65uRk.png' }, assists: 7 },
                 { player: { name: 'Kylian Mbappé', photo: 'https://i.imgur.com/oA6r5Xw.png' }, team: { name: 'Paris Saint-Germain', crest: 'https://i.imgur.com/rP65uRk.png' }, assists: 6 },
@@ -88,7 +88,6 @@ export async function onRequest(context) {
         
         const motmData = {
             manOfTheMatch: [
-                // Misali data na Man of the Match
                 { player: { name: 'Vinícius Júnior', photo: 'https://i.imgur.com/6Zp7N6V.png' }, team: { name: 'Real Madrid', crest: 'https://i.imgur.com/2Xy0U3L.png' } },
                 { player: { name: 'Erling Haaland', photo: 'https://i.imgur.com/jM8V9bT.png' }, team: { name: 'Manchester City', crest: 'https://i.imgur.com/G5d0lJ2.png' } },
             ]
@@ -96,11 +95,10 @@ export async function onRequest(context) {
 
         const finalData = {
             matches: matchesData.matches || [],
-            standings: standingsData.standings || [],
+            standings: groupedStandings, // **An canza wannan**
             scorers: scorersData.scorers || [],
             assists: assistsData.assists,
             manOfTheMatch: motmData.manOfTheMatch,
-            // Ƙara stages da currentStage don amfani a frontend
             stages: [
                 { code: '', name: 'Duk Wasanni' },
                 { code: 'GROUP_STAGE', name: 'Matakin Groups' },
@@ -109,13 +107,12 @@ export async function onRequest(context) {
                 { code: 'SEMI_FINALS', name: 'Semi Finals' },
                 { code: 'FINAL', name: 'Final' }
             ],
-            currentStage: stage || (matchesData.matches[0]?.stage || 'GROUP_STAGE')
+            currentStage: stage || (matchesData.matches[0]?.stage || '')
         };
 
         const response = new Response(JSON.stringify(finalData), {
             status: 200,
-            headers: { "Content-Type": "application/json"
-            },
+            headers: { "Content-Type": "application/json" },
         });
         return withCORSHeaders(response, origin);
 
@@ -124,12 +121,10 @@ export async function onRequest(context) {
         const errorResponse = new Response(
             JSON.stringify({
                 error: true,
-                message: "Kuskure a wajen dauko bayanan Champions League.",
-                details: e.message,
+                message: `Kuskure a wajen dauko bayanan Champions League: ${e.message}`,
             }), {
                 status: 500,
-                headers: { "Content-Type": "application/json"
-                },
+                headers: { "Content-Type": "application/json" },
             }
         );
         return withCORSHeaders(errorResponse, origin);
