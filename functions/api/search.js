@@ -30,18 +30,20 @@ export async function onRequest(context) {
     if (WORKER_API_KEY !== "@haruna66") {
         const response = new Response(
             JSON.stringify({ error: true, message: "Invalid API Key" }), {
-            status: 401,
-            headers: { "Content-Type": "application/json" },
-        });
+                status: 401,
+                headers: { "Content-Type": "application/json" },
+            }
+        );
         return withCORSHeaders(response, origin);
     }
 
     if (request.method !== "POST" || !contentType.includes("application/json")) {
         const response = new Response(
             JSON.stringify({ error: true, message: "Invalid Request Method or Content-Type" }), {
-            status: 400,
-            headers: { "Content-Type": "application/json" },
-        });
+                status: 400,
+                headers: { "Content-Type": "application/json" },
+            }
+        );
         return withCORSHeaders(response, origin);
     }
 
@@ -52,9 +54,10 @@ export async function onRequest(context) {
         if (!competition) {
             const response = new Response(
                 JSON.stringify({ error: true, message: "Competition parameter is missing." }), {
-                status: 400,
-                headers: { "Content-Type": "application/json" }
-            });
+                    status: 400,
+                    headers: { "Content-Type": "application/json" }
+                }
+            );
             return withCORSHeaders(response, origin);
         }
 
@@ -65,45 +68,48 @@ export async function onRequest(context) {
         let standingsData = null;
         let scorersData = null;
 
-        const fetchWithStatusCheck = async (url) => {
+        const fetchMatches = async () => {
             try {
-                const response = await fetch(url, { headers: { "X-Auth-Token": FOOTBALL_API_TOKEN } });
-                if (response.status === 404) {
-                    return { status: 404, data: null };
-                }
-                return response.ok ? { status: response.status, data: await response.json() } : null;
+                const matchesRes = await fetch(`https://api.football-data.org/v4/competitions/${compCode}/matches`, { headers: { "X-Auth-Token": FOOTBALL_API_TOKEN } });
+                return matchesRes.ok ? await matchesRes.json() : null;
             } catch (e) {
-                console.error(`Failed to fetch from ${url}:`, e);
+                console.error("Failed to fetch matches:", e);
                 return null;
             }
         };
 
-        const [matchesRes, standingsRes, scorersRes] = await Promise.all([
-            fetchWithStatusCheck(`https://api.football-data.org/v4/competitions/${compCode}/matches`),
-            fetchWithStatusCheck(`https://api.football-data.org/v4/competitions/${compCode}/standings`),
-            fetchWithStatusCheck(`https://api.football-data.org/v4/competitions/${compCode}/scorers?limit=10`)
-        ]);
-
-        if (matchesRes && matchesRes.status === 404) {
-            const response = new Response(JSON.stringify({
-                error: true,
-                message: "Ba a fara gasar ba a halin yanzu",
-                matches: [],
-                standings: [],
-                scorers: [],
-            }), {
-                status: 200, // Dawo da 200 OK don gane shi a shafin mai amfani
-                headers: { "Content-Type": "application/json" },
-            });
-            return withCORSHeaders(response, origin);
-        }
-
-        const result = {
-            matches: matchesRes?.data?.matches || [],
-            standings: standingsRes?.data?.standings || [],
-            scorers: scorersRes?.data?.scorers || [],
+        const fetchStandings = async () => {
+            try {
+                const standingsRes = await fetch(`https://api.football-data.org/v4/competitions/${compCode}/standings`, { headers: { "X-Auth-Token": FOOTBALL_API_TOKEN } });
+                return standingsRes.ok ? await standingsRes.json() : null;
+            } catch (e) {
+                console.error("Failed to fetch standings:", e);
+                return null;
+            }
         };
 
+        const fetchScorers = async () => {
+            try {
+                const scorersRes = await fetch(`https://api.football-data.org/v4/competitions/${compCode}/scorers?limit=10`, { headers: { "X-Auth-Token": FOOTBALL_API_TOKEN } });
+                return scorersRes.ok ? await scorersRes.json() : null;
+            } catch (e) {
+                console.error("Failed to fetch scorers:", e);
+                return null;
+            }
+        };
+
+        [matchesData, standingsData, scorersData] = await Promise.all([
+            fetchMatches(),
+            fetchStandings(),
+            fetchScorers()
+        ]);
+        
+        const result = {
+            matches: matchesData?.matches || [],
+            standings: standingsData?.standings || [],
+            scorers: scorersData?.scorers || [],
+        };
+        
         const response = new Response(JSON.stringify(result), {
             status: 200,
             headers: { "Content-Type": "application/json" },
@@ -119,9 +125,10 @@ export async function onRequest(context) {
                 message: "An samu matsala yayin aikin bincike. Da fatan za a gwada daga baya.",
                 details: e.message,
             }), {
-            status: 500,
-            headers: { "Content-Type": "application/json" }
-        });
+                status: 500,
+                headers: { "Content-Type": "application/json" }
+            }
+        );
         return withCORSHeaders(errorResponse, origin);
     }
 }
