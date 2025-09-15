@@ -21,18 +21,7 @@ export async function onRequest(context) {
     }
 
     if (request.method === "OPTIONS") {
-        if (ALLOWED_ORIGINS.includes(origin)) {
-            return new Response(null, {
-                status: 204,
-                headers: {
-                    "Access-Control-Allow-Origin": origin,
-                    "Access-Control-Allow-Methods": "POST, OPTIONS",
-                    "Access-Control-Allow-Headers": "Content-Type, x-api-key",
-                    "Access-Control-Max-Age": "86400",
-                },
-            });
-        }
-        return new Response(null, { status: 403 });
+        return withCORSHeaders(new Response(null, { status: 204 }), origin);
     }
 
     const WORKER_API_KEY = request.headers.get("x-api-key");
@@ -43,7 +32,8 @@ export async function onRequest(context) {
             JSON.stringify({ error: true, message: "Invalid API Key" }), {
                 status: 401,
                 headers: { "Content-Type": "application/json" },
-            });
+            }
+        );
         return withCORSHeaders(response, origin);
     }
 
@@ -52,218 +42,74 @@ export async function onRequest(context) {
             JSON.stringify({ error: true, message: "Invalid Request Method or Content-Type" }), {
                 status: 400,
                 headers: { "Content-Type": "application/json" },
-            });
+            }
+        );
         return withCORSHeaders(response, origin);
     }
 
     try {
         const requestBody = await request.json();
-        const { query } = requestBody;
+        const { competition } = requestBody;
 
-        if (!query) {
+        if (!competition) {
             const response = new Response(
-                JSON.stringify({ error: true, message: "Query parameter is missing." }), {
+                JSON.stringify({ error: true, message: "Competition parameter is missing." }), {
                     status: 400,
                     headers: { "Content-Type": "application/json" }
-                });
+                }
+            );
             return withCORSHeaders(response, origin);
         }
-        
+
         const FOOTBALL_API_TOKEN = env.FOOTBALL_API_TOKEN || "b75541b8a8cc43719195871aa2bd419e";
-        const TRANSLATE_API_KEY = env.TRANSLATE_API_KEY || "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";
-        const TRANSLATE_API_URL = "https://openrouter.ai/api/v1/chat/completions";
+        const compCode = competition.toUpperCase();
 
-        const translateText = async (text) => {
-            if (!text) return "";
-            try {
-                const translateRes = await fetch(TRANSLATE_API_URL, {
-                    method: "POST",
-                    headers: {
-                        Authorization: `Bearer ${TRANSLATE_API_KEY}`,
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        model: "openai/gpt-4o-mini",
-                        messages: [{
-                            role: "user",
-                            content: `Ka fassara wannan zuwa Hausa kai tsaye: ${text}`
-                        }],
-                    }),
-                });
-                if (!translateRes.ok) {
-                    console.error(`Translation API Error: ${translateRes.status}`);
-                    return text;
-                }
-                const translateData = await translateRes.json();
-                return translateData?.choices?.[0]?.message?.content || text;
-            } catch (e) {
-                console.error("Translation error:", e.message);
-                return text;
-            }
-        };
+        let matchesData = null;
+        let standingsData = null;
+        let scorersData = null;
 
-        const getChatAnswer = async (userQuery) => {
-            const date = new Date().getFullYear();
-            const fullQuery = `Bani amsa kai tsaye (da hausa ko english) game da: ${userQuery}. Ka bayar da amsa mai ma'ana ta tarihi ko ta yanzu. Ka duba lokacin yanzu ${date}.`;
+        const fetchMatches = async () => {
             try {
-                const chatRes = await fetch(TRANSLATE_API_URL, {
-                    method: "POST",
-                    headers: {
-                        Authorization: `Bearer ${TRANSLATE_API_KEY}`,
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        model: "openai/gpt-4o-mini",
-                        messages: [{
-                            role: "user",
-                            content: fullQuery
-                        }],
-                    }),
-                });
-                if (!chatRes.ok) {
-                    console.error(`Chat API Error: ${chatRes.status}`);
-                    return null;
-                }
-                const chatData = await chatRes.json();
-                return chatData?.choices?.[0]?.message?.content || null;
+                const matchesRes = await fetch(`https://api.football-data.org/v4/competitions/${compCode}/matches`, { headers: { "X-Auth-Token": FOOTBALL_API_TOKEN } });
+                return matchesRes.ok ? await matchesRes.json() : null;
             } catch (e) {
-                console.error("Chat API error:", e.message);
+                console.error("Failed to fetch matches:", e);
                 return null;
             }
         };
-        
-        const searchTheSportsDB = async (query) => {
-            const TEAM_API = "https://www.thesportsdb.com/api/v1/json/3/searchteams.php?t=";
-            const PLAYER_API = "https://www.thesportsdb.com/api/v1/json/3/searchplayers.php?p=";
-        
+
+        const fetchStandings = async () => {
             try {
-                const [teamRes, playerRes] = await Promise.all([
-                    fetch(TEAM_API + encodeURIComponent(query)),
-                    fetch(PLAYER_API + encodeURIComponent(query))
-                ]);
-        
-                const teamData = teamRes.ok ? await teamRes.json() : null;
-                const playerData = playerRes.ok ? await playerRes.json() : null;
-        
-                if (teamData && teamData.teams && teamData.teams.length > 0) {
-                    const teamsWithTranslations = await Promise.all(
-                        teamData.teams.map(async (team) => {
-                            if (team.strDescriptionEN) {
-                                team.strDescriptionHA = await translateText(team.strDescriptionEN);
-                            }
-                            return team;
-                        })
-                    );
-                    return { type: "team_info", teams: teamsWithTranslations };
-                }
-        
-                if (playerData && playerData.player && playerData.player.length > 0) {
-                    const playersWithTranslations = await Promise.all(
-                        playerData.player.map(async (player) => {
-                            if (player.strDescriptionEN) {
-                                player.strDescriptionHA = await translateText(player.strDescriptionEN);
-                            }
-                            return player;
-                        })
-                    );
-                    return { type: "player_info", players: playersWithTranslations };
-                }
+                const standingsRes = await fetch(`https://api.football-data.org/v4/competitions/${compCode}/standings`, { headers: { "X-Auth-Token": FOOTBALL_API_TOKEN } });
+                return standingsRes.ok ? await standingsRes.json() : null;
             } catch (e) {
-                console.error("TheSportsDB search error:", e.message);
+                console.error("Failed to fetch standings:", e);
+                return null;
             }
-            return null;
         };
 
-        const searchFootballData = async (query) => {
-            const normalizedQuery = query.toLowerCase();
-            const knownComps = {
-                "fac": "FAC", "dfb": "DFB", "cdr": "CDR", "cli": "CLI", "knvb": "KNVB",
-                "ecl": "ECL", "afcon": "AFCON", "wc": "WC", "ec": "EC", "unl": "UNL",
-            };
-            
-            const compCode = knownComps[normalizedQuery];
-            if (compCode) {
-                let matchesData = null;
-                let standingsData = null;
-                let scorersData = null;
-
-                try {
-                    const matchesRes = await fetch(`https://api.football-data.org/v4/competitions/${compCode}/matches`, { headers: { "X-Auth-Token": FOOTBALL_API_TOKEN } });
-                    if (matchesRes.ok) {
-                        matchesData = await matchesRes.json();
-                    } else {
-                        console.error(`Football-Data matches error: ${matchesRes.status}`);
-                    }
-                } catch (e) {
-                    console.error("Failed to fetch matches:", e);
-                }
-
-                try {
-                    const standingsRes = await fetch(`https://api.football-data.org/v4/competitions/${compCode}/standings`, { headers: { "X-Auth-Token": FOOTBALL_API_TOKEN } });
-                    if (standingsRes.ok) {
-                        standingsData = await standingsRes.json();
-                    } else {
-                        console.error(`Football-Data standings error: ${standingsRes.status}`);
-                    }
-                } catch (e) {
-                    console.error("Failed to fetch standings:", e);
-                }
-
-                try {
-                    const scorersRes = await fetch(`https://api.football-data.org/v4/competitions/${compCode}/scorers?limit=10`, { headers: { "X-Auth-Token": FOOTBALL_API_TOKEN } });
-                    if (scorersRes.ok) {
-                        scorersData = await scorersRes.json();
-                    } else {
-                        console.error(`Football-Data scorers error: ${scorersRes.status}`);
-                    }
-                } catch (e) {
-                    console.error("Failed to fetch scorers:", e);
-                }
-
-                if (matchesData) {
-                    return {
-                        type: "competition_matches", 
-                        data: {
-                            matches: matchesData?.matches,
-                            standings: standingsData?.standings,
-                            scorers: scorersData?.scorers,
-                        },
-                        query: compCode,
-                        name: query
-                    };
-                }
+        const fetchScorers = async () => {
+            try {
+                const scorersRes = await fetch(`https://api.football-data.org/v4/competitions/${compCode}/scorers?limit=10`, { headers: { "X-Auth-Token": FOOTBALL_API_TOKEN } });
+                return scorersRes.ok ? await scorersRes.json() : null;
+            } catch (e) {
+                console.error("Failed to fetch scorers:", e);
+                return null;
             }
-            return null;
         };
 
-        let result = await searchFootballData(query);
-
-        if (!result) {
-            result = await searchTheSportsDB(query);
-        }
-
-        if (!result) {
-            const chatAnswer = await getChatAnswer(query);
-            if (chatAnswer) {
-                const translatedAnswer = await translateText(chatAnswer);
-                const response = new Response(
-                    JSON.stringify({ type: "general_info", message: translatedAnswer }), {
-                        status: 200,
-                        headers: { "Content-Type": "application/json" },
-                    });
-                return withCORSHeaders(response, origin);
-            }
-        }
-
-        if (!result) {
-            const notFoundResponse = new Response(
-                JSON.stringify({ type: "not_found", message: "Ba a samu sakamako ba." }), {
-                    status: 200,
-                    headers: { "Content-Type": "application/json" },
-                });
-            return withCORSHeaders(notFoundResponse, origin);
-        }
-
+        [matchesData, standingsData, scorersData] = await Promise.all([
+            fetchMatches(),
+            fetchStandings(),
+            fetchScorers()
+        ]);
+        
+        const result = {
+            matches: matchesData?.matches || [],
+            standings: standingsData?.standings || [],
+            scorers: scorersData?.scorers || [],
+        };
+        
         const response = new Response(JSON.stringify(result), {
             status: 200,
             headers: { "Content-Type": "application/json" },
@@ -281,7 +127,8 @@ export async function onRequest(context) {
             }), {
                 status: 500,
                 headers: { "Content-Type": "application/json" }
-            });
+            }
+        );
         return withCORSHeaders(errorResponse, origin);
     }
 }
