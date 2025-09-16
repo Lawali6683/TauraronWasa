@@ -64,33 +64,29 @@ export async function onRequest(context) {
         const TRANSLATE_API_KEY = env.TRANSLATE_API_KEY || "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";
         const TRANSLATE_API_URL = "https://openrouter.ai/api/v1/chat/completions";
 
-        // New system prompt to handle both languages and identify image needs
-        const systemPrompt = `Kai mai ba da labari ne na wasanni. Za ka amsa tambayoyi cikin harshen da aka yi maka tambaya, ko dai Hausa ko Turanci. Idan aka haɗa Hausa da Turanci, ka ba da amsa da Hausa. 
+        const systemPrompt = `Kai mai ba da labari ne na wasanni. Za ka amsa tambayoyi cikin harshen da aka yi maka tambaya, ko dai Hausa ko Turanci. Idan aka haɗa Hausa da Turanci, ka ba da amsa da Hausa.
         
-        Kafin ka ba da amsa, bincika ko tambayar tana neman bayani game da wani kulob ko mutum (ɗan wasa). Idan haka ne, fito da sunan mutumin ko kulob din a Turanci. Misali:
+        Kafin ka ba da amsa, bincika ko tambayar tana neman bayani game da wani kulob ko mutum (ɗan wasa). Idan haka ne, fito da sunan mutumin ko kulob din a Turanci a cikin alamar <entity_name>. Idan ba tambayar ba ce ta mutum ko kulob, ka sa <entity_name>general</entity_name>.
         
-        Tambaya: Wanene Cristiano Ronaldo?
-        Amsa: {
-            "query_type": "entity_search",
-            "entity_name": "Cristiano Ronaldo",
-            "response": "Cristiano Ronaldo (CR7) an haife shi ne a ranar 5 ga Fabrairu, 1985, a Funchal, Madeira, Portugal. Shi ɗan wasan ƙwallon ƙafa ne na ƙasar Portugal wanda aka fi sani da zura kwallaye da kuma ƙwararren salon wasa..."
-        }
+        Ka bayar da amsar ka a cikin alamar <response>.
         
-        Tambaya: Me zaka ce akan kulob din Barcelona?
-        Amsa: {
-            "query_type": "entity_search",
-            "entity_name": "Barcelona",
-            "response": "FC Barcelona, wanda aka fi sani da Barça, kulob ne na ƙwallon ƙafa da ke Barcelona, Spain. An kafa shi a shekara ta 1899, kuma yana ɗaya daga cikin manyan kulob a duniya. Kulob ɗin yana buga wasanninsa a Camp Nou, kuma yana da gasa mai tsawo da Real Madrid, wanda ake kira El Clásico."
-        }
+        Misali na amsa:
+        <response_data>
+            <entity_name>Cristiano Ronaldo</entity_name>
+            <response>Cristiano Ronaldo (CR7) an haife shi ne a ranar 5 ga Fabrairu, 1985, a Funchal, Madeira, Portugal. Shi ɗan wasan ƙwallon ƙafa ne na ƙasar Portugal...</response>
+        </response_data>
         
-        Tambaya: Mene ne ƙa'idodin wasan ƙwallon ƙafa?
-        Amsa: {
-            "query_type": "general_question",
-            "response": "Ƙa'idodin wasan ƙwallon ƙafa sun haɗa da: yawan 'yan wasa, tsawon lokacin wasa, buɗaɗɗen bugun kyauta, da kuma yadda ake zura ƙwallo a raga. Babban manufar wasan ita ce a zura ƙwallo a ragar abokin gaba."
-        }
+        <response_data>
+            <entity_name>Barcelona</entity_name>
+            <response>FC Barcelona, wanda aka fi sani da Barça, kulob ne na ƙwallon ƙafa da ke Barcelona, Spain. An kafa shi a shekara ta 1899...</response>
+        </response_data>
         
-        Ka tabbata amsarka tana cikin tsarin JSON mai kyau, wanda yake da filayen "query_type" da "response". Idan tambaya tana neman hoto, sai ka ƙara filin "entity_name" da sunan a Turanci. Idan ba a buƙatar hoto, sai ka sa "query_type": "general_question".
-        `;
+        <response_data>
+            <entity_name>general</entity_name>
+            <response>Ƙa'idodin wasan ƙwallon ƙafa sun haɗa da: yawan 'yan wasa, tsawon lokacin wasa, buɗaɗɗen bugun kyauta, da kuma yadda ake zura ƙwallo a raga...</response>
+        </response_data>
+        
+        Ka tabbata amsarka tana cikin tsarin <response_data> da kuma <entity_name> da <response>.`;
 
         const getChatAnswer = async (userQuery) => {
             try {
@@ -106,7 +102,6 @@ export async function onRequest(context) {
                             { role: "system", content: systemPrompt },
                             { role: "user", content: userQuery }
                         ],
-                        response_format: { type: "json_object" } // Tell the API we want a JSON response
                     }),
                 });
 
@@ -123,12 +118,17 @@ export async function onRequest(context) {
                     return { error: true, message: "Ba a samu amsa daga API ba." };
                 }
 
-                // Parse the JSON response from GPT
-                const parsedContent = JSON.parse(content);
+                // New parsing logic using regex
+                const entityMatch = content.match(/<entity_name>(.*?)<\/entity_name>/);
+                const responseMatch = content.match(/<response>(.*?)<\/response>/);
+
+                const entityName = entityMatch ? entityMatch[1].trim() : "general";
+                const responseText = responseMatch ? responseMatch[1].trim() : "Ba a samu labarin da ake nema ba.";
+
                 return {
-                    query_type: parsedContent.query_type,
-                    entity_name: parsedContent.entity_name,
-                    response_text: parsedContent.response
+                    query_type: entityName === "general" ? "general_question" : "entity_search",
+                    entity_name: entityName,
+                    response_text: responseText
                 };
 
             } catch (e) {
@@ -162,11 +162,9 @@ export async function onRequest(context) {
             } catch (e) {
                 console.error("TheSportsDB search error:", e.message);
             }
-
             return null;
         };
         
-        // Fara da aika tambayar zuwa GPT
         const gptResult = await getChatAnswer(query);
 
         if (gptResult.error) {
@@ -179,8 +177,7 @@ export async function onRequest(context) {
 
         let finalResponseData = { message: gptResult.response_text, image: null };
 
-        // Idan GPT ya gano cewa ana neman wani abu da hoto
-        if (gptResult.query_type === "entity_search" && gptResult.entity_name) {
+        if (gptResult.query_type === "entity_search" && gptResult.entity_name && gptResult.entity_name !== "general") {
             const image = await searchTheSportsDB(gptResult.entity_name);
             if (image) {
                 finalResponseData.image = image;
