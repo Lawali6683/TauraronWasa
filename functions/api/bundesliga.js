@@ -1,8 +1,7 @@
 export async function onRequest(context) {
     const { request, env } = context;
     const cache = caches.default;
-    const cacheKey = new URL(request.url).toString();
-
+    
     const origin = request.headers.get("Origin");
     const ALLOWED_ORIGINS = [
         "https://tauraronwasa.pages.dev",
@@ -22,7 +21,6 @@ export async function onRequest(context) {
         return response;
     }
 
-    // Handle CORS preflight requests
     if (request.method === "OPTIONS") {
         return withCORSHeaders(new Response(null, { status: 204 }));
     }
@@ -30,7 +28,6 @@ export async function onRequest(context) {
     const WORKER_API_KEY = request.headers.get("x-api-key");
     const contentType = request.headers.get("content-type") || "";
 
-    // Validate API Key
     if (WORKER_API_KEY !== "@haruna66") {
         return withCORSHeaders(new Response(
             JSON.stringify({ error: true, message: "Invalid API Key" }), {
@@ -40,7 +37,6 @@ export async function onRequest(context) {
         ));
     }
 
-    // Validate request method and content type
     if (request.method !== "POST" || !contentType.includes("application/json")) {
         return withCORSHeaders(new Response(
             JSON.stringify({ error: true, message: "Invalid Request Method or Content-Type" }), {
@@ -51,7 +47,6 @@ export async function onRequest(context) {
     }
 
     try {
-        // Muna canza cacheKey zuwa wani abu mai tsayayye, ba tare da matchday ba
         const fixedCacheKey = new URL(request.url).origin + new URL(request.url).pathname;
         const cachedResponse = await cache.match(fixedCacheKey);
         
@@ -67,38 +62,56 @@ export async function onRequest(context) {
         const BUNDESLIGA_SCORERS_URL = `https://api.football-data.org/v4/competitions/${BUNDESLIGA_CODE}/scorers?limit=10`;
         const BUNDESLIGA_MATCHES_URL = `https://api.football-data.org/v4/competitions/${BUNDESLIGA_CODE}/matches`;
 
-        // Yanzu muna kiran API sau uku a lokaci daya don dawo da dukkan bayanan
-        const [tableResponse, scorersResponse, matchesResponse] = await Promise.all([
+        // Yanzu zamu yi buƙatu daban-daban sannan mu tantance su daya bayan daya
+        const [tableRes, matchesRes, scorersRes] = await Promise.allSettled([
             fetch(BUNDESLIGA_TABLE_URL, { headers: { "X-Auth-Token": FOOTBALL_API_TOKEN } }),
-            fetch(BUNDESLIGA_SCORERS_URL, { headers: { "X-Auth-Token": FOOTBALL_API_TOKEN } }),
             fetch(BUNDESLIGA_MATCHES_URL, { headers: { "X-Auth-Token": FOOTBALL_API_TOKEN } }),
+            fetch(BUNDESLIGA_SCORERS_URL, { headers: { "X-Auth-Token": FOOTBALL_API_TOKEN } }),
         ]);
 
-        if (!tableResponse.ok || !scorersResponse.ok || !matchesResponse.ok) {
-            const errorText = await (!tableResponse.ok ? tableResponse.text() : !scorersResponse.ok ? scorersResponse.text() : matchesResponse.text());
-            const status = !tableResponse.ok ? tableResponse.status : !scorersResponse.ok ? scorersResponse.status : matchesResponse.status;
-            const statusText = !tableResponse.ok ? tableResponse.statusText : !scorersResponse.ok ? scorersResponse.statusText : matchesResponse.statusText;
-            console.error(`Error fetching Bundesliga data: ${status} - ${errorText}`);
+        let finalData = {};
+        let errors = [];
+
+        // Tantance aikin Standing (League Table)
+        if (tableRes.status === 'fulfilled' && tableRes.value.ok) {
+            const data = await tableRes.value.json();
+            finalData.leagueTable = data?.standings?.[0]?.table || [];
+            finalData.currentMatchday = data?.season?.currentMatchday;
+            finalData.totalMatchdays = data?.season?.totalMatchdays;
+        } else {
+            errors.push("Failed to fetch standings data.");
+            console.error("Standings fetch failed:", tableRes.reason ? tableRes.reason.message : `Status: ${tableRes.value?.status}`);
+        }
+
+        // Tantance aikin Matches
+        if (matchesRes.status === 'fulfilled' && matchesRes.value.ok) {
+            const data = await matchesRes.value.json();
+            finalData.matches = data?.matches || [];
+        } else {
+            errors.push("Failed to fetch matches data.");
+            console.error("Matches fetch failed:", matchesRes.reason ? matchesRes.reason.message : `Status: ${matchesRes.value?.status}`);
+        }
+
+        // Tantance aikin Scorers
+        if (scorersRes.status === 'fulfilled' && scorersRes.value.ok) {
+            const data = await scorersRes.value.json();
+            finalData.scorers = data?.scorers || [];
+        } else {
+            errors.push("Failed to fetch scorers data.");
+            console.error("Scorers fetch failed:", scorersRes.reason ? scorersRes.reason.message : `Status: ${scorersRes.value?.status}`);
+        }
+
+        // Idan duk aikin ya kasa, sai mu mayar da kuskure
+        if (errors.length === 3) {
             return withCORSHeaders(new Response(
-                JSON.stringify({ error: true, message: `Failed to fetch Bundesliga data: ${statusText}` }), {
-                    status: status,
+                JSON.stringify({ error: true, message: "All API calls failed. Please check your API key and plan limits." }), {
+                    status: 500,
                     headers: { "Content-Type": "application/json" },
                 }
             ));
         }
 
-        const tableData = await tableResponse.json();
-        const matchesData = await matchesResponse.json();
-        const scorersData = await scorersResponse.json();
-
-        const finalData = {
-            matches: matchesData?.matches || [],
-            leagueTable: tableData?.standings?.[0]?.table || [],
-            scorers: scorersData?.scorers || [],
-            currentMatchday: tableData?.season?.currentMatchday,
-            totalMatchdays: tableData?.season?.totalMatchdays,
-        };
-
+        // Idan wasu sunyi aiki, za mu nuna su, kuma mu mayar da kuskure idan an sami matsala.
         const response = new Response(JSON.stringify(finalData), {
             status: 200,
             headers: {
@@ -109,7 +122,7 @@ export async function onRequest(context) {
 
         // Add to cache
         context.waitUntil(cache.put(fixedCacheKey, response.clone()));
-
+        
         return withCORSHeaders(response);
 
     } catch (e) {
