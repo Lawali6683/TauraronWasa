@@ -51,29 +51,33 @@ export async function onRequest(context) {
     }
 
     try {
-        const cachedResponse = await cache.match(cacheKey);
+        // Muna canza cacheKey zuwa wani abu mai tsayayye, ba tare da matchday ba
+        const fixedCacheKey = new URL(request.url).origin + new URL(request.url).pathname;
+        const cachedResponse = await cache.match(fixedCacheKey);
+        
         if (cachedResponse) {
-            console.log("Serving from cache:", cacheKey);
+            console.log("Serving from cache:", fixedCacheKey);
             return withCORSHeaders(cachedResponse);
         }
 
-        const requestBody = await request.json();
-        let { matchday } = requestBody;
         const FOOTBALL_API_TOKEN = "b75541b8a8cc43719195871aa2bd419e";
         const BUNDESLIGA_CODE = "BL1";
 
         const BUNDESLIGA_TABLE_URL = `https://api.football-data.org/v4/competitions/${BUNDESLIGA_CODE}/standings`;
         const BUNDESLIGA_SCORERS_URL = `https://api.football-data.org/v4/competitions/${BUNDESLIGA_CODE}/scorers?limit=10`;
+        const BUNDESLIGA_MATCHES_URL = `https://api.football-data.org/v4/competitions/${BUNDESLIGA_CODE}/matches`;
 
-        const [tableResponse, scorersResponse] = await Promise.all([
+        // Yanzu muna kiran API sau uku a lokaci daya don dawo da dukkan bayanan
+        const [tableResponse, scorersResponse, matchesResponse] = await Promise.all([
             fetch(BUNDESLIGA_TABLE_URL, { headers: { "X-Auth-Token": FOOTBALL_API_TOKEN } }),
             fetch(BUNDESLIGA_SCORERS_URL, { headers: { "X-Auth-Token": FOOTBALL_API_TOKEN } }),
+            fetch(BUNDESLIGA_MATCHES_URL, { headers: { "X-Auth-Token": FOOTBALL_API_TOKEN } }),
         ]);
 
-        if (!tableResponse.ok || !scorersResponse.ok) {
-            const errorText = await (!tableResponse.ok ? tableResponse.text() : scorersResponse.text());
-            const status = !tableResponse.ok ? tableResponse.status : scorersResponse.status;
-            const statusText = !tableResponse.ok ? tableResponse.statusText : scorersResponse.statusText;
+        if (!tableResponse.ok || !scorersResponse.ok || !matchesResponse.ok) {
+            const errorText = await (!tableResponse.ok ? tableResponse.text() : !scorersResponse.ok ? scorersResponse.text() : matchesResponse.text());
+            const status = !tableResponse.ok ? tableResponse.status : !scorersResponse.ok ? scorersResponse.status : matchesResponse.status;
+            const statusText = !tableResponse.ok ? tableResponse.statusText : !scorersResponse.ok ? scorersResponse.statusText : matchesResponse.statusText;
             console.error(`Error fetching Bundesliga data: ${status} - ${errorText}`);
             return withCORSHeaders(new Response(
                 JSON.stringify({ error: true, message: `Failed to fetch Bundesliga data: ${statusText}` }), {
@@ -84,29 +88,6 @@ export async function onRequest(context) {
         }
 
         const tableData = await tableResponse.json();
-        const currentMatchday = tableData?.season?.currentMatchday;
-        const totalMatchdays = tableData?.season?.totalMatchdays;
-
-        if (!matchday) {
-            matchday = currentMatchday;
-        }
-
-        const BUNDESLIGA_MATCHES_URL = `https://api.football-data.org/v4/competitions/${BUNDESLIGA_CODE}/matches?matchday=${matchday}`;
-        const matchesResponse = await fetch(BUNDESLIGA_MATCHES_URL, {
-            headers: { "X-Auth-Token": FOOTBALL_API_TOKEN }
-        });
-
-        if (!matchesResponse.ok) {
-            const errorText = await matchesResponse.text();
-            console.error(`Error fetching Bundesliga matches: ${matchesResponse.status} - ${errorText}`);
-            return withCORSHeaders(new Response(
-                JSON.stringify({ error: true, message: `Failed to fetch Bundesliga matches: ${matchesResponse.statusText}` }), {
-                    status: matchesResponse.status,
-                    headers: { "Content-Type": "application/json" },
-                }
-            ));
-        }
-
         const matchesData = await matchesResponse.json();
         const scorersData = await scorersResponse.json();
 
@@ -114,8 +95,8 @@ export async function onRequest(context) {
             matches: matchesData?.matches || [],
             leagueTable: tableData?.standings?.[0]?.table || [],
             scorers: scorersData?.scorers || [],
-            currentMatchday: currentMatchday,
-            totalMatchdays: totalMatchdays,
+            currentMatchday: tableData?.season?.currentMatchday,
+            totalMatchdays: tableData?.season?.totalMatchdays,
         };
 
         const response = new Response(JSON.stringify(finalData), {
@@ -127,8 +108,8 @@ export async function onRequest(context) {
         });
 
         // Add to cache
-        context.waitUntil(cache.put(cacheKey, response.clone()));
-        
+        context.waitUntil(cache.put(fixedCacheKey, response.clone()));
+
         return withCORSHeaders(response);
 
     } catch (e) {
