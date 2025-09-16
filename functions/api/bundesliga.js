@@ -1,7 +1,9 @@
 export async function onRequest(context) {
-    const { request } = context;
-    const origin = request.headers.get("Origin");
+    const { request, env } = context;
+    const cache = caches.default;
+    const cacheKey = new URL(request.url).toString();
 
+    const origin = request.headers.get("Origin");
     const ALLOWED_ORIGINS = [
         "https://tauraronwasa.pages.dev",
         "https://leadwaypeace.pages.dev",
@@ -49,10 +51,16 @@ export async function onRequest(context) {
     }
 
     try {
+        const cachedResponse = await cache.match(cacheKey);
+        if (cachedResponse) {
+            console.log("Serving from cache:", cacheKey);
+            return withCORSHeaders(cachedResponse);
+        }
+
         const requestBody = await request.json();
         let { matchday } = requestBody;
         const FOOTBALL_API_TOKEN = "b75541b8a8cc43719195871aa2bd419e";
-        const BUNDESLIGA_CODE = "BL1"; // Code na Bundesliga
+        const BUNDESLIGA_CODE = "BL1";
 
         const BUNDESLIGA_TABLE_URL = `https://api.football-data.org/v4/competitions/${BUNDESLIGA_CODE}/standings`;
         const BUNDESLIGA_SCORERS_URL = `https://api.football-data.org/v4/competitions/${BUNDESLIGA_CODE}/scorers?limit=10`;
@@ -62,12 +70,14 @@ export async function onRequest(context) {
             fetch(BUNDESLIGA_SCORERS_URL, { headers: { "X-Auth-Token": FOOTBALL_API_TOKEN } }),
         ]);
 
-        if (!tableResponse.ok) {
-            const errorText = await tableResponse.text();
-            console.error(`Error fetching Bundesliga standings: ${tableResponse.status} - ${errorText}`);
+        if (!tableResponse.ok || !scorersResponse.ok) {
+            const errorText = await (!tableResponse.ok ? tableResponse.text() : scorersResponse.text());
+            const status = !tableResponse.ok ? tableResponse.status : scorersResponse.status;
+            const statusText = !tableResponse.ok ? tableResponse.statusText : scorersResponse.statusText;
+            console.error(`Error fetching Bundesliga data: ${status} - ${errorText}`);
             return withCORSHeaders(new Response(
-                JSON.stringify({ error: true, message: `Failed to fetch Bundesliga standings: ${tableResponse.statusText}` }), {
-                    status: tableResponse.status,
+                JSON.stringify({ error: true, message: `Failed to fetch Bundesliga data: ${statusText}` }), {
+                    status: status,
                     headers: { "Content-Type": "application/json" },
                 }
             ));
@@ -76,7 +86,7 @@ export async function onRequest(context) {
         const tableData = await tableResponse.json();
         const currentMatchday = tableData?.season?.currentMatchday;
         const totalMatchdays = tableData?.season?.totalMatchdays;
-        
+
         if (!matchday) {
             matchday = currentMatchday;
         }
@@ -98,7 +108,7 @@ export async function onRequest(context) {
         }
 
         const matchesData = await matchesResponse.json();
-        const scorersData = scorersResponse.ok ? await scorersResponse.json() : { scorers: [] };
+        const scorersData = await scorersResponse.json();
 
         const finalData = {
             matches: matchesData?.matches || [],
@@ -108,10 +118,18 @@ export async function onRequest(context) {
             totalMatchdays: totalMatchdays,
         };
 
-        return withCORSHeaders(new Response(JSON.stringify(finalData), {
+        const response = new Response(JSON.stringify(finalData), {
             status: 200,
-            headers: { "Content-Type": "application/json" },
-        }));
+            headers: {
+                "Content-Type": "application/json",
+                "Cache-Control": "public, max-age=1800" // Cache for 30 minutes (1800 seconds)
+            },
+        });
+
+        // Add to cache
+        context.waitUntil(cache.put(cacheKey, response.clone()));
+        
+        return withCORSHeaders(response);
 
     } catch (e) {
         console.error("Server error in bundesliga.js:", e.message, e.stack);
