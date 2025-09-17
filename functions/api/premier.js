@@ -1,138 +1,207 @@
 export async function onRequest(context) {
-    const { request, env } = context;
 
-    const origin = request.headers.get("Origin");
-    const ALLOWED_ORIGINS = [
-        "https://tauraronwasa.pages.dev",
-        "https://leadwaypeace.pages.dev",
-        "http://localhost:8080",
-    ];
+  const { request } = context;
 
-    // Handle preflight OPTIONS request
-    if (request.method === "OPTIONS") {
-        if (ALLOWED_ORIGINS.includes(origin)) {
-            return new Response(null, {
-                status: 204,
-                headers: {
-                    "Access-Control-Allow-Origin": origin,
-                    "Access-Control-Allow-Methods": "POST, OPTIONS",
-                    "Access-Control-Allow-Headers": "Content-Type, x-api-key",
-                    "Access-Control-Max-Age": "86400",
-                },
-            });
-        }
-        return new Response(null, { status: 403 });
+  const origin = request.headers.get("Origin");
+  const ALLOWED_ORIGINS = [
+
+    "https://tauraronwasa.pages.dev",
+
+    "https://leadwaypeace.pages.dev",
+
+    "http://localhost:8080",
+
+  ];
+
+  if (request.method === "OPTIONS") {
+
+    if (ALLOWED_ORIGINS.includes(origin)) {
+
+      return new Response(null, {
+
+        status: 204,
+
+        headers: {
+
+          "Access-Control-Allow-Origin": origin,
+
+          "Access-Control-Allow-Methods": "POST, OPTIONS",
+
+          "Access-Control-Allow-Headers": "Content-Type, x-api-key",
+
+          "Access-Control-Max-Age": "86400",
+
+        },
+
+      });
+
     }
 
-    const WORKER_API_KEY = request.headers.get("x-api-key");
-    const contentType = request.headers.get("content-type") || "";
+    return new Response(null, { status: 403 });
 
-    // Validate API Key
-    if (WORKER_API_KEY !== "@haruna66") {
-        const response = new Response(
-            JSON.stringify({ error: true, message: "Invalid API Key" }), {
-                status: 401,
-                headers: { "Content-Type": "application/json" },
-            }
-        );
-        return withCORSHeaders(response, origin);
+  }
+
+  const WORKER_API_KEY = request.headers.get("x-api-key");
+
+  const contentType = request.headers.get("content-type") || "";
+
+  if (WORKER_API_KEY !== "@haruna66") {
+
+    const response = new Response(
+
+      JSON.stringify({ error: true, message: "Invalid API Key" }), {
+
+      status: 401,
+
+      headers: { "Content-Type": "application/json" },
+
     }
 
-    // Validate request method and content type
-    if (request.method !== "POST" || !contentType.includes("application/json")) {
-        const response = new Response(
-            JSON.stringify({ error: true, message: "Invalid Request Method or Content-Type" }), {
-                status: 400,
-                headers: { "Content-Type": "application/json" },
-            }
-        );
-        return withCORSHeaders(response, origin);
+    );
+
+    return withCORSHeaders(response, origin);
+
+  }
+
+  if (request.method !== "POST" || !contentType.includes("application/json")) {
+
+    const response = new Response(
+
+      JSON.stringify({ error: true, message: "Invalid Request Method or Content-Type" }), {
+
+      status: 400,
+
+      headers: { "Content-Type": "application/json" },
+
     }
 
-    try {
-        const requestBody = await request.json();
-        let requestedMatchday = requestBody?.matchday;
-        const FOOTBALL_API_TOKEN = "b75541b8a8cc43719195871aa2bd419e";
-        const PL_CODE = "PL";
+    );
 
-        let targetMatchday;
+    return withCORSHeaders(response, origin);
 
-        // Fetch current matchday if not provided in the request
-        if (!requestedMatchday) {
-            const leagueResponse = await fetch(`https://api.football-data.org/v4/competitions/${PL_CODE}`, { headers: { "X-Auth-Token": FOOTBALL_API_TOKEN } });
-            
-            if (!leagueResponse.ok) {
-                const errorText = await leagueResponse.text();
-                console.error(`Error fetching league data: ${leagueResponse.status} - ${errorText}`);
-                throw new Error(`Kasa loda bayanan gasar: ${leagueResponse.statusText}`);
-            }
-            
-            const leagueData = await leagueResponse.json();
-            targetMatchday = leagueData?.currentSeason?.currentMatchday || 1;
-        } else {
-            targetMatchday = requestedMatchday;
-        }
+  }
 
-        // Fetch all data concurrently using Promise.all
-        const [matchesResponse, standingsResponse, scorersResponse] = await Promise.all([
-            fetch(`https://api.football-data.org/v4/competitions/${PL_CODE}/matches?matchday=${targetMatchday}`, { headers: { "X-Auth-Token": FOOTBALL_API_TOKEN } }),
-            fetch(`https://api.football-data.org/v4/competitions/${PL_CODE}/standings`, { headers: { "X-Auth-Token": FOOTBALL_API_TOKEN } }),
-            fetch(`https://api.football-data.org/v4/competitions/${PL_CODE}/scorers?limit=10`, { headers: { "X-Auth-Token": FOOTBALL_API_TOKEN } }),
-        ]);
+  try {
 
-        // Process all responses
-        const matchesData = matchesResponse.ok ? await matchesResponse.json() : { matches: [] };
-        const plTableData = standingsResponse.ok ? await standingsResponse.json() : { standings: [] };
-        const plScorersData = scorersResponse.ok ? await scorersResponse.json() : { scorers: [] };
+    const FOOTBALL_API_TOKEN = "b75541b8a8cc43719195871aa2bd419e";
 
-        // Construct the final combined data object
-        const finalData = {
-            currentMatchday: targetMatchday,
-            totalMatchdays: matchesData?.resultSet?.last || 38,
-            matches: matchesData?.matches || [],
-            leagueTable: plTableData?.standings?.[0]?.table || [],
-            scorers: plScorersData?.scorers || [],
-        };
+    // Canja code daga CL zuwa PL don Premier League
 
-        const response = new Response(JSON.stringify(finalData), {
-            status: 200,
-            headers: { "Content-Type": "application/json" },
-        });
+    const PL_CODE = "PL";
 
-        return withCORSHeaders(response, origin);
+    const BASE_API_URL = "https://api.football-data.org/v4";
 
-    } catch (e) {
-        console.error("Server error in premier.js:", e.message, e.stack);
-        const errorResponse = new Response(
-            JSON.stringify({
-                error: true,
-                message: `Server error while fetching data: ${e.message}`,
-                details: e.stack,
-            }), {
-                status: 500,
-                headers: { "Content-Type": "application/json" },
-            }
-        );
-        return withCORSHeaders(errorResponse, origin);
+    const apiHeaders = { "X-Auth-Token": FOOTBALL_API_TOKEN };
+
+    
+    // Sabunta URLs don Premier League
+
+    const matchesUrl = `${BASE_API_URL}/competitions/${PL_CODE}/matches`;
+
+    const standingsUrl = `${BASE_API_URL}/competitions/${PL_CODE}/standings`;
+
+    const scorersUrl = `${BASE_API_URL}/competitions/${PL_CODE}/scorers?limit=10`;
+    
+    const [matchesRes, standingsRes, scorersRes] = await Promise.all([
+
+      fetch(matchesUrl, { headers: apiHeaders }),
+
+      fetch(standingsUrl, { headers: apiHeaders }),
+
+      fetch(scorersUrl, { headers: apiHeaders }),
+
+    ]);
+
+    
+    const matchesData = matchesRes.ok ? await matchesRes.json() : { matches: [] };
+
+    const standingsData = standingsRes.ok ? await standingsRes.json() : { standings: [] };
+
+    const scorersData = scorersRes.ok ? await scorersRes.json() : { scorers: [] };
+
+    
+    // Tattara bayanan da za a tura zuwa shafin HTML
+
+    const finalData = {
+
+      matches: matchesData.matches || [],
+
+      // An canja tsarin teburin PL saboda API yana dawo da shi daban da na CL
+
+      standings: standingsData.standings && standingsData.standings.length > 0 ? standingsData.standings[0].table : [],
+
+      scorers: scorersData.scorers || [],
+
+      // A halin yanzu babu assists a API, don haka zamu barshi a kosong
+
+      assists: [],
+
+    };
+
+    const response = new Response(JSON.stringify(finalData), {
+
+      status: 200,
+
+      headers: { "Content-Type": "application/json" },
+
+    });
+
+    return withCORSHeaders(response, origin);
+
+  } catch (e) {
+
+    console.error("Server error in premier.js:", e.message, e.stack);
+
+    const errorResponse = new Response(
+
+      JSON.stringify({
+
+        error: true,
+
+        message: `Kuskure a wajen dauko bayanan Premier League: ${e.message}`,
+
+      }), {
+
+      status: 500,
+
+      headers: { "Content-Type": "application/json" },
+
     }
+
+    );
+
+    return withCORSHeaders(errorResponse, origin);
+
+  }
 }
 
 function withCORSHeaders(response, origin) {
-    const ALLOWED_ORIGINS = [
-        "https://tauraronwasa.pages.dev",
-        "https://leadwaypeace.pages.dev",
-        "http://localhost:8080",
-    ];
 
-    if (ALLOWED_ORIGINS.includes(origin)) {
-        response.headers.set("Access-Control-Allow-Origin", origin);
-    } else {
-        response.headers.set("Access-Control-Allow-Origin", "https://tauraronwasa.pages.dev");
-    }
+  const ALLOWED_ORIGINS = [
 
-    response.headers.set("Access-Control-Allow-Methods", "POST, OPTIONS");
-    response.headers.set("Access-Control-Allow-Headers", "Content-Type, x-api-key");
-    response.headers.set("Access-Control-Max-Age", "86400");
+    "https://tauraronwasa.pages.dev",
 
-    return response;
+    "https://leadwaypeace.pages.dev",
+
+    "http://localhost:8080",
+
+  ];
+
+  if (ALLOWED_ORIGINS.includes(origin)) {
+
+    response.headers.set("Access-Control-Allow-Origin", origin);
+
+  } else {
+
+    response.headers.set("Access-Control-Allow-Origin", "https://tauraronwasa.pages.dev");
+
+  }
+
+  response.headers.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+
+  response.headers.set("Access-Control-Allow-Headers", "Content-Type, x-api-key");
+
+  response.headers.set("Access-Control-Max-Age", "86400");
+
+  return response;
 }
