@@ -1,142 +1,115 @@
 export async function onRequest(context) {
-    const { request, env } = context;
-    const cache = caches.default;
-    
-    const origin = request.headers.get("Origin");
-    const ALLOWED_ORIGINS = [
-        "https://tauraronwasa.pages.dev",
-        "https://leadwaypeace.pages.dev",
-        "http://localhost:8080",
-    ];
+  const { request } = context;
+  const origin = request.headers.get("Origin");
+  const ALLOWED_ORIGINS = [
+    "https://tauraronwasa.pages.dev",
+    "https://leadwaypeace.pages.dev",
+    "http://localhost:8080",
+  ];
 
-    function withCORSHeaders(response) {
-        if (ALLOWED_ORIGINS.includes(origin)) {
-            response.headers.set("Access-Control-Allow-Origin", origin);
-        } else {
-            response.headers.set("Access-Control-Allow-Origin", "https://tauraronwasa.pages.dev");
-        }
-        response.headers.set("Access-Control-Allow-Methods", "POST, OPTIONS");
-        response.headers.set("Access-Control-Allow-Headers", "Content-Type, x-api-key");
-        response.headers.set("Access-Control-Max-Age", "86400");
-        return response;
+  if (request.method === "OPTIONS") {
+    if (ALLOWED_ORIGINS.includes(origin)) {
+      return new Response(null, {
+        status: 204,
+        headers: {
+          "Access-Control-Allow-Origin": origin,
+          "Access-Control-Allow-Methods": "POST, OPTIONS",
+          "Access-Control-Allow-Headers": "Content-Type, x-api-key",
+          "Access-Control-Max-Age": "86400",
+        },
+      });
     }
+    return new Response(null, { status: 403 });
+  }
 
-    if (request.method === "OPTIONS") {
-        return withCORSHeaders(new Response(null, { status: 204 }));
+  const WORKER_API_KEY = request.headers.get("x-api-key");
+  const contentType = request.headers.get("content-type") || "";
+
+  if (WORKER_API_KEY !== "@haruna66") {
+    const response = new Response(
+      JSON.stringify({ error: true, message: "Invalid API Key" }), {
+      status: 401,
+      headers: { "Content-Type": "application/json" },
     }
+    );
+    return withCORSHeaders(response, origin);
+  }
 
-    const WORKER_API_KEY = request.headers.get("x-api-key");
-    const contentType = request.headers.get("content-type") || "";
-
-    if (WORKER_API_KEY !== "@haruna66") {
-        return withCORSHeaders(new Response(
-            JSON.stringify({ error: true, message: "Invalid API Key" }), {
-                status: 401,
-                headers: { "Content-Type": "application/json" },
-            }
-        ));
+  if (request.method !== "POST" || !contentType.includes("application/json")) {
+    const response = new Response(
+      JSON.stringify({ error: true, message: "Invalid Request Method or Content-Type" }), {
+      status: 400,
+      headers: { "Content-Type": "application/json" },
     }
+    );
+    return withCORSHeaders(response, origin);
+  }
 
-    if (request.method !== "POST" || !contentType.includes("application/json")) {
-        return withCORSHeaders(new Response(
-            JSON.stringify({ error: true, message: "Invalid Request Method or Content-Type" }), {
-                status: 400,
-                headers: { "Content-Type": "application/json" },
-            }
-        ));
+  try {
+    const FOOTBALL_API_TOKEN = "b75541b8a8cc43719195871aa2bd419e";
+    // Canja code daga SA zuwa BL1 don Bundesliga
+    const BL1_CODE = "BL1";
+    const BASE_API_URL = "https://api.football-data.org/v4";
+    const apiHeaders = { "X-Auth-Token": FOOTBALL_API_TOKEN };
+
+    // Sabunta URLs don Bundesliga
+    const matchesUrl = `${BASE_API_URL}/competitions/${BL1_CODE}/matches`;
+    const standingsUrl = `${BASE_API_URL}/competitions/${BL1_CODE}/standings`;
+    const scorersUrl = `${BASE_API_URL}/competitions/${BL1_CODE}/scorers?limit=10`;
+
+    const [matchesRes, standingsRes, scorersRes] = await Promise.all([
+      fetch(matchesUrl, { headers: apiHeaders }),
+      fetch(standingsUrl, { headers: apiHeaders }),
+      fetch(scorersUrl, { headers: apiHeaders }),
+    ]);
+
+    const matchesData = matchesRes.ok ? await matchesRes.json() : { matches: [] };
+    const standingsData = standingsRes.ok ? await standingsRes.json() : { standings: [] };
+    const scorersData = scorersRes.ok ? await scorersRes.json() : { scorers: [] };
+
+    const finalData = {
+      matches: matchesData.matches || [],
+      // An tabbatar da tsarin standings ya yi daidai da na Bundesliga
+      standings: standingsData.standings && standingsData.standings.length > 0 ? standingsData.standings[0].table : [],
+      scorers: scorersData.scorers || [],
+      assists: [],
+    };
+
+    const response = new Response(JSON.stringify(finalData), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+    return withCORSHeaders(response, origin);
+  } catch (e) {
+    console.error("Server error in bundesliga.js:", e.message, e.stack);
+    const errorResponse = new Response(
+      JSON.stringify({
+        error: true,
+        message: `Kuskure a wajen dauko bayanan Bundesliga: ${e.message}`,
+      }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
     }
+    );
+    return withCORSHeaders(errorResponse, origin);
+  }
+}
 
-    try {
-        const fixedCacheKey = new URL(request.url).origin + new URL(request.url).pathname;
-        const cachedResponse = await cache.match(fixedCacheKey);
-        
-        if (cachedResponse) {
-            console.log("Serving from cache:", fixedCacheKey);
-            return withCORSHeaders(cachedResponse);
-        }
+function withCORSHeaders(response, origin) {
+  const ALLOWED_ORIGINS = [
+    "https://tauraronwasa.pages.dev",
+    "https://leadwaypeace.pages.dev",
+    "http://localhost:8080",
+  ];
 
-        const FOOTBALL_API_TOKEN = "b75541b8a8cc43719195871aa2bd419e";
-        const BUNDESLIGA_CODE = "BL1";
+  if (ALLOWED_ORIGINS.includes(origin)) {
+    response.headers.set("Access-Control-Allow-Origin", origin);
+  } else {
+    response.headers.set("Access-Control-Allow-Origin", "https://tauraronwasa.pages.dev");
+  }
 
-        const BUNDESLIGA_TABLE_URL = `https://api.football-data.org/v4/competitions/${BUNDESLIGA_CODE}/standings`;
-        const BUNDESLIGA_SCORERS_URL = `https://api.football-data.org/v4/competitions/${BUNDESLIGA_CODE}/scorers?limit=10`;
-        const BUNDESLIGA_MATCHES_URL = `https://api.football-data.org/v4/competitions/${BUNDESLIGA_CODE}/matches`;
-
-        // Yanzu zamu yi buƙatu daban-daban sannan mu tantance su daya bayan daya
-        const [tableRes, matchesRes, scorersRes] = await Promise.allSettled([
-            fetch(BUNDESLIGA_TABLE_URL, { headers: { "X-Auth-Token": FOOTBALL_API_TOKEN } }),
-            fetch(BUNDESLIGA_MATCHES_URL, { headers: { "X-Auth-Token": FOOTBALL_API_TOKEN } }),
-            fetch(BUNDESLIGA_SCORERS_URL, { headers: { "X-Auth-Token": FOOTBALL_API_TOKEN } }),
-        ]);
-
-        let finalData = {};
-        let errors = [];
-
-        // Tantance aikin Standing (League Table)
-        if (tableRes.status === 'fulfilled' && tableRes.value.ok) {
-            const data = await tableRes.value.json();
-            finalData.leagueTable = data?.standings?.[0]?.table || [];
-            finalData.currentMatchday = data?.season?.currentMatchday;
-            finalData.totalMatchdays = data?.season?.totalMatchdays;
-        } else {
-            errors.push("Failed to fetch standings data.");
-            console.error("Standings fetch failed:", tableRes.reason ? tableRes.reason.message : `Status: ${tableRes.value?.status}`);
-        }
-
-        // Tantance aikin Matches
-        if (matchesRes.status === 'fulfilled' && matchesRes.value.ok) {
-            const data = await matchesRes.value.json();
-            finalData.matches = data?.matches || [];
-        } else {
-            errors.push("Failed to fetch matches data.");
-            console.error("Matches fetch failed:", matchesRes.reason ? matchesRes.reason.message : `Status: ${matchesRes.value?.status}`);
-        }
-
-        // Tantance aikin Scorers
-        if (scorersRes.status === 'fulfilled' && scorersRes.value.ok) {
-            const data = await scorersRes.value.json();
-            finalData.scorers = data?.scorers || [];
-        } else {
-            errors.push("Failed to fetch scorers data.");
-            console.error("Scorers fetch failed:", scorersRes.reason ? scorersRes.reason.message : `Status: ${scorersRes.value?.status}`);
-        }
-
-        // Idan duk aikin ya kasa, sai mu mayar da kuskure
-        if (errors.length === 3) {
-            return withCORSHeaders(new Response(
-                JSON.stringify({ error: true, message: "All API calls failed. Please check your API key and plan limits." }), {
-                    status: 500,
-                    headers: { "Content-Type": "application/json" },
-                }
-            ));
-        }
-
-        // Idan wasu sunyi aiki, za mu nuna su, kuma mu mayar da kuskure idan an sami matsala.
-        const response = new Response(JSON.stringify(finalData), {
-            status: 200,
-            headers: {
-                "Content-Type": "application/json",
-                "Cache-Control": "public, max-age=1800" // Cache for 30 minutes (1800 seconds)
-            },
-        });
-
-        // Add to cache
-        context.waitUntil(cache.put(fixedCacheKey, response.clone()));
-        
-        return withCORSHeaders(response);
-
-    } catch (e) {
-        console.error("Server error in bundesliga.js:", e.message, e.stack);
-        const errorResponse = new Response(
-            JSON.stringify({
-                error: true,
-                message: "Server error while fetching Bundesliga data.",
-                details: e.message,
-            }), {
-                status: 500,
-                headers: { "Content-Type": "application/json" },
-            }
-        );
-        return withCORSHeaders(errorResponse);
-    }
+  response.headers.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+  response.headers.set("Access-Control-Allow-Headers", "Content-Type, x-api-key");
+  response.headers.set("Access-Control-Max-Age", "86400");
+  return response;
 }
