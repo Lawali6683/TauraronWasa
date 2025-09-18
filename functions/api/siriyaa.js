@@ -46,7 +46,7 @@ export async function onRequest(context) {
   }
 
   try {
-    const FOOTBALL_API_TOKEN = "b75541b8a8cc43719195871aa2bd419e";
+    const FOOTBALL_API_TOKEN = "bc96c7c2d2d844e48b48f400d8fae946";
     // Canja code daga PD zuwa SA don Seria A
     const SA_CODE = "SA";
     const BASE_API_URL = "https://api.football-data.org/v4";
