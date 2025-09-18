@@ -46,7 +46,7 @@ export async function onRequest(context) {
   }
 
   try {
-    const FOOTBALL_API_TOKEN = "b75541b8a8cc43719195871aa2bd419e";
+    const FOOTBALL_API_TOKEN = "78ec2397c126414ba0cd35f4c228625a";
     // Canja code daga SA zuwa BL1 don Bundesliga
     const BL1_CODE = "BL1";
     const BASE_API_URL = "https://api.football-data.org/v4";
