@@ -46,7 +46,7 @@ export async function onRequest(context) {
   }
 
   try {
-    const FOOTBALL_API_TOKEN = "b75541b8a8cc43719195871aa2bd419e";
+    const FOOTBALL_API_TOKEN = "6b3b1d8897ad4933855ae37697958246";
     // Canja code daga PL zuwa PD don La Liga
     const PD_CODE = "PD";
     const BASE_API_URL = "https://api.football-data.org/v4";
