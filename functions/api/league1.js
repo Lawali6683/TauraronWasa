@@ -46,7 +46,7 @@ export async function onRequest(context) {
   }
 
   try {
-    const FOOTBALL_API_TOKEN = "b75541b8a8cc43719195871aa2bd419e";
+    const FOOTBALL_API_TOKEN = "2c2d4eb5bf9144ad8f9e7c0db580f74e";
     // Canja code daga BL1 zuwa FL1 don Ligue 1
     const FL1_CODE = "FL1";
     const BASE_API_URL = "https://api.football-data.org/v4";
