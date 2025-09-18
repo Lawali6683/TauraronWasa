@@ -56,7 +56,7 @@ export async function onRequest(context) {
 
   try {
     const { date, game1Name, game2Name } = await request.json();
-    const FOOTBALL_API_TOKEN = "b75541b8a8cc43719195871aa2bd419e";
+    const FOOTBALL_API_TOKEN = "bc96c7c2d2d844e48b48f400d8fae946";
 
     
     if (!date || !game1Name || !game2Name) {
