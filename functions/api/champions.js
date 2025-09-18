@@ -49,7 +49,7 @@ export async function onRequest(context) {
   try {
     // An cire buƙatar `stage` saboda yanzu muna jawo duk bayanan a lokaci guda
     // kuma ana tace su a gefen abokin ciniki (HTML).
-    const FOOTBALL_API_TOKEN = "b75541b8a8cc43719195871aa2bd419e";
+    const FOOTBALL_API_TOKEN = "78ec2397c126414ba0cd35f4c228625a";
     const CL_CODE = "CL";
     const BASE_API_URL = "https://api.football-data.org/v4";
     const apiHeaders = { "X-Auth-Token": FOOTBALL_API_TOKEN };
