@@ -1,8 +1,6 @@
-
 export async function onRequest(context) {
   const { request } = context;
 
- 
   const origin = request.headers.get("Origin");
   const ALLOWED_ORIGINS = [
     "https://tauraronwasa.pages.dev",
@@ -10,7 +8,6 @@ export async function onRequest(context) {
     "http://localhost:8080",
   ];
 
- 
   if (request.method === "OPTIONS") {
     if (ALLOWED_ORIGINS.includes(origin)) {
       return new Response(null, {
@@ -23,18 +20,15 @@ export async function onRequest(context) {
         },
       });
     }
-    return new Response(null, { status: 403 }); 
+    return new Response(null, { status: 403 });
   }
 
- 
   const WORKER_API_KEY = request.headers.get("x-api-key");
   const contentType = request.headers.get("content-type") || "";
 
-  
   if (WORKER_API_KEY !== "@haruna66") {
     const response = new Response(
-      JSON.stringify({ error: true, message: "Invalid API Key" }),
-      {
+      JSON.stringify({ error: true, message: "Invalid API Key" }), {
         status: 401,
         headers: { "Content-Type": "application/json" },
       }
@@ -42,11 +36,9 @@ export async function onRequest(context) {
     return withCORSHeaders(response, origin);
   }
 
- 
   if (request.method !== "POST" || !contentType.includes("application/json")) {
     const response = new Response(
-      JSON.stringify({ error: true, message: "Invalid Request Method or Content-Type" }),
-      {
+      JSON.stringify({ error: true, message: "Invalid Request Method or Content-Type" }), {
         status: 400,
         headers: { "Content-Type": "application/json" },
       }
@@ -58,28 +50,29 @@ export async function onRequest(context) {
     const { date, game1Name, game2Name } = await request.json();
     const FOOTBALL_API_TOKEN = "bc96c7c2d2d844e48b48f400d8fae946";
 
-    
     if (!date || !game1Name || !game2Name) {
       const response = new Response(
-        JSON.stringify({ error: true, message: "Missing required parameters: date, game1Name, and game2Name." }),
-        { status: 400, headers: { "Content-Type": "application/json" } }
+        JSON.stringify({ error: true, message: "Missing required parameters: date, game1Name, and game2Name." }), {
+          status: 400,
+          headers: { "Content-Type": "application/json" }
+        }
       );
       return withCORSHeaders(response, origin);
     }
 
-   
     const footballApiUrl = `https://api.football-data.org/v4/matches?dateFrom=${date}&dateTo=${date}`;
     const apiResponse = await fetch(footballApiUrl, {
       headers: { 'X-Auth-Token': FOOTBALL_API_TOKEN }
     });
 
-    
     if (!apiResponse.ok) {
       const errorText = await apiResponse.text();
       console.error(`Error from Football API: ${apiResponse.status} - ${errorText}`);
       const response = new Response(
-        JSON.stringify({ error: true, message: `Failed to fetch football data from external API: ${apiResponse.statusText}` }),
-        { status: apiResponse.status, headers: { "Content-Type": "application/json" } }
+        JSON.stringify({ error: true, message: `Failed to fetch football data from external API: ${apiResponse.statusText}` }), {
+          status: apiResponse.status,
+          headers: { "Content-Type": "application/json" }
+        }
       );
       return withCORSHeaders(response, origin);
     }
@@ -103,22 +96,20 @@ export async function onRequest(context) {
     }
 
     const response = new Response(
-      JSON.stringify({ error: true, message: "Match not found or not finished." }),
-      { status: 404, headers: { "Content-Type": "application/json" } }
+      JSON.stringify({ error: true, message: "Match not found or not finished." }), {
+        status: 404,
+        headers: { "Content-Type": "application/json" }
+      }
     );
     return withCORSHeaders(response, origin);
-
   } catch (e) {
-   
     console.error("Server error in football.js:", e.message, e.stack);
-
     const errorResponse = new Response(
       JSON.stringify({
         error: true,
         message: "Internal server error.",
         details: e.message,
-      }),
-      {
+      }), {
         status: 500,
         headers: { "Content-Type": "application/json" },
       }
@@ -127,14 +118,12 @@ export async function onRequest(context) {
   }
 }
 
-
 function withCORSHeaders(response, origin) {
   const ALLOWED_ORIGINS = [
     "https://tauraronwasa.pages.dev",
     "https://leadwaypeace.pages.dev",
     "http://localhost:8080",
   ];
-
   if (ALLOWED_ORIGINS.includes(origin)) {
     response.headers.set("Access-Control-Allow-Origin", origin);
   } else {
