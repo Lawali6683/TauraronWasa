@@ -1,5 +1,5 @@
 export async function onRequest(context) {
-    const { request, env } = context;
+    const { request } = context;
     const origin = request.headers.get("Origin");
 
     const ALLOWED_ORIGINS = [
@@ -47,7 +47,8 @@ export async function onRequest(context) {
         return withCORSHeaders(response, origin);
     }
 
-    const TRANSLATE_API_KEY = env.TRANSLATE_API_KEY;
+    // Saka API key kai tsaye
+    const TRANSLATE_API_KEY = "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";
     const TRANSLATE_API_URL = "https://openrouter.ai/api/v1/chat/completions";
 
     const systemPrompt = `Kai mai ba da labari ne na wasanni. Za ka amsa tambayoyi cikin harshen da aka yi maka tambaya, ko dai Hausa ko Turanci. Idan aka haɗa Hausa da Turanci, ka ba da amsa da Hausa.
@@ -63,6 +64,8 @@ Ka bayar da amsar ka a cikin alamar <response>.`;
                 headers: {
                     Authorization: `Bearer ${TRANSLATE_API_KEY}`,
                     "Content-Type": "application/json",
+                    "HTTP-Referer": "https://tauraronwasa.pages.dev",
+                    "X-Title": "Tauraron Wasa"
                 },
                 body: JSON.stringify({
                     model: "openai/gpt-4o-mini",
@@ -74,9 +77,9 @@ Ka bayar da amsar ka a cikin alamar <response>.`;
             });
 
             if (!chatRes.ok) {
-                const errorData = await chatRes.json().catch(() => ({}));
-                console.error(`Chat API Error: ${chatRes.status}, Details: ${JSON.stringify(errorData)}`);
-                return { error: true, message: "An samu kuskure wajen neman labari. Da fatan za a gwada daga baya." };
+                const text = await chatRes.text(); // full raw response
+                console.error("Chat API failed:", chatRes.status, text);
+                return { error: true, message: `API error ${chatRes.status}: ${text}` };
             }
 
             const chatData = await chatRes.json();
@@ -86,19 +89,14 @@ Ka bayar da amsar ka a cikin alamar <response>.`;
                 return { error: true, message: "Ba a samu amsa daga AI ba." };
             }
 
-            // Tabbatar akwai fallback idan GPT bai yi markup ba
             let entityName = "general";
             let responseText = content;
 
             const entityMatch = content.match(/<entity_name>(.*?)<\/entity_name>/i);
-            if (entityMatch) {
-                entityName = entityMatch[1].trim();
-            }
+            if (entityMatch) entityName = entityMatch[1].trim();
 
             const responseMatch = content.match(/<response>(.*?)<\/response>/i);
-            if (responseMatch) {
-                responseText = responseMatch[1].trim();
-            }
+            if (responseMatch) responseText = responseMatch[1].trim();
 
             return {
                 query_type: entityName === "general" ? "general_question" : "entity_search",
