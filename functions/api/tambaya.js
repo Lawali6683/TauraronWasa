@@ -8,7 +8,6 @@ export async function onRequest(context) {
         "http://localhost:8080",
     ];
 
-  
     function withCORSHeaders(response, origin) {
         if (ALLOWED_ORIGINS.includes(origin)) {
             response.headers.set("Access-Control-Allow-Origin", origin);
@@ -21,7 +20,6 @@ export async function onRequest(context) {
         return response;
     }
 
-   
     if (request.method === "OPTIONS") {
         return withCORSHeaders(new Response(null, { status: 204 }), origin);
     }
@@ -29,7 +27,6 @@ export async function onRequest(context) {
     const WORKER_API_KEY = request.headers.get("x-api-key");
     const contentType = request.headers.get("content-type") || "";
 
-   
     if (WORKER_API_KEY !== "@haruna66") {
         const response = new Response(
             JSON.stringify({ error: true, message: "Maɓallin API bai daidaita ba." }), {
@@ -40,7 +37,6 @@ export async function onRequest(context) {
         return withCORSHeaders(response, origin);
     }
 
-  
     if (request.method !== "POST" || !contentType.includes("application/json")) {
         const response = new Response(
             JSON.stringify({ error: true, message: "Hanyar buƙata ko nau'in abun ciki bai daidaita ba." }), {
@@ -51,40 +47,15 @@ export async function onRequest(context) {
         return withCORSHeaders(response, origin);
     }
 
-   
-    const TRANSLATE_API_KEY = env.TRANSLATE_API_KEY || "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";
+    const TRANSLATE_API_KEY = env.TRANSLATE_API_KEY;
     const TRANSLATE_API_URL = "https://openrouter.ai/api/v1/chat/completions";
-    
-   
-    const SITE_URL = "https://tauraronwasa.pages.dev";
-    const SITE_TITLE = "Tauraron Wasa";
 
-    
     const systemPrompt = `Kai mai ba da labari ne na wasanni. Za ka amsa tambayoyi cikin harshen da aka yi maka tambaya, ko dai Hausa ko Turanci. Idan aka haɗa Hausa da Turanci, ka ba da amsa da Hausa.
-    
-Kafin ka ba da amsa, bincika ko tambayar tana neman bayani game da wani kulob ko mutum (ɗan wasa). Idan haka ne, fito da sunan mutumin ko kulob din a Turanci a cikin alamar <entity_name>. Idan ba tambayar ba ce ta mutum ko kulob, ka sa <entity_name>general</entity_name>.
-    
-Ka bayar da amsar ka a cikin alamar <response>.
-    
-Misali na amsa:
-<response_data>
-    <entity_name>Cristiano Ronaldo</entity_name>
-    <response>Cristiano Ronaldo (CR7) an haife shi ne a ranar 5 ga Fabrairu, 1985, a Funchal, Madeira, Portugal. Shi ɗan wasan ƙwallon ƙafa ne na ƙasar Portugal...</response>
-</response_data>
-    
-<response_data>
-    <entity_name>Barcelona</entity_name>
-    <response>FC Barcelona, wanda aka fi sani da Barça, kulob ne na ƙwallon ƙafa da ke Barcelona, Spain. An kafa shi a shekara ta 1899...</response>
-</response_data>
-    
-<response_data>
-    <entity_name>general</entity_name>
-    <response>Ƙa'idodin wasan ƙwallon ƙafa sun haɗa da: yawan 'yan wasa, tsawon lokacin wasa, buɗaɗɗen bugun kyauta, da kuma yadda ake zura ƙwallo a raga...</response>
-</response_data>
-    
-Ka tabbata amsarka tana cikin tsarin <response_data> da kuma <entity_name> da <response>.`;
 
-  
+Kafin ka ba da amsa, bincika ko tambayar tana neman bayani game da wani kulob ko mutum (ɗan wasa). Idan haka ne, fito da sunan mutumin ko kulob din a Turanci a cikin alamar <entity_name>. Idan ba tambayar ba ce ta mutum ko kulob, ka sa <entity_name>general</entity_name>.
+
+Ka bayar da amsar ka a cikin alamar <response>.`;
+
     const getChatAnswer = async (userQuery) => {
         try {
             const chatRes = await fetch(TRANSLATE_API_URL, {
@@ -92,8 +63,6 @@ Ka tabbata amsarka tana cikin tsarin <response_data> da kuma <entity_name> da <r
                 headers: {
                     Authorization: `Bearer ${TRANSLATE_API_KEY}`,
                     "Content-Type": "application/json",
-                    "HTTP-Referer": SITE_URL, // Anan ne aka kara wannan shugaban
-                    "X-Title": SITE_TITLE,    // Anan ne kuma aka kara wannan
                 },
                 body: JSON.stringify({
                     model: "openai/gpt-4o-mini",
@@ -105,7 +74,7 @@ Ka tabbata amsarka tana cikin tsarin <response_data> da kuma <entity_name> da <r
             });
 
             if (!chatRes.ok) {
-                const errorData = await chatRes.json();
+                const errorData = await chatRes.json().catch(() => ({}));
                 console.error(`Chat API Error: ${chatRes.status}, Details: ${JSON.stringify(errorData)}`);
                 return { error: true, message: "An samu kuskure wajen neman labari. Da fatan za a gwada daga baya." };
             }
@@ -117,12 +86,19 @@ Ka tabbata amsarka tana cikin tsarin <response_data> da kuma <entity_name> da <r
                 return { error: true, message: "Ba a samu amsa daga AI ba." };
             }
 
-            
-            const entityMatch = content.match(/<entity_name>(.*?)<\/entity_name>/i);
-            const responseMatch = content.match(/<response>(.*?)<\/response>/i);
+            // Tabbatar akwai fallback idan GPT bai yi markup ba
+            let entityName = "general";
+            let responseText = content;
 
-            const entityName = entityMatch ? entityMatch[1].trim() : "general";
-            const responseText = responseMatch ? responseMatch[1].trim() : "Ba a samu labarin da ake nema ba.";
+            const entityMatch = content.match(/<entity_name>(.*?)<\/entity_name>/i);
+            if (entityMatch) {
+                entityName = entityMatch[1].trim();
+            }
+
+            const responseMatch = content.match(/<response>(.*?)<\/response>/i);
+            if (responseMatch) {
+                responseText = responseMatch[1].trim();
+            }
 
             return {
                 query_type: entityName === "general" ? "general_question" : "entity_search",
@@ -135,7 +111,6 @@ Ka tabbata amsarka tana cikin tsarin <response_data> da kuma <entity_name> da <r
         }
     };
 
-    
     const searchTheSportsDB = async (entityName) => {
         const TEAM_API = "https://www.thesportsdb.com/api/v1/json/3/searchteams.php?t=";
         const PLAYER_API = "https://www.thesportsdb.com/api/v1/json/3/searchplayers.php?p=";
@@ -157,14 +132,11 @@ Ka tabbata amsarka tana cikin tsarin <response_data> da kuma <entity_name> da <r
                 const player = playerData.player[0];
                 return player.strThumb || player.strCutout || null;
             }
-
         } catch (e) {
             console.error("TheSportsDB search error:", e.message);
         }
-
         return null;
     };
-
 
     try {
         const requestBody = await request.json();
@@ -174,13 +146,12 @@ Ka tabbata amsarka tana cikin tsarin <response_data> da kuma <entity_name> da <r
             const response = new Response(
                 JSON.stringify({ error: true, message: "Tambaya ba ta nan." }), {
                     status: 400,
-                    headers: { "Content-Type": "application/json" }
+                    headers: { "Content-Type": "application/json" },
                 }
             );
             return withCORSHeaders(response, origin);
         }
 
-        // Yana Kiran aikin da aka gyara don samun amsa daga AI.
         const gptResult = await getChatAnswer(query);
 
         if (gptResult.error) {
@@ -193,7 +164,6 @@ Ka tabbata amsarka tana cikin tsarin <response_data> da kuma <entity_name> da <r
 
         let finalResponseData = { message: gptResult.response_text, image: null };
 
-        // Yana neman hoton idan tambayar tana nufin wani mutum ko kulob.
         if (gptResult.query_type === "entity_search" && gptResult.entity_name && gptResult.entity_name !== "general") {
             const image = await searchTheSportsDB(gptResult.entity_name);
             if (image) {
@@ -216,7 +186,7 @@ Ka tabbata amsarka tana cikin tsarin <response_data> da kuma <entity_name> da <r
                 details: e.message,
             }), {
                 status: 500,
-                headers: { "Content-Type": "application/json" }
+                headers: { "Content-Type": "application/json" },
             }
         );
         return withCORSHeaders(errorResponse, origin);
