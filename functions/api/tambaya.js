@@ -8,13 +8,7 @@ export async function onRequest(context) {
         "http://localhost:8080",
     ];
 
-    /**
-     * Wannan aikin yana ƙara shugabannin (CORS headers) ga amsar HTTP
-     * domin a ba da damar shafuka daban-daban su shiga.
-     * @param {Response} response - Amsar da za a dawo da ita.
-     * @param {string} origin - Asalin buƙatar.
-     * @returns {Response} Amsar da aka ƙara mata shugabannin CORS.
-     */
+  
     function withCORSHeaders(response, origin) {
         if (ALLOWED_ORIGINS.includes(origin)) {
             response.headers.set("Access-Control-Allow-Origin", origin);
@@ -27,7 +21,7 @@ export async function onRequest(context) {
         return response;
     }
 
-    // Yana ɗaukar buƙatun OPTIONS don CORS preflight.
+   
     if (request.method === "OPTIONS") {
         return withCORSHeaders(new Response(null, { status: 204 }), origin);
     }
@@ -35,7 +29,7 @@ export async function onRequest(context) {
     const WORKER_API_KEY = request.headers.get("x-api-key");
     const contentType = request.headers.get("content-type") || "";
 
-    // Yana duba ko maɓallin API (x-api-key) daidai ne.
+   
     if (WORKER_API_KEY !== "@haruna66") {
         const response = new Response(
             JSON.stringify({ error: true, message: "Maɓallin API bai daidaita ba." }), {
@@ -46,7 +40,7 @@ export async function onRequest(context) {
         return withCORSHeaders(response, origin);
     }
 
-    // Yana duba ko buƙatar POST ce kuma tana da Content-Type daidai.
+  
     if (request.method !== "POST" || !contentType.includes("application/json")) {
         const response = new Response(
             JSON.stringify({ error: true, message: "Hanyar buƙata ko nau'in abun ciki bai daidaita ba." }), {
@@ -57,15 +51,15 @@ export async function onRequest(context) {
         return withCORSHeaders(response, origin);
     }
 
-    // Wannan shine maɓallin da aka sa a cikin Cloudflare Pages don sirri.
+   
     const TRANSLATE_API_KEY = env.TRANSLATE_API_KEY || "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";
     const TRANSLATE_API_URL = "https://openrouter.ai/api/v1/chat/completions";
     
-    // Anan ne za'a saka sunan shafin da adireshinsa.
+   
     const SITE_URL = "https://tauraronwasa.pages.dev";
     const SITE_TITLE = "Tauraron Wasa";
 
-    // Wannan shine umarnin da aka baiwa AI (model) don amsa tambayoyi.
+    
     const systemPrompt = `Kai mai ba da labari ne na wasanni. Za ka amsa tambayoyi cikin harshen da aka yi maka tambaya, ko dai Hausa ko Turanci. Idan aka haɗa Hausa da Turanci, ka ba da amsa da Hausa.
     
 Kafin ka ba da amsa, bincika ko tambayar tana neman bayani game da wani kulob ko mutum (ɗan wasa). Idan haka ne, fito da sunan mutumin ko kulob din a Turanci a cikin alamar <entity_name>. Idan ba tambayar ba ce ta mutum ko kulob, ka sa <entity_name>general</entity_name>.
@@ -90,11 +84,7 @@ Misali na amsa:
     
 Ka tabbata amsarka tana cikin tsarin <response_data> da kuma <entity_name> da <response>.`;
 
-    /**
-     * Wannan aikin yana aika buƙata zuwa OpenRouter don samun amsa daga AI.
-     * @param {string} userQuery - Tambayar mai amfani.
-     * @returns {Promise<object>} - Amsa daga AI ko sakon kuskure.
-     */
+  
     const getChatAnswer = async (userQuery) => {
         try {
             const chatRes = await fetch(TRANSLATE_API_URL, {
@@ -127,7 +117,7 @@ Ka tabbata amsarka tana cikin tsarin <response_data> da kuma <entity_name> da <r
                 return { error: true, message: "Ba a samu amsa daga AI ba." };
             }
 
-            // An gyara wannan sashen don zama mai karfi wajen fahimtar amsa.
+            
             const entityMatch = content.match(/<entity_name>(.*?)<\/entity_name>/i);
             const responseMatch = content.match(/<response>(.*?)<\/response>/i);
 
@@ -145,11 +135,7 @@ Ka tabbata amsarka tana cikin tsarin <response_data> da kuma <entity_name> da <r
         }
     };
 
-    /**
-     * Wannan aikin yana neman hoton kulob ko dan wasa daga TheSportsDB.
-     * @param {string} entityName - Sunan kulob ko dan wasa.
-     * @returns {Promise<string|null>} - URL din hoton ko null idan babu.
-     */
+    
     const searchTheSportsDB = async (entityName) => {
         const TEAM_API = "https://www.thesportsdb.com/api/v1/json/3/searchteams.php?t=";
         const PLAYER_API = "https://www.thesportsdb.com/api/v1/json/3/searchplayers.php?p=";
