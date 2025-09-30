@@ -95,7 +95,7 @@ export async function onRequest(context) {
         let scorersData = null;
         
         // An canza daga '123' zuwa '1'
-        const TSDB_API_KEY = '123'; 
+        const TSDB_API_KEY = '1'; 
         const TSDB_BASE_URL = `https://www.thesportsdb.com/api/v1/json/${TSDB_API_KEY}`;
         
         const TSDB_COMPETITIONS = {
