@@ -125,18 +125,20 @@ export async function onRequest(context) {
             const leagueName = tsdbComp.encodedName;
             const fetchTasks = [];
 
+         
             const fetchAllMatches = async () => {
                 let allEvents = [];
                 let fetchUrls = [];
                 
-                fetchUrls.push(`${TSDB_BASE_URL}/searchevents.php?l=${leagueName}`);
+              
+                fetchUrls.push(`${TSDB_BASE_URL}/searchevents.php?l=${leagueName}`); // URL na 0
                 
                 if (tsdbComp.isLeague) {
-                    fetchUrls.push(`${TSDB_BASE_URL}/eventspastleague.php?id=${leagueId}`);
-                    fetchUrls.push(`${TSDB_BASE_URL}/eventsnextleague.php?id=${leagueId}`);
+                    fetchUrls.push(`${TSDB_BASE_URL}/eventspastleague.php?id=${leagueId}`); // URL na 1
+                    fetchUrls.push(`${TSDB_BASE_URL}/eventsnextleague.php?id=${leagueId}`); // URL na 2
                 } else {
-                    fetchUrls.push(`${TSDB_BASE_URL}/eventslast.php?id=${leagueId}`);
-                    fetchUrls.push(`${TSDB_BASE_URL}/eventsnext.php?id=${leagueId}`);
+                    fetchUrls.push(`${TSDB_BASE_URL}/eventslast.php?id=${leagueId}`); // URL na 1
+                    fetchUrls.push(`${TSDB_BASE_URL}/eventsnext.php?id=${leagueId}`); // URL na 2
                 }
                 
                 const fetchPromises = fetchUrls.map(url => fetch(url).then(res => res.ok ? res.json() : null).catch(() => null));
@@ -151,12 +153,20 @@ export async function onRequest(context) {
 
                 const uniqueEvents = new Map();
                 for (const event of allEvents) {
-                    if (event.idEvent && event.idLeague === leagueId) {
-                        uniqueEvents.set(event.idEvent, normalizeTsdbMatch(event));
+                    if (event.idEvent) {
+                       
+                        const isCorrectLeague = event.idLeague === leagueId || 
+                                               event.strLeague === tsdbComp.name;
+
+                        if (isCorrectLeague) {
+                            uniqueEvents.set(event.idEvent, normalizeTsdbMatch(event));
+                        }
                     }
                 }
                 return Array.from(uniqueEvents.values());
             };
+            
+
             
             fetchTasks.push(fetchAllMatches().then(matches => {
                 matchesData = { matches: matches };
