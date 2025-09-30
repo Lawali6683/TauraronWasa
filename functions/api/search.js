@@ -68,7 +68,7 @@ export async function onRequest(context) {
         let scorersData = null;
         
         // Lambobin TheSportsDB da aka kara
-        const TSDB_API_KEY = '1'; // Ko 123
+        const TSDB_API_KEY = '123'; // Ko 123
         const TSDB_BASE_URL = `https://www.thesportsdb.com/api/v1/json/${TSDB_API_KEY}`;
         
         // Tsarawar Gasa don TheSportsDB (TSDB)
