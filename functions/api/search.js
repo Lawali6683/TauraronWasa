@@ -1,8 +1,7 @@
 export async function onRequest(context) {
-
     const { request, env } = context;
-    const origin = request.headers.get("Origin");
 
+    const origin = request.headers.get("Origin");
     const ALLOWED_ORIGINS = [
         "https://tauraronwasa.pages.dev",
         "https://leadwaypeace.pages.dev",
@@ -48,6 +47,34 @@ export async function onRequest(context) {
         return withCORSHeaders(response, origin);
     }
 
+   
+    function normalizeTsdbMatch(match) {
+        let utcDate;        
+        
+        if (match.strTimestamp) {
+            
+            const timestampInMs = parseInt(match.strTimestamp.padEnd(13, '0'));
+            utcDate = new Date(timestampInMs).toISOString();
+        } else if (match.strDate && match.strTime) {
+            
+            utcDate = `${match.strDate} ${match.strTime}`;
+        } else if (match.dateEvent) {
+             utcDate = match.dateEvent; 
+        } else {
+            utcDate = new Date().toISOString(); // Fallback
+        }
+
+        
+        return {
+            ...match,
+            utcDate: utcDate,
+            homeTeam: { name: match.strHomeTeam || match.strEvent, crest: match.strHomeTeamBadge },
+            awayTeam: { name: match.strAwayTeam, crest: match.strAwayTeamBadge },
+            score: { fullTime: { home: parseInt(match.intHomeScore), away: parseInt(match.intAwayScore) } },
+            status: match.strStatus || 'Scheduled',
+        };
+    }
+    
     try {
         const requestBody = await request.json();
         const { competition } = requestBody;
@@ -67,65 +94,75 @@ export async function onRequest(context) {
         let standingsData = null;
         let scorersData = null;
         
-        // Lambobin TheSportsDB da aka kara
-        const TSDB_API_KEY = '123'; // Ko 123
+        // An canza daga '123' zuwa '1'
+        const TSDB_API_KEY = '123'; 
         const TSDB_BASE_URL = `https://www.thesportsdb.com/api/v1/json/${TSDB_API_KEY}`;
         
-        // Tsarawar Gasa don TheSportsDB (TSDB)
         const TSDB_COMPETITIONS = {
-            'NPL': { id: '4827', isLeague: true }, // Nigeria Premier League (NPFL)
-            'SPL': { id: '4359', isLeague: true }, // Saudi Pro League
-            'AFCON': { id: '4319', isLeague: false }, // Africa Cup
-            'CWC': { id: '4487', isLeague: false }, // FIFA Club World Cup
-            'UECL': { id: '4521', isLeague: true }, // UEFA Conference League (Yana da Group Stage)
-            'FAC': { id: '4336', isLeague: false }, // FA Cup
-            'DFBP': { id: '4401', isLeague: false }, // DFB-Pokal
-            'CDR': { id: '4371', isLeague: false }, // Copa del Rey
-            'COPI': { id: '4486', isLeague: false }, // Coppa Italia
-            'KNVB': { id: '4383', isLeague: false }, // KNVB Beker
-            'EFLC': { id: '4396', isLeague: false }, // Carabao Cup (EFL Cup)
-         
+            'NPL': { id: '4827', isLeague: true }, 
+            'SPL': { id: '4359', isLeague: true }, 
+            'AFCON': { id: '4319', isLeague: false }, 
+            'CWC': { id: '4487', isLeague: false }, 
+            'UECL': { id: '4521', isLeague: true }, 
+            'FAC': { id: '4336', isLeague: false }, 
+            'DFBP': { id: '4401', isLeague: false }, 
+            'CDR': { id: '4371', isLeague: false }, 
+            'COPI': { id: '4486', isLeague: false }, 
+            'KNVB': { id: '4383', isLeague: false }, 
+            'EFLC': { id: '4396', isLeague: false },
         };
 
         const tsdbComp = TSDB_COMPETITIONS[compCode];
-     
+
         if (tsdbComp) {
             const leagueId = tsdbComp.id;
             const fetchTasks = [];
 
-         
-            const fetchPastMatches = async () => {
-                try {
-                    const res = await fetch(`${TSDB_BASE_URL}/eventspastleague.php?id=${leagueId}`);
-                  
-                    const data = res.ok ? await res.json() : null;
-                    return data?.events ? data.events : null;
-                } catch (e) {
-                    console.error(`TSDB Past Matches Failed for ${compCode}:`, e.message);
-                    return null;
-                }
-            };
+            // Aikin tattara matches gaba daya don leagues da cups
+            const fetchAllMatches = async () => {
+                let allEvents = [];
+                let pastEvents = [];
+                let nextEvents = [];
+                let lastEvents = [];
 
-          
-            const fetchNextMatches = async () => {
-                try {
-                    const res = await fetch(`${TSDB_BASE_URL}/eventsnextleague.php?id=${leagueId}`);
-                  
-                    const data = res.ok ? await res.json() : null;
-                    return data?.events ? data.events : null;
-                } catch (e) {
-                    console.error(`TSDB Next Matches Failed for ${compCode}:`, e.message);
-                    return null;
+                if (tsdbComp.isLeague) {
+                    const [pastRes, nextRes] = await Promise.all([
+                        fetch(`${TSDB_BASE_URL}/eventspastleague.php?id=${leagueId}`),
+                        fetch(`${TSDB_BASE_URL}/eventsnextleague.php?id=${leagueId}`)
+                    ]);
+                    pastEvents = pastRes.ok ? (await pastRes.json())?.events || [] : [];
+                    nextEvents = nextRes.ok ? (await nextRes.json())?.events || [] : [];
+                    allEvents = [...pastEvents, ...nextEvents];
+                } else {
+                    
+                    const [lastRes, nextRes] = await Promise.all([
+                        fetch(`${TSDB_BASE_URL}/eventslast.php?id=${leagueId}`),
+                        fetch(`${TSDB_BASE_URL}/eventsnext.php?id=${leagueId}`)
+                    ]);
+                    
+                    lastEvents = lastRes.ok ? (await lastRes.json())?.results || [] : [];
+                    nextEvents = nextRes.ok ? (await nextRes.json())?.events || [] : [];
+                    allEvents = [...lastEvents, ...nextEvents];
                 }
+
+                
+                const uniqueEvents = new Map();
+                for (const event of allEvents) {
+                    
+                    if (event.idEvent) {
+                        uniqueEvents.set(event.idEvent, normalizeTsdbMatch(event));
+                    }
+                }
+                return Array.from(uniqueEvents.values());
             };
             
-         
-            fetchTasks.push(Promise.all([fetchPastMatches(), fetchNextMatches()]).then(([past, next]) => {
-             
-                matchesData = { matches: [...(past || []), ...(next || [])] };
+            fetchTasks.push(fetchAllMatches().then(matches => {
+                matchesData = { matches: matches };
+            }).catch(e => {
+                 console.error(`TSDB Matches Failed for ${compCode}:`, e.message);
+                 matchesData = { matches: [] };
             }));
 
-         
             if (tsdbComp.isLeague) {
                 const fetchStandings = async () => {
                     try {
@@ -138,19 +175,16 @@ export async function onRequest(context) {
                     }
                 };
                 fetchTasks.push(fetchStandings().then(data => {
-                 
                     standingsData = { standings: data };
                 }));
             }
 
-          
             const fetchScorers = async () => {
                 try {
                     const res = await fetch(`${TSDB_BASE_URL}/lookuptopscorers.php?id=${leagueId}`);
                     const data = res.ok ? await res.json() : null;
                    
                     return data?.countrys ? data.countrys : null; 
-                  
                 } catch (e) {
                     console.error(`TSDB Scorers Failed for ${compCode}:`, e.message);
                     return null;
@@ -160,13 +194,11 @@ export async function onRequest(context) {
                 scorersData = { scorers: data };
             }));
 
-          
             await Promise.all(fetchTasks);
-
         } else {
-          
+            
             const FOOTBALL_API_TOKEN = env.FOOTBALL_API_TOKEN4;
-
+          
             const fetchMatches = async () => {
                 try {
                     const matchesRes = await fetch(`https://api.football-data.org/v4/competitions/${compCode}/matches`, { headers: { "X-Auth-Token": FOOTBALL_API_TOKEN } });
@@ -176,7 +208,6 @@ export async function onRequest(context) {
                     return null;
                 }
             };
-
             const fetchStandings = async () => {
                 try {
                     const standingsRes = await fetch(`https://api.football-data.org/v4/competitions/${compCode}/standings`, { headers: { "X-Auth-Token": FOOTBALL_API_TOKEN } });
@@ -186,7 +217,6 @@ export async function onRequest(context) {
                     return null;
                 }
             };
-
             const fetchScorers = async () => {
                 try {
                     const scorersRes = await fetch(`https://api.football-data.org/v4/competitions/${compCode}/scorers?limit=10`, { headers: { "X-Auth-Token": FOOTBALL_API_TOKEN } });
@@ -196,18 +226,15 @@ export async function onRequest(context) {
                     return null;
                 }
             };
-
-          
+            
             [matchesData, standingsData, scorersData] = await Promise.all([
                 fetchMatches(),
                 fetchStandings(),
                 fetchScorers()
             ]);
         }
-
        
         const result = {
-           
             matches: matchesData?.matches || [], 
             standings: standingsData?.standings || [],
             scorers: scorersData?.scorers || [],
