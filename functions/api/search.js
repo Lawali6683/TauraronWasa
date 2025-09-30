@@ -6,7 +6,6 @@ export async function onRequest(context) {
         "https://leadwaypeace.pages.dev",
         "http://localhost:8080",
     ];
-
     function withCORSHeaders(response, origin) {
         if (ALLOWED_ORIGINS.includes(origin)) {
             response.headers.set("Access-Control-Allow-Origin", origin);
@@ -18,14 +17,11 @@ export async function onRequest(context) {
         response.headers.set("Access-Control-Max-Age", "86400");
         return response;
     }
-
     if (request.method === "OPTIONS") {
         return withCORSHeaders(new Response(null, { status: 204 }), origin);
     }
-
     const WORKER_API_KEY = request.headers.get("x-api-key");
     const contentType = request.headers.get("content-type") || "";
-
     if (WORKER_API_KEY !== env.API_AUTH_KEY) {
         const response = new Response(
             JSON.stringify({ error: true, message: "Invalid API Key" }), {
@@ -35,7 +31,6 @@ export async function onRequest(context) {
         );
         return withCORSHeaders(response, origin);
     }
-
     if (request.method !== "POST" || !contentType.includes("application/json")) {
         const response = new Response(
             JSON.stringify({ error: true, message: "Invalid Request Method or Content-Type" }), {
@@ -45,7 +40,6 @@ export async function onRequest(context) {
         );
         return withCORSHeaders(response, origin);
     }
-
     function normalizeTsdbMatch(match) {
         let utcDate = null;
         
@@ -56,14 +50,18 @@ export async function onRequest(context) {
                 if (timePart.length === 5 && timePart.includes(':')) {
                     timePart = `${timePart}:00`;
                 }
-
                 // An saka 'Z' (Zulu/UTC) don tilasta JavaScript ya ɗauke shi a matsayin UTC
                 const dateString = `${match.strDate}T${timePart}Z`;
                 const dateObj = new Date(dateString);
                 
                 // Gwada ingancin kwanan wata kuma tabbatar da ba kwanan wata na 1970 ba
-                if (!isNaN(dateObj.getTime()) && dateObj.getTime() > 0) {
+                // ⭐ GYARA: An rage gwajin zuwa dateObj.getFullYear() don gujewa kuskure a UTC na 1970
+                if (!isNaN(dateObj.getTime()) && dateObj.getFullYear() > 1970) { 
                     utcDate = dateObj.toISOString();
+                } else if (!isNaN(dateObj.getTime()) && match.strStatus !== 'Finished') {
+                    // Idan kwanan wata ya dawo 1970, kuma match bai riga ya kare ba, za mu bar shi null.
+                    // Client zai nuna 'Scheduled'.
+                    utcDate = null;
                 }
             } catch (e) {
                 // An bar utcDate a matsayin null idan haɗin ya kasa
@@ -71,7 +69,6 @@ export async function onRequest(context) {
         } 
         
         // An cire strTimestamp gaba ɗaya don hana matsalar 1970
-
         return {
             ...match,
             utcDate: utcDate,
@@ -85,7 +82,6 @@ export async function onRequest(context) {
     try {
         const requestBody = await request.json();
         const { competition } = requestBody;
-
         if (!competition) {
             const response = new Response(
                 JSON.stringify({ error: true, message: "Competition parameter is missing." }), {
@@ -95,7 +91,6 @@ export async function onRequest(context) {
             );
             return withCORSHeaders(response, origin);
         }
-
         const compCode = competition.toUpperCase();
         let matchesData = null;
         let standingsData = null;
@@ -117,64 +112,70 @@ export async function onRequest(context) {
             'KNVB': { id: '4383', name: 'KNVB Beker', encodedName: 'KNVB_Beker', isLeague: false }, 
             'EFLC': { id: '4396', name: 'EFL Cup', encodedName: 'EFL_Cup', isLeague: false },
         };
-
         const tsdbComp = TSDB_COMPETITIONS[compCode];
-
         if (tsdbComp) {
             const leagueId = tsdbComp.id;
             const leagueName = tsdbComp.encodedName;
             const fetchTasks = [];
-
-         
+        
             const fetchAllMatches = async () => {
-                let allEvents = [];
                 let fetchUrls = [];
                 
-              
-                fetchUrls.push(`${TSDB_BASE_URL}/searchevents.php?l=${leagueName}`); // URL na 0
+                // URL na 0: Neman matches ta suna
+                fetchUrls.push(`${TSDB_BASE_URL}/searchevents.php?l=${leagueName}`); 
                 
+                // URL na 1 & 2: Neman matches ta ID na league (Past & Next)
                 if (tsdbComp.isLeague) {
-                    fetchUrls.push(`${TSDB_BASE_URL}/eventspastleague.php?id=${leagueId}`); // URL na 1
-                    fetchUrls.push(`${TSDB_BASE_URL}/eventsnextleague.php?id=${leagueId}`); // URL na 2
+                    fetchUrls.push(`${TSDB_BASE_URL}/eventspastleague.php?id=${leagueId}`);
+                    fetchUrls.push(`${TSDB_BASE_URL}/eventsnextleague.php?id=${leagueId}`);
                 } else {
-                    fetchUrls.push(`${TSDB_BASE_URL}/eventslast.php?id=${leagueId}`); // URL na 1
-                    fetchUrls.push(`${TSDB_BASE_URL}/eventsnext.php?id=${leagueId}`); // URL na 2
+                    fetchUrls.push(`${TSDB_BASE_URL}/eventslast.php?id=${leagueId}`);
+                    fetchUrls.push(`${TSDB_BASE_URL}/eventsnext.php?id=${leagueId}`);
                 }
                 
                 const fetchPromises = fetchUrls.map(url => fetch(url).then(res => res.ok ? res.json() : null).catch(() => null));
                 const results = await Promise.allSettled(fetchPromises);
                 
-                for (const result of results) {
-                    if (result.status === 'fulfilled' && result.value) {
-                        const data = result.value;
-                        allEvents.push(...(data?.results || data?.events || data?.event || []));
+                // ⭐ SABON TSARIN TATTARAWA DA TACewa (Gyara #1)
+                const uniqueEvents = new Map();
+                
+                // 1. Tattara matches daga Bincike da Suna (URL na 0) - Wannan shine mafi cikakken data.
+                const matchesFromSearch = (results[0].status === 'fulfilled' && results[0].value) ? 
+                                           (results[0].value.results || results[0].value.events || []) : [];
+                
+                for (const event of matchesFromSearch) {
+                    if (event.idEvent) {
+                        uniqueEvents.set(event.idEvent, normalizeTsdbMatch(event));
                     }
                 }
-
-                const uniqueEvents = new Map();
-                for (const event of allEvents) {
-                    if (event.idEvent) {
-                       
-                        const isCorrectLeague = event.idLeague === leagueId || 
-                                               event.strLeague === tsdbComp.name;
-
-                        if (isCorrectLeague) {
-                            uniqueEvents.set(event.idEvent, normalizeTsdbMatch(event));
+                
+                // 2. Tattara matches daga Bincike da ID (URL na 1 & 2)
+                for (let i = 1; i < results.length; i++) {
+                    if (results[i].status === 'fulfilled' && results[i].value) {
+                        const apiEvents = results[i].value.events || [];
+                        for (const event of apiEvents) {
+                            if (event.idEvent) {
+                                // Tabbatar cewa an tace matches da suka fito ta hanyar ID
+                                if (event.idLeague === leagueId) { 
+                                    uniqueEvents.set(event.idEvent, normalizeTsdbMatch(event));
+                                }
+                            }
                         }
                     }
                 }
+
                 return Array.from(uniqueEvents.values());
             };
             
-
             
             fetchTasks.push(fetchAllMatches().then(matches => {
                 matchesData = { matches: matches };
             }).catch(e => {
-                 console.error(`TSDB Matches Failed for ${compCode}:`, e.message); 
-                 matchesData = { matches: [] };
+                console.error(`TSDB Matches Failed for ${compCode}:`, e.message); 
+                matchesData = { matches: [] };
             }));
-
+            
+            // ... (Sauran kiran Standings da Scorers sun ci gaba yadda suke)
             if (tsdbComp.isLeague) {
                 const fetchStandings = async () => {
                     try {
@@ -190,7 +191,6 @@ export async function onRequest(context) {
                     standingsData = { standings: data };
                 }));
             }
-
             const fetchScorers = async () => {
                 try {
                     const res = await fetch(`${TSDB_BASE_URL}/lookuptopscorers.php?id=${leagueId}`);
@@ -204,7 +204,6 @@ export async function onRequest(context) {
             fetchTasks.push(fetchScorers().then(data => {
                 scorersData = { scorers: data };
             }));
-
             await Promise.all(fetchTasks); 
         } else {
             // Bangaren Football-Data.org API
@@ -243,20 +242,17 @@ export async function onRequest(context) {
                 fetchScorers()
             ]);
         }
-       
+        
         const result = {
             matches: matchesData?.matches || [], 
             standings: standingsData?.standings || [],
             scorers: scorersData?.scorers || [],
         };
-
         const response = new Response(JSON.stringify(result), {
             status: 200,
             headers: { "Content-Type": "application/json" },
         });
-
         return withCORSHeaders(response, origin);
-
     } catch (e) {
         const errorResponse = new Response(
             JSON.stringify({
