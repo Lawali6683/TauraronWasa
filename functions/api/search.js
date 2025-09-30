@@ -49,36 +49,48 @@ export async function onRequest(context) {
     function normalizeTsdbMatch(match) {
         let utcDate = null;
         
+        // Gwaji na farko: Haɗa Date da Time don samun cikakken kwanan wata
         if (match.strDate && match.strTime) {
-            // Tabbatar da an daidaita lokaci zuwa tsarin ISO 8601
             try {
                 let timePart = match.strTime;
-                if (timePart.length === 5) {
+                if (timePart.length === 5 && timePart.includes(':')) {
                     timePart = `${timePart}:00`;
                 }
-                
-                // An haɗa kwanan wata, lokaci, da Z (Zulu/UTC)
-                const dateString = `${match.strDate}T${timePart}Z`;
+
+                // Haɗa kwanan wata da lokaci (ISO 8601 format)
+                // An saki 'Z' (Zulu) don guje wa matsalar Timezone, amma zamu yi amfani da UTC+0
+                // Wannan ne babban gyaran mu.
+                const dateString = `${match.strDate}T${timePart}`;
                 const dateObj = new Date(dateString);
                 
-                // Idan an dawo da Jan 1, 1970, ko kwanan wata mara inganci, kada a yi amfani da shi
-                if (dateObj.getTime() > 0) {
+                // Idan an dawo da Jan 1, 1970, ko kwanan wata mara inganci, babu amfani
+                if (!isNaN(dateObj.getTime()) && dateObj.getTime() > 0) {
                     utcDate = dateObj.toISOString();
                 }
             } catch (e) {
                 // Bar utcDate a matsayin null idan haɗin ya kasa
             }
-        } else if (match.strTimestamp && match.strTimestamp !== '0') {
-            // A gwada amfani da Timestamp, amma a ninka shi idan seconds ne (lambobi 10)
+        } 
+        
+        // Gwaji na biyu: Amfani da strTimestamp idan gwaji na farko ya kasa
+        if (utcDate === null && match.strTimestamp && match.strTimestamp !== '0') {
             const timestampStr = match.strTimestamp;
-            if (timestampStr.length === 10) {
-                const timestampInMs = parseInt(timestampStr) * 1000;
-                utcDate = new Date(timestampInMs).toISOString();
-            } else if (timestampStr.length === 13) {
-                utcDate = new Date(parseInt(timestampStr)).toISOString();
+            try {
+                 let timestampInMs;
+                if (timestampStr.length === 10) {
+                    timestampInMs = parseInt(timestampStr) * 1000;
+                } else if (timestampStr.length === 13) {
+                    timestampInMs = parseInt(timestampStr);
+                }
+                const dateObj = new Date(timestampInMs);
+                if (!isNaN(dateObj.getTime()) && dateObj.getTime() > 0) {
+                    utcDate = dateObj.toISOString();
+                }
+            } catch (e) {
+                 // Bar utcDate a matsayin null
             }
         }
-        
+
         return {
             ...match,
             utcDate: utcDate,
@@ -112,24 +124,24 @@ export async function onRequest(context) {
         const TSDB_BASE_URL = `https://www.thesportsdb.com/api/v1/json/${TSDB_API_KEY}`;
         
         const TSDB_COMPETITIONS = {
-            'NPL': { id: '4827', name: 'Nigerian Professional Football League', isLeague: true }, 
-            'SPL': { id: '4359', name: 'Scottish Premiership', isLeague: true }, 
-            'AFCON': { id: '4319', name: 'African Cup of Nations', isLeague: false }, 
-            'CWC': { id: '4487', name: 'Club World Cup', isLeague: false }, 
-            'UECL': { id: '4521', name: 'UEFA Europa Conference League', isLeague: true }, 
-            'FAC': { id: '4336', name: 'The FA Cup', isLeague: false }, 
-            'DFBP': { id: '4401', name: 'DFB-Pokal', isLeague: false }, 
-            'CDR': { id: '4371', name: 'Copa del Rey', isLeague: false }, 
-            'COPI': { id: '4486', name: 'Copa Italia', isLeague: false }, 
-            'KNVB': { id: '4383', name: 'KNVB Beker', isLeague: false }, 
-            'EFLC': { id: '4396', name: 'EFL Cup', isLeague: false },
+            'NPL': { id: '4827', name: 'Nigerian Professional Football League', encodedName: 'Nigerian_Professional_Football_League', isLeague: true }, 
+            'SPL': { id: '4359', name: 'Scottish Premiership', encodedName: 'Scottish_Premiership', isLeague: true }, 
+            'AFCON': { id: '4319', name: 'African Cup of Nations', encodedName: 'African_Cup_of_Nations', isLeague: false }, 
+            'CWC': { id: '4487', name: 'Club World Cup', encodedName: 'Club_World_Cup', isLeague: false }, 
+            'UECL': { id: '4521', name: 'UEFA Europa Conference League', encodedName: 'UEFA_Europa_Conference_League', isLeague: true }, 
+            'FAC': { id: '4336', name: 'The FA Cup', encodedName: 'The_FA_Cup', isLeague: false }, 
+            'DFBP': { id: '4401', name: 'DFB-Pokal', encodedName: 'DFB-Pokal', isLeague: false }, 
+            'CDR': { id: '4371', name: 'Copa del Rey', encodedName: 'Copa_del_Rey', isLeague: false }, 
+            'COPI': { id: '4486', name: 'Copa Italia', encodedName: 'Copa_Italia', isLeague: false }, 
+            'KNVB': { id: '4383', name: 'KNVB Beker', encodedName: 'KNVB_Beker', isLeague: false }, 
+            'EFLC': { id: '4396', name: 'EFL Cup', encodedName: 'EFL_Cup', isLeague: false },
         };
 
         const tsdbComp = TSDB_COMPETITIONS[compCode];
 
         if (tsdbComp) {
             const leagueId = tsdbComp.id;
-            const leagueName = tsdbComp.name;
+            const leagueName = tsdbComp.encodedName;
             const fetchTasks = [];
 
             const fetchAllMatches = async () => {
@@ -137,7 +149,7 @@ export async function onRequest(context) {
                 let fetchUrls = [];
                 
                 // Mafi mahimmanci: Neman matches ta suna
-                fetchUrls.push(`${TSDB_BASE_URL}/searchevents.php?e=${encodeURIComponent(leagueName)}`);
+                fetchUrls.push(`${TSDB_BASE_URL}/searchevents.php?l=${leagueName}`);
                 
                 if (tsdbComp.isLeague) {
                     fetchUrls.push(`${TSDB_BASE_URL}/eventspastleague.php?id=${leagueId}`);
@@ -257,7 +269,6 @@ export async function onRequest(context) {
         return withCORSHeaders(response, origin);
 
     } catch (e) {
-        console.error("Server error in search.js:", e.message);
         const errorResponse = new Response(
             JSON.stringify({
                 error: true,
