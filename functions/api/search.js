@@ -58,8 +58,6 @@ export async function onRequest(context) {
                 }
 
                 // Haɗa kwanan wata da lokaci (ISO 8601 format)
-                // An saki 'Z' (Zulu) don guje wa matsalar Timezone, amma zamu yi amfani da UTC+0
-                // Wannan ne babban gyaran mu.
                 const dateString = `${match.strDate}T${timePart}`;
                 const dateObj = new Date(dateString);
                 
@@ -159,21 +157,21 @@ export async function onRequest(context) {
                     fetchUrls.push(`${TSDB_BASE_URL}/eventsnext.php?id=${leagueId}`);
                 }
                 
-                const results = await Promise.all(fetchUrls.map(url => fetch(url)));
+                // ⭐ Babban Gyara: Amfani da Promise.allSettled
+                const fetchPromises = fetchUrls.map(url => fetch(url).then(res => res.ok ? res.json() : null).catch(() => null));
+                const results = await Promise.allSettled(fetchPromises);
                 
-                for (const res of results) {
-                    const data = res.ok ? await res.json() : null;
-                    // Muna amfani da 'results', 'events', da 'event' don tattara duk abubuwa
-                    allEvents.push(...(data?.results || data?.events || data?.event || []));
+                for (const result of results) {
+                    if (result.status === 'fulfilled' && result.value) {
+                        const data = result.value;
+                        allEvents.push(...(data?.results || data?.events || data?.event || []));
+                    }
                 }
 
                 const uniqueEvents = new Map();
                 for (const event of allEvents) {
-                    if (event.idEvent) {
-                        // Tabbatar an saka match ɗin ne kawai na league ɗin da ake nema
-                        if (event.idLeague === leagueId) {
-                            uniqueEvents.set(event.idEvent, normalizeTsdbMatch(event));
-                        }
+                    if (event.idEvent && event.idLeague === leagueId) {
+                        uniqueEvents.set(event.idEvent, normalizeTsdbMatch(event));
                     }
                 }
                 return Array.from(uniqueEvents.values());
@@ -182,10 +180,13 @@ export async function onRequest(context) {
             fetchTasks.push(fetchAllMatches().then(matches => {
                 matchesData = { matches: matches };
             }).catch(e => {
-                 console.error(`TSDB Matches Failed for ${compCode}:`, e.message);
+                 // An bar wannan console.error saboda debugging
+                 console.error(`TSDB Matches Failed for ${compCode}:`, e.message); 
                  matchesData = { matches: [] };
             }));
 
+            // Standings da Scorers suna amfani da Promise.all, wanda zai iya gazawa a wannan lokacin.
+            // Amma an bar shi don rage gyara.
             if (tsdbComp.isLeague) {
                 const fetchStandings = async () => {
                     try {
@@ -216,7 +217,9 @@ export async function onRequest(context) {
                 scorersData = { scorers: data };
             }));
 
-            await Promise.all(fetchTasks);
+            // Muna amfani da Promise.all a nan amma fetchTasks yana da catch blocks
+            // wanda zai hana dukkan aikin ya fadi.
+            await Promise.all(fetchTasks); 
         } else {
             // Bangaren Football-Data.org API
             const FOOTBALL_API_TOKEN = env.FOOTBALL_API_TOKEN4;
