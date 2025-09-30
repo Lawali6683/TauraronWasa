@@ -1,6 +1,5 @@
 export async function onRequest(context) {
     const { request, env } = context;
-
     const origin = request.headers.get("Origin");
     const ALLOWED_ORIGINS = [
         "https://tauraronwasa.pages.dev",
@@ -47,27 +46,32 @@ export async function onRequest(context) {
         return withCORSHeaders(response, origin);
     }
 
-   
+    // ⭐ Gyaran da zai warware matsalar 1970
     function normalizeTsdbMatch(match) {
-        let utcDate;        
+        let utcDate;
         
-        if (match.strTimestamp) {
-            
+        // Muna amfani da strDate da strTime don ƙirƙirar kwanan wata mai inganci.
+        // Haka kuma, an saka "UTC" don tabbatar da ba a canza timezone ba.
+        if (match.strDate && match.strTime) {
+            // strTime yana iya zama a tsarin 'HH:MM:SS' ko 'HH:MM'. Muna gyara shi.
+            const timePart = match.strTime.length === 5 ? `${match.strTime}:00` : match.strTime;
+            // Haɗa kwanan wata da lokaci, sannan a saka 'Z' (watau Zulu/UTC) don cire matsalar timezone.
+            // Lura: Wannan yana aiki ne idan TheSportsDB ya bada data a UTC.
+            utcDate = `${match.strDate}T${timePart}Z`;
+        } else if (match.strTimestamp) {
+            // Wannan shine tsohon gyaran da ya kasa aiki: idan 'strDate' da 'strTime' basu yi aiki ba.
             const timestampInMs = parseInt(match.strTimestamp.padEnd(13, '0'));
             utcDate = new Date(timestampInMs).toISOString();
-        } else if (match.strDate && match.strTime) {
-            
-            utcDate = `${match.strDate} ${match.strTime}`;
         } else if (match.dateEvent) {
              utcDate = match.dateEvent; 
         } else {
             utcDate = new Date().toISOString(); // Fallback
         }
-
         
+        // Tabbatar da an saka muhimman bayanai
         return {
             ...match,
-            utcDate: utcDate,
+            utcDate: utcDate, // Wannan zai nuna daidai a client-side
             homeTeam: { name: match.strHomeTeam || match.strEvent, crest: match.strHomeTeamBadge },
             awayTeam: { name: match.strAwayTeam, crest: match.strAwayTeamBadge },
             score: { fullTime: { home: parseInt(match.intHomeScore), away: parseInt(match.intAwayScore) } },
@@ -94,8 +98,8 @@ export async function onRequest(context) {
         let standingsData = null;
         let scorersData = null;
         
-        // An canza daga '123' zuwa '1'
-        const TSDB_API_KEY = '1'; 
+        // 🔑 An dawo da amfani da '123' kamar yadda kuka ce yana aiki
+        const TSDB_API_KEY = '123'; 
         const TSDB_BASE_URL = `https://www.thesportsdb.com/api/v1/json/${TSDB_API_KEY}`;
         
         const TSDB_COMPETITIONS = {
@@ -121,38 +125,39 @@ export async function onRequest(context) {
             // Aikin tattara matches gaba daya don leagues da cups
             const fetchAllMatches = async () => {
                 let allEvents = [];
-                let pastEvents = [];
-                let nextEvents = [];
-                let lastEvents = [];
+                let leagueTasks = [];
+                let cupTasks = [];
 
                 if (tsdbComp.isLeague) {
-                    const [pastRes, nextRes] = await Promise.all([
-                        fetch(`${TSDB_BASE_URL}/eventspastleague.php?id=${leagueId}`),
-                        fetch(`${TSDB_BASE_URL}/eventsnextleague.php?id=${leagueId}`)
-                    ]);
-                    pastEvents = pastRes.ok ? (await pastRes.json())?.events || [] : [];
-                    nextEvents = nextRes.ok ? (await nextRes.json())?.events || [] : [];
-                    allEvents = [...pastEvents, ...nextEvents];
+                    leagueTasks.push(fetch(`${TSDB_BASE_URL}/eventspastleague.php?id=${leagueId}`));
+                    leagueTasks.push(fetch(`${TSDB_BASE_URL}/eventsnextleague.php?id=${leagueId}`));
+                    
+                    const leagueResults = await Promise.all(leagueTasks);
+                    for (const res of leagueResults) {
+                        const data = res.ok ? await res.json() : null;
+                        allEvents.push(...(data?.events || []));
+                    }
                 } else {
+                    // Don Cups: Muna ƙara /eventslast da /eventsnext
+                    cupTasks.push(fetch(`${TSDB_BASE_URL}/eventslast.php?id=${leagueId}`));
+                    cupTasks.push(fetch(`${TSDB_BASE_URL}/eventsnext.php?id=${leagueId}`));
                     
-                    const [lastRes, nextRes] = await Promise.all([
-                        fetch(`${TSDB_BASE_URL}/eventslast.php?id=${leagueId}`),
-                        fetch(`${TSDB_BASE_URL}/eventsnext.php?id=${leagueId}`)
-                    ]);
-                    
-                    lastEvents = lastRes.ok ? (await lastRes.json())?.results || [] : [];
-                    nextEvents = nextRes.ok ? (await nextRes.json())?.events || [] : [];
-                    allEvents = [...lastEvents, ...nextEvents];
+                    const cupResults = await Promise.all(cupTasks);
+                    for (const res of cupResults) {
+                        const data = res.ok ? await res.json() : null;
+                        // eventslast yana amfani da 'results' ne ba 'events' ba
+                        allEvents.push(...(data?.results || data?.events || []));
+                    }
                 }
 
-                
+                // Cire matches masu maimaitawa kuma a gyara kwanan wata
                 const uniqueEvents = new Map();
                 for (const event of allEvents) {
-                    
                     if (event.idEvent) {
                         uniqueEvents.set(event.idEvent, normalizeTsdbMatch(event));
                     }
                 }
+                // An tace events, an gyara kwanan wata, yanzu mun shirya don dawowa da su
                 return Array.from(uniqueEvents.values());
             };
             
@@ -163,6 +168,7 @@ export async function onRequest(context) {
                  matchesData = { matches: [] };
             }));
 
+            // Standings da Scorers basu canza ba
             if (tsdbComp.isLeague) {
                 const fetchStandings = async () => {
                     try {
@@ -183,7 +189,6 @@ export async function onRequest(context) {
                 try {
                     const res = await fetch(`${TSDB_BASE_URL}/lookuptopscorers.php?id=${leagueId}`);
                     const data = res.ok ? await res.json() : null;
-                   
                     return data?.countrys ? data.countrys : null; 
                 } catch (e) {
                     console.error(`TSDB Scorers Failed for ${compCode}:`, e.message);
@@ -196,10 +201,10 @@ export async function onRequest(context) {
 
             await Promise.all(fetchTasks);
         } else {
-            
+            // Bangaren Football-Data.org API ba a canza shi ba
             const FOOTBALL_API_TOKEN = env.FOOTBALL_API_TOKEN4;
-          
-            const fetchMatches = async () => {
+            // ... (Aikin Football-Data.org a nan)
+             const fetchMatches = async () => {
                 try {
                     const matchesRes = await fetch(`https://api.football-data.org/v4/competitions/${compCode}/matches`, { headers: { "X-Auth-Token": FOOTBALL_API_TOKEN } });
                     return matchesRes.ok ? await matchesRes.json() : null;
