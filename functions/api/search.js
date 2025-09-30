@@ -57,37 +57,20 @@ export async function onRequest(context) {
                     timePart = `${timePart}:00`;
                 }
 
-                // Haɗa kwanan wata da lokaci (ISO 8601 format)
-                const dateString = `${match.strDate}T${timePart}`;
+                // An saka 'Z' (Zulu/UTC) don tilasta JavaScript ya ɗauke shi a matsayin UTC
+                const dateString = `${match.strDate}T${timePart}Z`;
                 const dateObj = new Date(dateString);
                 
-                // Idan an dawo da Jan 1, 1970, ko kwanan wata mara inganci, babu amfani
+                // Gwada ingancin kwanan wata kuma tabbatar da ba kwanan wata na 1970 ba
                 if (!isNaN(dateObj.getTime()) && dateObj.getTime() > 0) {
                     utcDate = dateObj.toISOString();
                 }
             } catch (e) {
-                // Bar utcDate a matsayin null idan haɗin ya kasa
+                // An bar utcDate a matsayin null idan haɗin ya kasa
             }
         } 
         
-        // Gwaji na biyu: Amfani da strTimestamp idan gwaji na farko ya kasa
-        if (utcDate === null && match.strTimestamp && match.strTimestamp !== '0') {
-            const timestampStr = match.strTimestamp;
-            try {
-                 let timestampInMs;
-                if (timestampStr.length === 10) {
-                    timestampInMs = parseInt(timestampStr) * 1000;
-                } else if (timestampStr.length === 13) {
-                    timestampInMs = parseInt(timestampStr);
-                }
-                const dateObj = new Date(timestampInMs);
-                if (!isNaN(dateObj.getTime()) && dateObj.getTime() > 0) {
-                    utcDate = dateObj.toISOString();
-                }
-            } catch (e) {
-                 // Bar utcDate a matsayin null
-            }
-        }
+        // An cire strTimestamp gaba ɗaya don hana matsalar 1970
 
         return {
             ...match,
@@ -146,7 +129,6 @@ export async function onRequest(context) {
                 let allEvents = [];
                 let fetchUrls = [];
                 
-                // Mafi mahimmanci: Neman matches ta suna
                 fetchUrls.push(`${TSDB_BASE_URL}/searchevents.php?l=${leagueName}`);
                 
                 if (tsdbComp.isLeague) {
@@ -157,7 +139,6 @@ export async function onRequest(context) {
                     fetchUrls.push(`${TSDB_BASE_URL}/eventsnext.php?id=${leagueId}`);
                 }
                 
-                // ⭐ Babban Gyara: Amfani da Promise.allSettled
                 const fetchPromises = fetchUrls.map(url => fetch(url).then(res => res.ok ? res.json() : null).catch(() => null));
                 const results = await Promise.allSettled(fetchPromises);
                 
@@ -180,13 +161,10 @@ export async function onRequest(context) {
             fetchTasks.push(fetchAllMatches().then(matches => {
                 matchesData = { matches: matches };
             }).catch(e => {
-                 // An bar wannan console.error saboda debugging
                  console.error(`TSDB Matches Failed for ${compCode}:`, e.message); 
                  matchesData = { matches: [] };
             }));
 
-            // Standings da Scorers suna amfani da Promise.all, wanda zai iya gazawa a wannan lokacin.
-            // Amma an bar shi don rage gyara.
             if (tsdbComp.isLeague) {
                 const fetchStandings = async () => {
                     try {
@@ -217,8 +195,6 @@ export async function onRequest(context) {
                 scorersData = { scorers: data };
             }));
 
-            // Muna amfani da Promise.all a nan amma fetchTasks yana da catch blocks
-            // wanda zai hana dukkan aikin ya fadi.
             await Promise.all(fetchTasks); 
         } else {
             // Bangaren Football-Data.org API
