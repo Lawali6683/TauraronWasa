@@ -1,14 +1,5 @@
 export async function onRequest(context) {
-  const { request, env } = context;
-
-  // Damar CORS domin localhost da tauraronwasa
-  const ALLOWED_ORIGINS = [
-    "https://tauraronwasa.pages.dev",
-    "https://www.tauraronwasa.com",
-    "http://localhost:8080",
-  ];
-  const origin = request.headers.get("Origin");
-  const allowOrigin = ALLOWED_ORIGINS.includes(origin) ? origin : "*";
+  const { env } = context;
 
   try {
     const now = Date.now();
@@ -19,26 +10,27 @@ export async function onRequest(context) {
     const dateFrom = start.toISOString().split("T")[0];
     const dateTo = end.toISOString().split("T")[0];
 
-    console.log("🔍 Fetching fixtures from API...");
-    console.log(`Range: ${dateFrom} - ${dateTo}`);
+    // ========== FETCH FIXTURES ==========
+    const apiUrl = `https://api.football-data.org/v4/matches?dateFrom=${dateFrom}&dateTo=${dateTo}`;
+    const response = await fetch(apiUrl, {
+      headers: { "X-Auth-Token": env.FOOTBALL_DATA_API_KEY6 },
+    });
 
-    const response = await fetch(
-      `https://api.football-data.org/v4/matches?dateFrom=${dateFrom}&dateTo=${dateTo}`,
-      {
-        headers: { "X-Auth-Token": env.FOOTBALL_DATA_API_KEY6 },
-      }
-    );
-
+    // Idan response bai yi ba
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("❌ API error:", errorText);
       return new Response(
-        JSON.stringify({ error: true, message: errorText }),
+        JSON.stringify({
+          error: true,
+          stage: "Football API",
+          message: `HTTP ${response.status}: ${errorText}`,
+          apiUrl,
+        }),
         {
           status: response.status,
           headers: {
             "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": allowOrigin,
+            "Access-Control-Allow-Origin": "*",
           },
         }
       );
@@ -47,9 +39,7 @@ export async function onRequest(context) {
     const data = await response.json();
     const fixtures = data.matches || [];
 
-    console.log(`✅ Fixtures fetched: ${fixtures.length}`);
-
-    // Categorize fixtures
+    // ========== CATEGORIZE ==========
     const categorized = {};
     fixtures.forEach((f) => {
       const fixtureDate = new Date(f.utcDate).toISOString().split("T")[0];
@@ -57,40 +47,32 @@ export async function onRequest(context) {
       categorized[fixtureDate].push(f);
     });
 
-    // Save to Firebase
-    console.log("💾 Saving data to Firebase...");
-    const saveRes = await fetch(
-      `https://tauraronwasa-default-rtdb.firebaseio.com/fixtures.json?auth=${env.FIREBASE_SECRET}`,
-      {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          fixtures: categorized,
-          lastUpdated: now,
-        }),
-      }
-    );
+    // ========== SAVE TO FIREBASE ==========
+    const fbUrl = `https://tauraronwasa-default-rtdb.firebaseio.com/fixtures.json?auth=${env.FIREBASE_SECRET}`;
+    const fbRes = await fetch(fbUrl, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ fixtures: categorized, lastUpdated: now }),
+    });
 
-    if (!saveRes.ok) {
-      const text = await saveRes.text();
-      console.error("❌ Firebase error:", text);
+    if (!fbRes.ok) {
+      const fbErr = await fbRes.text();
       return new Response(
         JSON.stringify({
           error: true,
-          message: "Firebase save error",
-          details: text,
+          stage: "Firebase",
+          message: fbErr,
+          fbUrl,
         }),
         {
-          status: saveRes.status,
+          status: fbRes.status,
           headers: {
             "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": allowOrigin,
+            "Access-Control-Allow-Origin": "*",
           },
         }
       );
     }
-
-    console.log("✅ Firebase update completed.");
 
     return new Response(
       JSON.stringify({
@@ -103,19 +85,23 @@ export async function onRequest(context) {
         status: 200,
         headers: {
           "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": allowOrigin,
+          "Access-Control-Allow-Origin": "*",
         },
       }
     );
   } catch (error) {
-    console.error("💥 Unexpected error:", error);
     return new Response(
-      JSON.stringify({ status: "error", message: error.message }),
+      JSON.stringify({
+        status: "error",
+        stage: "Catch Block",
+        message: error.message,
+        stack: error.stack,
+      }),
       {
         status: 500,
         headers: {
           "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": allowOrigin,
+          "Access-Control-Allow-Origin": "*",
         },
       }
     );
