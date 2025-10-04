@@ -4,19 +4,20 @@ export async function onRequest(context) {
   try {
     const now = Date.now();
     const start = new Date(now);
+    start.setDate(start.getDate() - 2); // ✅ Kwanaki 2 da suka wuce
     const end = new Date(now);
-    end.setDate(end.getDate() + 14);
+    end.setDate(end.getDate() + 7); // ✅ Har zuwa kwanaki 7 masu zuwa
 
     const dateFrom = start.toISOString().split("T")[0];
     const dateTo = end.toISOString().split("T")[0];
 
-    // ========== FETCH FIXTURES ==========
     const apiUrl = `https://api.football-data.org/v4/matches?dateFrom=${dateFrom}&dateTo=${dateTo}`;
+
+    // ===== FETCH FIXTURES =====
     const response = await fetch(apiUrl, {
       headers: { "X-Auth-Token": env.FOOTBALL_DATA_API_KEY6 },
     });
 
-    // Idan response bai yi ba
     if (!response.ok) {
       const errorText = await response.text();
       return new Response(
@@ -39,7 +40,7 @@ export async function onRequest(context) {
     const data = await response.json();
     const fixtures = data.matches || [];
 
-    // ========== CATEGORIZE ==========
+    // ===== CATEGORIZE BY DATE =====
     const categorized = {};
     fixtures.forEach((f) => {
       const fixtureDate = new Date(f.utcDate).toISOString().split("T")[0];
@@ -47,7 +48,7 @@ export async function onRequest(context) {
       categorized[fixtureDate].push(f);
     });
 
-    // ========== SAVE TO FIREBASE ==========
+    // ===== SAVE TO FIREBASE =====
     const fbUrl = `https://tauraronwasa-default-rtdb.firebaseio.com/fixtures.json?auth=${env.FIREBASE_SECRET}`;
     const fbRes = await fetch(fbUrl, {
       method: "PUT",
@@ -80,6 +81,7 @@ export async function onRequest(context) {
         message: "Fixtures updated successfully",
         total: fixtures.length,
         days: Object.keys(categorized).length,
+        dateRange: `${dateFrom} → ${dateTo}`,
       }),
       {
         status: 200,
