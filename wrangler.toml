@@ -1,6 +1,6 @@
 name = "tauraronwasa-functions"
-main = "functions/_worker.js"
+main = "functions/_worker.js"          
 compatibility_date = "2023-10-03"
 
 [triggers]
-crons = ["*/1 * * * *"]   
+crons = ["*/1 * * * *"]
