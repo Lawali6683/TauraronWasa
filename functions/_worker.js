@@ -10,23 +10,19 @@ async function updateFixtures(env) {
     const dateTo = end.toISOString().split("T")[0];
     
     
-    const apiUrl = `https://api.football-data.org/v4/matches?dateFrom=${dateFrom}&dateTo=${dateTo}&status=FINISHED,SCHEDULED,IN_PLAY,PAUSED,SUSPENDED,POSTPONED`;
+    const apiUrl = `https://api.football-data.org/v4/matches?dateFrom=${dateFrom}&dateTo=${dateTo}`; 
 
-    // ===== FETCH FIXTURES =====
     const response = await fetch(apiUrl, {
       headers: { "X-Auth-Token": env.FOOTBALL_DATA_API_KEY6 },
     });
 
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error(`Football API Error: HTTP ${response.status}: ${errorText} at ${apiUrl}`);
       throw new Error(`Football API Error: ${response.status}`);
     }
 
     const data = await response.json();
     const fixtures = data.matches || [];
 
-    // ===== CATEGORIZE BY DATE =====
     const categorized = {};
     fixtures.forEach((f) => {
       const fixtureDate = new Date(f.utcDate).toISOString().split("T")[0];
@@ -34,17 +30,15 @@ async function updateFixtures(env) {
       categorized[fixtureDate].push(f);
     });
 
-    // ===== SAVE TO FIREBASE =====
+    
     const fbUrl = `https://tauraronwasa-default-rtdb.firebaseio.com/fixtures.json?auth=${env.FIREBASE_SECRET}`;
     const fbRes = await fetch(fbUrl, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ fixtures: categorized, lastUpdated: now }),
+      body: JSON.stringify(categorized), 
     });
 
     if (!fbRes.ok) {
-      const fbErr = await fbRes.text();
-      console.error(`Firebase Error: ${fbRes.status}: ${fbErr} at ${fbUrl}`);
       throw new Error(`Firebase Error: ${fbRes.status}`);
     }
     
@@ -56,22 +50,17 @@ async function updateFixtures(env) {
 }
 
 export default {
-  
   async scheduled(event, env, ctx) {
     ctx.waitUntil(
         (async () => {
             try {
-                const result = await updateFixtures(env);
-                console.log(`Cron Job Success: ${JSON.stringify(result)}`);
+                await updateFixtures(env);
             } catch (error) {
                 console.error(`Cron Job Failed: ${error.message}`);
-                
             }
         })()
     );
   },
-
-
   async fetch(request, env, ctx) {
     try {
         const result = await updateFixtures(env);
