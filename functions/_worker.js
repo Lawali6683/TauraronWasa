@@ -12,17 +12,20 @@ async function updateFixtures(env) {
     
     const apiUrl = `https://api.football-data.org/v4/matches?dateFrom=${dateFrom}&dateTo=${dateTo}`; 
 
+    // ===== FETCH FIXTURES =====
     const response = await fetch(apiUrl, {
       headers: { "X-Auth-Token": env.FOOTBALL_DATA_API_KEY6 },
     });
 
     if (!response.ok) {
-      throw new Error(`Football API Error: ${response.status}`);
+      const errorText = await response.text();
+      throw new Error(`Football API Error HTTP ${response.status}: ${errorText.substring(0, 100)}`);
     }
 
     const data = await response.json();
     const fixtures = data.matches || [];
 
+    
     const categorized = {};
     fixtures.forEach((f) => {
       const fixtureDate = new Date(f.utcDate).toISOString().split("T")[0];
@@ -39,39 +42,33 @@ async function updateFixtures(env) {
     });
 
     if (!fbRes.ok) {
-      throw new Error(`Firebase Error: ${fbRes.status}`);
+      const fbErr = await fbRes.text();
+      throw new Error(`Firebase Error HTTP ${fbRes.status}: ${fbErr.substring(0, 100)}`);
     }
     
     return {
         status: "success",
-        total: fixtures.length,
-        dateRange: `${dateFrom} → ${dateTo}`
+        total: fixtures.length
     };
 }
 
 export default {
+ 
   async scheduled(event, env, ctx) {
     ctx.waitUntil(
         (async () => {
             try {
                 await updateFixtures(env);
             } catch (error) {
+                
                 console.error(`Cron Job Failed: ${error.message}`);
             }
         })()
     );
   },
+
+  
   async fetch(request, env, ctx) {
-    try {
-        const result = await updateFixtures(env);
-        return new Response(JSON.stringify(result), {
-            headers: { "Content-Type": "application/json" },
-        });
-    } catch (error) {
-        return new Response(JSON.stringify({ error: true, message: error.message }), {
-            status: 500,
-            headers: { "Content-Type": "application/json" },
-        });
-    }
+    return undefined; 
   }
 };
