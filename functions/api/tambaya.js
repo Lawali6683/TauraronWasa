@@ -5,7 +5,7 @@ export async function onRequest(context) {
     const ALLOWED_ORIGINS = [
         "https://tauraronwasa.pages.dev",
         "https://leadwaypeace.pages.dev",
-        "http://localhost:8080",
+        "http://localhost:8080"
     ];
 
     function withCORSHeaders(response, origin) {
@@ -45,21 +45,16 @@ export async function onRequest(context) {
         return withCORSHeaders(response, origin);
     }
 
-    const systemPrompt = `Kai babban kwararre ne kuma mai ba da labari game da wasanni. Amsoshin ka suna da ilimi, bayyanannu, kuma cikin yaren da aka yi maka tambaya (Hausa ko Turanci).
-Dole ne ka bi waɗannan ƙa'idoji:
-1. Yi amfani da binciken yanar gizo (Web Search) na ciki don bada amsoshi da suka shafi sabbin abubuwa, jadawalai, teburin gasa, da halin da ake ciki yanzu.
-2. Idan tambayar tana neman hoto na ɗan wasa ko kulob, ka haɗa da URL na hoton da ya dace a cikin amsar ka a wajen <response>. Yi amfani da hanyar haɗi (link) kai tsaye zuwa hoton (misali: https://misali.com/hoto.jpg). Idan ba a samu hoton ba, ka ba da amsa mai kyau ba tare da ambaton hoton ba.
-3. Tsara amsar ka a cikin alamar <response>...</response>.
-4. Idan tambayar tana neman bayani game da wani mutum ko kulob, fito da sunan a Turanci a cikin alamar <entity_name>...</entity_name>. Idan tambayar ba ta da alaƙa da mutum ko kulob, yi amfani da <entity_name>general</entity_name>.
-5. Ka tabbatar duk bayanan da ka bayar na gaskiya ne kuma babu karya.`;
+    const systemPrompt = `Kai babban kwararre ne kuma mai ba da labari game da wasanni. Amsoshin ka suna da ilimi, bayyanannu, kuma cikin yaren da aka yi maka tambaya (Hausa ko Turanci). 
+Amsar ka ta kasance cikin alamar <response>...</response> kawai, ba tare da haɗa hoto, link ko image ba. 
+Idan tambayar tana neman mutum ko kulob, ka saka sunan a <entity_name>...</entity_name>. 
+Idan tambayar ba ta da alaƙa da mutum ko kulob, yi amfani da <entity_name>general</entity_name>. 
+Ka tabbatar duk bayanan da ka bayar na gaskiya ne kuma ba tare da karya ba.`;
 
     const getChatAnswer = async (userQuery) => {
         try {
-            // Rage query idan yayi tsawo sosai
             let safeQuery = userQuery;
-            if (safeQuery.length > 5000) {
-                safeQuery = safeQuery.substring(0, 5000);
-            }
+            if (safeQuery.length > 5000) safeQuery = safeQuery.substring(0, 5000);
 
             const chatRes = await fetch(TRANSLATE_API_URL, {
                 method: "POST",
@@ -67,21 +62,20 @@ Dole ne ka bi waɗannan ƙa'idoji:
                     Authorization: `Bearer ${TRANSLATE_API_KEY}`,
                     "Content-Type": "application/json",
                     "HTTP-Referer": "https://tauraronwasa.pages.dev",
-                    "X-Title": "TauraronWasa",
+                    "X-Title": "TauraronWasa"
                 },
                 body: JSON.stringify({
-                    model: "openai/gpt-4o-mini", // ƙaramar version don rage cin token
-                    max_tokens: 2000, // iyaka don kada ya wuce free plan
+                    model: "openai/gpt-4o-mini",
+                    max_tokens: 2000,
                     messages: [
                         { role: "system", content: systemPrompt },
-                        { role: "user", content: safeQuery },
-                    ],
-                }),
+                        { role: "user", content: safeQuery }
+                    ]
+                })
             });
 
             if (!chatRes.ok) {
                 const text = await chatRes.text();
-                console.error("Chat API failed:", chatRes.status, text);
                 return { error: true, message: `API error ${chatRes.status}: ${text}` };
             }
 
@@ -103,11 +97,10 @@ Dole ne ka bi waɗannan ƙa'idoji:
             return {
                 query_type: entityName === "general" ? "general_question" : "entity_search",
                 entity_name: entityName,
-                response_text: responseText,
+                response_text: responseText
             };
         } catch (e) {
-            console.error("Chat API error:", e.message);
-            return { error: true, message: "An samu matsala wajen haɗawa da API. Da fatan a gwada daga baya." };
+            return { error: true, message: "An samu matsala wajen haɗawa da API." };
         }
     };
 
@@ -140,7 +133,6 @@ Dole ne ka bi waɗannan ƙa'idoji:
 
         return withCORSHeaders(finalResponse, origin);
     } catch (e) {
-        console.error("Kuskuren aiki:", e.message);
         const errorResponse = new Response(
             JSON.stringify({ error: true, message: "An samu matsala yayin aikin bincike.", details: e.message }),
             { status: 500, headers: { "Content-Type": "application/json" } }
