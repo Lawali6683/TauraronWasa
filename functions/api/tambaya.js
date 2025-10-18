@@ -66,7 +66,7 @@ Ka tabbatar duk bayanan da ka bayar na gaskiya ne kuma ba tare da karya ba.`;
                 },
                 body: JSON.stringify({
                     model: "openai/gpt-4o-mini",
-                    max_tokens: 2000,
+                    max_tokens: 3000,
                     messages: [
                         { role: "system", content: systemPrompt },
                         { role: "user", content: safeQuery }
