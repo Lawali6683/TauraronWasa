@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="ha">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bincike Akan Duniyar Wasanni</title>
+    <link rel="icon" href="https://i.imgur.com/CgvdgMA.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+   <style>
+    :root {
+    
+    --bg: #0e0e0e;
+    --bg-glass: rgba(30,30,30,0.85);
+    --fg: #f4f4f4;
+    --accent: #16e7cf;
+    --danger: #ff4d4d;
+      
+    --card-radius: 18px;
+    --card-shadow: 0 4px 24px 0 rgba(0,0,0,0.22);
+    
+  
+    --table-header: #212121;
+    --table-row-alt: #191919;
+    --table-border: #252525;
+    
+  
+    --default-crest: rgba(255, 255, 255, 0.1);
+    --transition: all 0.3s cubic-bezier(.75,.16,.47,1.13);
+}
+
+body {
+    font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg);
+    color: var(--fg);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-x: hidden;
+}
+
+
+.loading-backdrop {
+    position: fixed;
+    z-index: 9000;
+    inset: 0;
+    background: linear-gradient(to bottom, #180022, #300040); 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.3s, visibility 0.3s;
+    text-align: center;
+    padding: 1em;
+}
+
+.loading-backdrop.hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+
+.lds-roller {
+    display: inline-block;
+    position: relative;
+    width: 72px;
+    height: 72px;
+}
+.lds-roller div {
+    animation: lds-roller 1.2s cubic-bezier(0.6, 0, 0.6, 1) infinite;
+    transform-origin: 36px 36px;
+}
+.lds-roller div:after {
+    content: " ";
+    display: block;
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    margin: -4px 0 0 -4px;
+}
+.lds-roller div:nth-child(1) { animation-delay: -0.036s; top: 63px; left: 63px; }
+.lds-roller div:nth-child(2) { animation-delay: -0.072s; top: 68px; left: 56px; }
+.lds-roller div:nth-child(3) { animation-delay: -0.108s; top: 71px; left: 48px; }
+.lds-roller div:nth-child(4) { animation-delay: -0.144s; top: 72px; left: 39px; }
+.lds-roller div:nth-child(5) { animation-delay: -0.18s; top: 71px; left: 31px; }
+.lds-roller div:nth-child(6) { animation-delay: -0.216s; top: 68px; left: 24px; }
+.lds-roller div:nth-child(7) { animation-delay: -0.252s; top: 63px; left: 17px; }
+.lds-roller div:nth-child(8) { animation-delay: -0.288s; top: 56px; left: 12px; }
+@keyframes lds-roller {
+    0% { transform: rotate(0deg);}
+    100% { transform: rotate(360deg);}
+}
+
+.loading-error-message {
+    color: var(--danger);
+    font-size: 1.2em;
+    margin-top: 20px;
+}
+.retry-button {
+    background-color: var(--accent);
+    color: var(--bg);
+    border: none;
+    padding: 10px 20px;
+    margin-top: 15px;
+    border-radius: 8px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+.retry-button:hover {
+    background-color: #00e0b3;
+}
+
+
+header {
+    width: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+    background-color: var(--bg-glass);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.logo-container {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+.logo-container img {
+    width: 50px;
+    height: 50px;
+}
+.logo-container h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    margin: 0;
+    color: var(--fg);
+    text-align: center;
+}
+
+
+.search-bar {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    max-width: 600px;
+    background-color: var(--bg-glass);
+    border-radius: 50px;
+    padding: 5px;
+    box-shadow: var(--card-shadow);
+    border: 1px solid #00ffcc;
+}
+.search-bar input {
+    flex-grow: 1;
+    background: transparent;
+    border: none;
+    color: var(--fg);
+    padding: 10px 20px;
+    font-size: 1rem;
+    outline: none;
+}
+.search-bar button {
+    background-color: var(--accent);
+    color: var(--bg);
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+    flex-shrink: 0;
+}
+.search-bar button:hover {
+    background-color: #00e0b3;
+}
+.search-bar i {
+    font-size: 1.2rem;
+}
+
+
+.cup-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 20px;
+    padding: 20px 10px;
+    
+}
+.cup-buttons button {
+    padding: 8px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--table-border);
+    background-color: var(--table-row-alt);
+    color: var(--fg);
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+    border: 1px solid #00ffcc;
+}
+.cup-buttons button:hover {
+    background-color: #2e2e2e;
+}
+.cup-buttons button.active {
+    background-color: var(--accent);
+    border-color: var(--accent);
+}
+
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    padding: 20px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    opacity: 1;
+}
+.card {
+    background-color: var(--bg-glass);
+    border-radius: var(--card-radius);
+    padding: 20px;
+    box-shadow: var(--card-shadow);
+}
+.card-header {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+.card-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: var(--fg);
+}
+.cup-banner {
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+    border-radius: var(--card-radius);
+    margin-bottom: 20px;
+}
+
+
+.matches-filter {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+.matches-filter button {
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: 1px solid var(--table-border);
+    background-color: var(--table-row-alt);
+    color: var(--fg);
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+.matches-filter button:hover {
+    background-color: #2e2e2e;
+}
+.matches-filter button.active {
+    background-color: var(--accent);
+    border-color: var(--accent);
+    color: var(--bg);
+}
+.match-card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+.match-card {
+   background: var(--bg-glass); 
+        border-radius: var(--card-radius);
+         border: 1px solid #00ffcc;
+        padding: 2px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        position: relative;
+        transition: transform 0.2s, box-shadow 0.2s;
+}
+.match-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--card-shadow);
+}
+.teams {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.8rem;
+}
+.team {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+}
+.team .crest {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 0.5rem;
+    object-fit: contain;
+}
+.team span {
+    font-weight: bold;
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+}
+.score {
+    font-size: 2em;
+    font-weight: bold;
+    color: var(--accent);
+}
+.match-info {
+    font-size: 0.9em;
+    color: #aaa;
+}
+.status {
+    font-weight: bold;
+    font-size: 1.1em;
+    margin-top: 0.5rem;
+}
+.status.finished { color: #9eff9e; }
+.status.live { color: var(--accent); }
+.status.scheduled { color: #ffd858; }
+.crest {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    background: var(--table-row-alt);
+    object-fit: contain;
+    border: 1.5px solid #fff1;
+}
+.show-more-btn {
+    display: block;
+    width: fit-content;
+    margin: 20px auto 0;
+    padding: 10px 20px;
+    background-color: var(--accent);
+    color: var(--bg);
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.2s;
+}
+.show-more-btn:hover {
+    background-color: #00e0b3;
+    transform: scale(1.05);
+}
+
+
+.group-table {
+    background: var(--table-row-alt);
+    border-radius: var(--card-radius);
+    margin-bottom: 20px;
+    overflow-x: auto;
+}
+.group-table h3 {
+    margin: 0;
+    padding: 15px;
+    background: var(--table-header);
+    border-bottom: 1px solid var(--table-border);
+    border-top-left-radius: var(--card-radius);
+    border-top-right-radius: var(--card-radius);
+}
+.group-table table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+.group-table th, .group-table td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid var(--table-border);
+}
+.group-table th:first-child, .group-table td:first-child {
+    padding-left: 20px;
+}
+.group-table th:last-child, .group-table td:last-child {
+    padding-right: 20px;
+}
+.group-table thead tr {
+    background-color: var(--table-header);
+}
+.group-table tbody tr:hover {
+    background-color: #333;
+}
+.team-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+
+.player-table table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 1rem;
+    background: var(--table-row-alt);
+    border-radius: var(--card-radius);
+}
+.player-table th, .player-table td {
+    padding: 3px 3px;
+    text-align: left;
+    border-bottom: 1px solid var(--table-border);
+}
+.player-table th {
+    background-color: var(--table-header);
+    font-weight: bold;
+}
+.player-table tbody tr:hover {
+    background-color: #333;
+}
+.player-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+.player-info .crest {
+    width: 35px;
+    height: 35px;
+}
+.player-info .player-name {
+    font-weight: bold;
+    white-space: nowrap;
+}
+.player-stats-value {
+    font-weight: bold;
+    color: var(--accent);
+}
+.hidden { display: none !important; }
+.fade-in { animation: fadeIn 0.5s ease-in-out; }
+
+
+.chat-answer {
+    background-color: var(--bg-glass);
+    padding: 20px;
+    border-radius: var(--card-radius);
+    box-shadow: var(--card-shadow);
+    margin-bottom: 20px;
+}
+.chat-answer .answer-text {
+    white-space: pre-wrap;
+    line-height: 1.6;
+    margin-bottom: 15px;
+}
+.chat-answer .answer-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--card-radius);
+    margin: 10px 0;
+    display: block;
+}
+.chat-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+.chat-actions button {
+    background: none;
+    border: none;
+    color: var(--fg);
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+.chat-actions button:hover {
+    color: var(--accent);
+}
+
+
+.toast-container {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+}
+.toast-container.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+
+@media (max-width: 700px) {
+    .main-container { padding: 0 0.2rem; }
+    .card { padding: 1.1rem 0.5rem; }
+    header h1 { font-size: 1.15rem; }
+    header img { height: 40px; width: 40px; }
+}
+
+@media (max-width: 600px) {
+    .logo-container h1 { font-size: 1.3rem; }
+    .container { padding: 10px; }
+    .card { padding: 15px; }
+    .matches-filter button { font-size: 0.8rem; padding: 6px 10px; }
+    .match-card-grid { grid-template-columns: 1fr; }
+    .teams .crest { width: 45px; height: 45px; }
+    .team span { font-size: 13px; }
+}
+</style>
+</head>
+<body>
+    <div class="loading-backdrop hidden" id="loading-backdrop">
+        <div class="lds-roller">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+        <div id="loading-message-text" class="loading-error-message hidden"></div>
+        <button id="retry-button" class="retry-button hidden">Sake Gwada</button>
+    </div>
+    <div id="toast-notification" class="toast-container">An yi kwafa!</div>
+    <header id="main-header">
+        <div class="logo-container">
+            <img src="https://i.imgur.com/CgvdgMA.png" alt="Tauraron Wasa Logo">
+            <h1>Bincike Akan Duniyar Wasanni A yau</h1>
+        </div>
+        <div class="search-bar">
+            <input type="text" id="search-input" placeholder="Bincike akan kowane labari...">
+            <button id="search-button"><i class="fas fa-search"></i></button>
+        </div>
+    </header>
+    <div class="cup-buttons" id="cup-menu">
+       
+        
+        
+        <button data-cup="WC">World Cup</button>
+        <button data-cup="EC">European Championship</button>
+        <button data-cup="UNL">UEFA Nations League</button>
+    </div>
+    
+    <div class="container" id="main-content">
+        <div id="search-result-container" class="card hidden">
+            <div id="chat-answers-list"></div>
+        </div>
+        <div class="card hidden" id="cup-data-container">
+            <img id="cup-banner-img" class="cup-banner hidden" src="" alt="Cup Banner">
+            
+            <div class="card hidden" id="matches-section">
+                <div class="card-header">
+                    <h2>Matches</h2>
+                </div>
+                <div class="matches-filter">
+                    <button id="upcoming-matches-btn" class="active">Wasanni Na Gaba</button>
+                    <button id="finished-matches-btn">Wasannin Da Aka Gama </button>
+                </div>
+                <div class="match-card-grid" id="matches-grid"></div>
+                <button id="show-more-matches" class="show-more-btn hidden">Nuna Sauran Wasanni</button>
+            </div>
+            
+            <div class="card hidden" id="standings-section">
+                <div class="card-header">
+                    <h2>Standings</h2>
+                </div>
+                <div id="standings-table"></div>
+            </div>
+            <div class="card hidden" id="player-stats-section">
+                <div class="card-header">
+                </div>
+                <div id="player-stats-content">
+                    <div class="player-table hidden" id="scorers-table">
+                        <h3>Top 10 Goals Scorers</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Player</th>
+                                    <th>Team</th>
+                                    <th>Goals</th>
+                                </tr>
+                            </thead>
+                            <tbody id="scorers-body"></tbody>
+                        </table>
+                    </div>
+                    <div class="player-table hidden" id="assists-table">
+                        <h3>Top 10 Assists</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Player</th>
+                                    <th>Team</th>
+                                    <th>Assists</th>
+                                </tr>
+                            </thead>
+                            <tbody id="assists-body"></tbody>
+                        </table>
+                    </div>
+                    <div class="player-table hidden" id="motm-table">
+                        <h3>Man of the Match</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Player</th>
+                                    <th>Team</th>
+                                    <th>Awards</th>
+                                </tr>
+                            </thead>
+                            <tbody id="motm-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    
+   <script>
+    const API_BASE_URL_SEARCH = "https://tauraronwasa.pages.dev/api/search";
+    const API_BASE_URL_TAMBAYA = "https://tauraronwasa.pages.dev/api/tambaya";
+    const API_KEY = "@haruna66";
+    const DEFAULT_CREST = 'https://i.imgur.com/kYmQ0c2.png';
+    const CUP_LOGOS = {
+        "NPL": "https://i.imgur.com/kQ9r3uY.png", // Nigeria Premier League
+        "SPL": "https://i.imgur.com/dK3f0wL.png", // Saudi Pro League
+        "FAC": "https://i.imgur.com/Cs79kKs.jpeg",
+        "DFBP": "https://i.imgur.com/buVr95d.jpeg",
+        "CDR": "https://i.imgur.com/3Zosjic.png",
+        "COPI": "https://i.imgur.com/MsPJKhv.jpeg",
+        "KNVB": "https://i.imgur.com/3fM17J5.jpeg",
+        "EFLC": "https://i.imgur.com/49ANf5Y.jpeg", // Carabao Cup
+        "UECL": "https://i.imgur.com/o2k9XzS.jpeg", // UEFA Conference League
+        "AFCON": "https://i.imgur.com/LPoYjIC.jpeg",
+        "CWC": "https://i.imgur.com/7bQyD5C.jpeg", // FIFA Club World Cup
+        "WC": "https://i.imgur.com/BST57yL.jpeg",
+        "EC": "https://i.imgur.com/QCL78Ar.jpeg",
+        "UNL": "https://i.imgur.com/J7d8j7F.jpeg"
+    };
+    const MATCH_DISPLAY_LIMIT = 5;
+    const loadingBackdrop = document.getElementById('loading-backdrop');
+    const loadingMessageText = document.getElementById('loading-message-text');
+    const searchResultContainer = document.getElementById('search-result-container');
+    const cupDataContainer = document.getElementById('cup-data-container');
+    const searchInput = document.getElementById('search-input');
+    const chatAnswersList = document.getElementById('chat-answers-list');
+    const upcomingMatchesBtn = document.getElementById('upcoming-matches-btn');
+    const finishedMatchesBtn = document.getElementById('finished-matches-btn');
+    const matchesGrid = document.getElementById('matches-grid');
+    const showMoreMatchesBtn = document.getElementById('show-more-matches');
+    const retryButton = document.getElementById('retry-button');
+    const spinner = document.querySelector('.lds-roller');
+    let allMatches = [];
+    let upcomingMatches = [];
+    let finishedMatches = [];
+    let matchesShown = MATCH_DISPLAY_LIMIT;
+    function showLoading() {
+        loadingBackdrop.classList.remove('hidden');
+        loadingMessageText.classList.add('hidden');
+        retryButton.classList.add('hidden');
+        if (spinner) {
+            spinner.classList.remove('hidden');
+        }
+    }
+    function hideLoading() {
+        loadingBackdrop.classList.add('hidden');
+    }
+    function showError(message) {
+        loadingBackdrop.classList.remove('hidden');
+        loadingMessageText.classList.remove('hidden');
+        retryButton.classList.remove('hidden');
+        if (spinner) {
+            spinner.classList.add('hidden');
+        }
+        loadingMessageText.textContent = message;
+    }
+    function showToast(message) {
+        const toast = document.getElementById('toast-notification');
+        toast.textContent = message;
+        toast.classList.add('show');
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 3000);
+    }
+    function clearAllContent() {
+        searchResultContainer.classList.add('hidden');
+        cupDataContainer.classList.add('hidden');
+        chatAnswersList.innerHTML = '';
+    }
+    function renderMatches(matchesToDisplay) {
+        matchesGrid.innerHTML = matchesToDisplay.slice(0, matchesShown).map(createMatchCard).join('');
+        if (matchesToDisplay.length > matchesShown) {
+            showMoreMatchesBtn.classList.remove('hidden');
+        } else {
+            showMoreMatchesBtn.classList.add('hidden');
+        }
+    }
+    function isTsdbData(data) {
+      
+        return data.matches && data.matches.length > 0 && data.matches[0].idEvent !== undefined;
+    }
+
+   
+    function formatTsdbMatch(match) {
+        const statusMap = {
+            'Finished': 'FINISHED',
+            'Postponed': 'POSTPONED',
+            'Upcoming': 'SCHEDULED',
+            'In Play': 'IN_PLAY',
+            'Scheduled': 'SCHEDULED', 
+            'Not Started': 'SCHEDULED', 
+            'TBA': 'SCHEDULED', 
+            'Cancelled': 'CANCELLED',
+        };
+
+      
+        const dateString = match.utcDate;
+        return {
+            status: statusMap[match.status] || 'SCHEDULED',
+            utcDate: dateString,
+            homeTeam: {
+                name: match.strHomeTeam || match.strEvent || 'N/A',
+                crest: match.strHomeTeamBadge || DEFAULT_CREST
+            },
+            awayTeam: {
+                name: match.strAwayTeam || 'N/A',
+                crest: match.strAwayTeamBadge || DEFAULT_CREST
+            },
+            score: {
+                fullTime: {
+                    home: parseInt(match.intHomeScore) || 0,
+                    away: parseInt(match.intAwayScore) || 0
+                }
+            }
+        };
+    }
+    function renderCupData(data, cupCode) {
+        clearAllContent();
+        hideLoading();
+        cupDataContainer.classList.remove('hidden');
+        const bannerImg = document.getElementById('cup-banner-img');
+        bannerImg.src = CUP_LOGOS[cupCode] || DEFAULT_CREST;
+        bannerImg.classList.remove('hidden');
+        const matchesSection = document.getElementById('matches-section');
+        let processedMatches = data.matches || [];
+       
+        if (processedMatches.length > 0 && processedMatches[0].idEvent) {
+            processedMatches = processedMatches.map(formatTsdbMatch);
+        }
+        allMatches = processedMatches;
+        
+        const finishedStatuses = ['FINISHED', 'POSTPONED', 'AWARDED', 'CANCELLED'];
+
+        if (allMatches.length > 0) {
+          
+            upcomingMatches = allMatches.filter(m => !finishedStatuses.includes(m.status));
+            
+         
+            finishedMatches = allMatches.filter(m => finishedStatuses.includes(m.status));
+
+            matchesShown = MATCH_DISPLAY_LIMIT;
+            upcomingMatchesBtn.click();
+            matchesSection.classList.remove('hidden');
+        } else {
+            matchesSection.classList.add('hidden');
+        }
+        const standingsSection = document.getElementById('standings-section');
+        const standingsTable = document.getElementById('standings-table');
+      
+        if (data.standings && data.standings.length > 0) {
+            const tableHtml = data.standings.map(createStandingTable).join('');
+            standingsTable.innerHTML = tableHtml;
+            standingsSection.classList.remove('hidden');
+        } else {
+            standingsSection.classList.add('hidden');
+        }
+        const scorersSection = document.getElementById('player-stats-section');
+        const scorersBody = document.getElementById('scorers-body');
+        const assistsBody = document.getElementById('assists-body');
+        const motmBody = document.getElementById('motm-body');
+        const scorersTable = document.getElementById('scorers-table');
+       
+        if (data.scorers && data.scorers.length > 0) {
+          
+            if (data.scorers[0].strPlayer) {
+                scorersBody.innerHTML = data.scorers.slice(0, 10).map((s, i) => createPlayerRowTSDB(s, i)).join('');
+            } else { 
+                scorersBody.innerHTML = data.scorers.slice(0, 10).map((s, i) => createPlayerRow(s.player, s.team, s.goals, i, 'Goals')).join('');
+            }
+            scorersTable.classList.remove('hidden');
+        } else {
+            scorersTable.classList.add('hidden');
+        }
+        const assistsTable = document.getElementById('assists-table');
+       
+        if (data.assists && data.assists.length > 0) {
+            assistsBody.innerHTML = data.assists.slice(0, 10).map((s, i) => createPlayerRow(s.player, s.team, s.assists, i, 'Assists')).join('');
+            assistsTable.classList.remove('hidden');
+        } else {
+            assistsTable.classList.add('hidden');
+        }
+        const motmTable = document.getElementById('motm-table');
+        if (data.motm && data.motm.length > 0) {
+            motmBody.innerHTML = data.motm.slice(0, 10).map((s, i) => createPlayerRow(s.player, s.team, s.awards, i, 'Awards')).join('');
+            motmTable.classList.remove('hidden');
+        } else {
+            motmTable.classList.add('hidden');
+        }
+        if (scorersTable.classList.contains('hidden') && assistsTable.classList.contains('hidden') && motmTable.classList.contains('hidden')) {
+            scorersSection.classList.add('hidden');
+        } else {
+            scorersSection.classList.remove('hidden');
+        }
+    }
+    function renderSearchResult(data) {
+        hideLoading();
+        searchResultContainer.classList.remove('hidden');
+        cupDataContainer.classList.add('hidden');
+        const answerDiv = document.createElement('div');
+        answerDiv.className = 'chat-answer fade-in';
+        const answerText = document.createElement('div');
+        answerText.className = 'answer-text';
+        let content = data.message || 'No result found.';
+        const urlRegex = /(https?:\/\/[^\s]+\.(?:png|jpe?g|gif|webp|bmp|svg))/gi;
+        content = content.replace(urlRegex, (url) => `<img src="${url}" alt="Image" class="answer-image">`);
+        answerText.innerHTML = content;
+        const actionsDiv = document.createElement('div');
+        actionsDiv.className = 'chat-actions';
+        const copyButton = document.createElement('button');
+        copyButton.innerHTML = '<i class="far fa-copy"></i>';
+        copyButton.title = 'Copy Text';
+        copyButton.addEventListener('click', () => {
+            const textToCopy = answerText.textContent || answerText.innerText;
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                showToast('An yi kwafi!');
+            }).catch(err => {
+                console.error('Failed to copy text:', err);
+            });
+        });
+        const clearButton = document.createElement('button');
+        clearButton.innerHTML = '<i class="far fa-trash-alt"></i>';
+        clearButton.title = 'Clear Answer';
+        clearButton.addEventListener('click', () => {
+            chatAnswersList.innerHTML = '';
+        });
+        actionsDiv.appendChild(copyButton);
+        actionsDiv.appendChild(clearButton);
+        answerDiv.appendChild(answerText);
+        answerDiv.appendChild(actionsDiv);
+        chatAnswersList.appendChild(answerDiv);
+        searchInput.value = '';
+        answerDiv.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    }
+    function createMatchCard(match) {
+        const homeTeam = match.homeTeam || {};
+        const awayTeam = match.awayTeam || {};
+        const score = match.score?.fullTime;
+        const homeCrest = homeTeam.crest || DEFAULT_CREST;
+        const awayCrest = awayTeam.crest || DEFAULT_CREST;
+        let scoreDisplay = (match.status === 'FINISHED' || match.status === 'AWARDED') ? `${score?.home || 0} - ${score?.away || 0}` : 'vs';
+        const statusClass = getStatusClass(match.status);
+        const statusText = getStatusText(match.status);
+        const formattedDate = formatDate(match.utcDate);
+        return `
+            <div class="match-card fade-in">
+                <div class="teams">
+                    <div class="team">
+                        <img class="crest" src="${homeCrest}" alt="${homeTeam.name || 'Unknown'}">
+                        <span>${homeTeam.name || 'N/A'}</span>
+                    </div>
+                    <div class="score">${scoreDisplay}</div>
+                    <div class="team">
+                        <img class="crest" src="${awayCrest}" alt="${awayTeam.name || 'Unknown'}">
+                        <span>${awayTeam.name || 'N/A'}</span>
+                    </div>
+                </div>
+                <div class="match-info">${formattedDate}</div>
+                <div class="status ${statusClass}">${statusText}</div>
+            </div>
+        `;
+    }
+    function getStatusClass(status) {
+        switch (status) {
+            case 'FINISHED': return 'finished';
+            case 'IN_PLAY': case 'PAUSED': return 'live';
+            case 'SCHEDULED': default: return 'scheduled';
+        }
+    }
+    function getStatusText(status) {
+        switch (status) {
+            case 'FINISHED': return 'Finished';
+            case 'IN_PLAY': case 'PAUSED': return 'Live';
+            case 'SCHEDULED': return 'Scheduled';
+            default: return status.replace(/_/g, ' ');
+        }
+    }
+    function formatDate(dateString) {
+      
+        if (!dateString) {
+            return 'Scheduled'; 
+        }
+        
+        const date = new Date(dateString);
+        
+      
+        if (isNaN(date.getTime())) {
+            
+            return 'Scheduled';
+        }
+        
+       
+        if (date.getTime() === 0) {
+            return 'Scheduled';
+        }
+
+        const options = {
+            weekday: 'long',
+            month: 'long',
+            day: 'numeric',
+            year: 'numeric',
+            hour: 'numeric',
+            minute: 'numeric',
+            hour12: true
+        };
+      
+        try {
+            return date.toLocaleString('en-US', options);
+        } catch (e) {
+            return 'Scheduled';
+        }
+    }
+  
+    function createStandingTable(standing) {
+        const groupName = standing.group || standing.strLeague; 
+        const tableData = standing.table || standing.standings;
+        
+        if (!tableData || tableData.length === 0) return '';
+        const tableRows = tableData.map(team => `
+            <tr>
+                <td>${team.position}</td>
+                <td><div class="team-info"><img class="crest" src="${team.team?.crest || team.strTeamBadge || DEFAULT_CREST}"><span>${team.team?.name || team.strTeam}</span></div></td>
+                <td>${team.playedGames || team.intPlayed}</td>
+                <td>${team.won || team.intWin}</td>
+                <td>${team.draw || team.intDraw}</td>
+                <td>${team.lost || team.intLoss}</td>
+                <td>${team.points || team.intPoints}</td>
+            </tr>
+        `).join('');
+        
+        const groupTitle = groupName.includes('GROUP') ? `Group ${groupName.replace('GROUP_', '')}` : groupName;
+        return `
+            <div class="group-table fade-in">
+                <h3>${groupTitle}</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Team</th>
+                            <th>P</th>
+                            <th>W</th>
+                            <th>D</th>
+                            <th>L</th>
+                            <th>Pts</th>
+                        </tr>
+                    </thead>
+                    <tbody>${tableRows}</tbody>
+                </table>
+            </div>
+        `;
+    }
+   
+    function createPlayerRowTSDB(scorer, index) {
+        
+        return `
+            <tr>
+                <td>${index + 1}</td>
+                <td><div class="player-info"><span class="player-name">${scorer.strPlayer}</span></div></td>
+                <td>${scorer.strTeam || 'N/A'}</td>
+                <td><span class="player-stats-value">${scorer.intGoals}</span></td>
+            </tr>
+        `;
+    }
+    function createPlayerRow(player, team, stat, index, statName) {
+        const hasPlayer = player && player.name;
+        const crest = (team && team.crest) ? team.crest : DEFAULT_CREST;
+        if (!hasPlayer) return '';
+        return `
+            <tr>
+                <td>${index + 1}</td>
+                <td><div class="player-info"><img class="crest" src="${crest}" alt="${team?.name || 'Unknown'}"><span class="player-name">${player.name}</span></div></td>
+                <td>${team ? team.name : 'N/A'}</td>
+                <td><span class="player-stats-value">${stat}</span></td>
+            </tr>
+        `;
+    }
+    async function fetchCupData(cupCode) {
+        showLoading();
+        try {
+            const response = await fetch(API_BASE_URL_SEARCH, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'x-api-key': API_KEY },
+                body: JSON.stringify({ competition: cupCode })
+            });
+            if (!response.ok) {
+                const errorData = await response.json();
+                if (response.status === 404 || response.status === 400 && errorData.message.includes("Competition parameter is missing")) {
+                    throw new Error('Ba a fara gasar ba a halin yanzu ko kuma ba mu da bayanan wannan gasar.');
+                }
+                throw new Error(errorData.message || 'Kuskuren sadarwa, da fatan za a sake gwadawa.');
+            }
+            const data = await response.json();
+            renderCupData(data, cupCode);
+        } catch (e) {
+            showError(e.message || 'Kuskuren sadarwa, da fatan za a sake gwadawa a wani lokaci.');
+        }
+    }
+    async function handleSearch() {
+        showLoading();
+        const query = searchInput.value.trim();
+        if (query === '') {
+            showError("Da fatan za a shigar da kalmar bincike.");
+            return;
+        }
+        try {
+            const response = await fetch(API_BASE_URL_TAMBAYA, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json', 
+                    'x-api-key': API_KEY 
+                },
+                body: JSON.stringify({ query: query })
+            });
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Kuskuren sadarwa, da fatan za a sake gwadawa.');
+            }
+            const data = await response.json();
+            renderSearchResult(data);
+        } catch (e) {
+            showError(e.message || 'An sami kuskure yayin bincike.');
+        }
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('search-button').addEventListener('click', handleSearch);
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                handleSearch();
+            }
+        });
+        document.querySelectorAll('#cup-menu button').forEach(button => {
+            button.addEventListener('click', (e) => {
+                document.querySelectorAll('#cup-menu button').forEach(btn => btn.classList.remove('active'));
+                e.target.classList.add('active');
+                const cupCode = e.target.getAttribute('data-cup');
+                fetchCupData(cupCode);
+            });
+        });
+        upcomingMatchesBtn.addEventListener('click', () => {
+            upcomingMatchesBtn.classList.add('active');
+            finishedMatchesBtn.classList.remove('active');
+            matchesShown = MATCH_DISPLAY_LIMIT;
+            renderMatches(upcomingMatches);
+        });
+        finishedMatchesBtn.addEventListener('click', () => {
+            finishedMatchesBtn.classList.add('active');
+            upcomingMatchesBtn.classList.remove('active');
+            matchesShown = MATCH_DISPLAY_LIMIT;
+            renderMatches(finishedMatches);
+        });
+        showMoreMatchesBtn.addEventListener('click', () => {
+            matchesShown += MATCH_DISPLAY_LIMIT;
+            const activeBtn = document.querySelector('.matches-filter button.active');
+            if (activeBtn.id === 'upcoming-matches-btn') {
+                renderMatches(upcomingMatches);
+            } else {
+                renderMatches(finishedMatches);
+            }
+        });
+        retryButton.addEventListener('click', () => {
+            const activeCupButton = document.querySelector('#cup-menu button.active');
+            if (activeCupButton) {
+                fetchCupData(activeCupButton.getAttribute('data-cup'));
+            } else if (searchInput.value.trim() !== '') {
+                handleSearch();
+            } else {
+                hideLoading();
+            }
+        });
+    });
+</script>
+
+</body>
+
+</html>
