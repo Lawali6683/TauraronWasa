@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="ha">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tuntuɓi - TauraronWasa</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  
+    <style>
+       
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;   
+    background: linear-gradient(to bottom, #180022, #300040); 
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
+    color: #ffffff;
+    transition: background 0.6s, color 0.6s;
+    line-height: 1.6;
+}
+
+
+h1, h2, h3 {
+    font-weight: 700;
+    color: #ffd700; 
+}
+
+a {
+    color: #00bcd4; 
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+a:hover {
+    color: #7fffd4;
+}
+
+
+header {
+    text-align: center;
+    padding: 30px 20px 40px;
+    background-color: rgba(0, 0, 0, 0.2);
+    margin-bottom: 20px;
+}
+
+.logo-link {
+    display: inline-block;
+    margin-bottom: 20px;
+}
+
+.logo {
+    width: 150px;
+    height: auto;
+    border-radius: 50%;
+    border: 3px solid #ffd700;
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+    transition: transform 0.3s;
+}
+
+.logo:hover {
+    transform: scale(1.05);
+}
+
+
+.contact-container {
+    display: flex;
+    flex-wrap: wrap; 
+    justify-content: space-around;
+    gap: 30px;
+    padding: 0 5%;
+    max-width: 1200px;
+    margin: auto;
+}
+
+.form-section, .info-section {
+    background-color: rgba(48, 0, 64, 0.7); 
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.form-section {
+    flex: 2; 
+    min-width: 300px;
+}
+
+.info-section {
+    flex: 1;
+    min-width: 280px;
+}
+
+
+.input-group {
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #ffd700;
+}
+
+.input-group label i {
+    margin-right: 8px;
+}
+
+.input-group input[type="text"], 
+.input-group input[type="email"], 
+.input-group textarea {
+    width: calc(100% - 20px);
+    padding: 10px;
+    border: 1px solid #6a0dad;
+    border-radius: 8px;
+    background-color: #2c0a3f;
+    color: #ffffff;
+    font-size: 16px;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.input-group input:focus, 
+.input-group textarea:focus {
+    border-color: #00bcd4;
+    outline: none;
+    box-shadow: 0 0 10px rgba(0, 188, 212, 0.5);
+}
+
+.submit-btn {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    background-color: #00bcd4;
+    color: #180022;
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.submit-btn:hover {
+    background-color: #7fffd4;
+    transform: translateY(-2px);
+}
+
+.submit-btn i {
+    margin-right: 10px;
+}
+
+
+.contact-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 25px;
+    padding: 15px;
+    border-radius: 10px;
+    background-color: rgba(24, 0, 34, 0.5);
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.contact-item:hover {
+    background-color: rgba(24, 0, 34, 0.8);
+    transform: translateY(-5px);
+}
+
+.contact-item i {
+    color: #ffd700;
+    margin-right: 15px;
+    flex-shrink: 0;
+}
+
+.contact-item.whatsapp-contact i {
+    color: #25d366; 
+}
+
+.contact-item.email-contact i {
+    color: #ff4500; 
+}
+
+.details h3 {
+    margin: 0 0 5px 0;
+    font-size: 1.2em;
+}
+
+.details p {
+    margin: 0;
+    font-size: 0.9em;
+    color: #ccc;
+}
+
+.contact-link {
+    font-weight: 600;
+}
+
+.whatsapp-link {
+    display: inline-block;
+    background-color: #25d366;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    margin-top: 5px;
+}
+
+
+@media (max-width: 768px) {
+    .contact-container {
+        flex-direction: column;
+    }
+    
+    header {
+        padding: 20px 10px 30px;
+    }
+    
+    .form-section, .info-section {
+        margin: 0 10px;
+    }
+}
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="#" class="logo-link">
+            <img src="https://i.imgur.com/CgvdgMA.png" alt="Logo na TauraronWasa" class="logo">
+        </a>
+        <h1>Tuntuɓi Mu</h1>
+        <p>Muna farin cikin jin ta bakinku. Aiko mana da saƙo ta kowace hanya da kuke so.</p>
+    </header>
+
+    <main class="contact-container">
+        
+        <section class="form-section">
+            <h2>Aiko Mana da Saƙo Kai Tsaye</h2>
+            <form id="contactForm">
+                <div class="input-group">
+                    <label for="name">
+                        <i class="fas fa-user"></i> Suna (Cikakke):
+                    </label>
+                    <input type="text" id="name" name="name" placeholder="Misali: Ahmad Musa" required>
+                </div>
+                
+                <div class="input-group">
+                    <label for="email">
+                        <i class="fas fa-envelope"></i> Adireshin Email:
+                    </label>
+                    <input type="email" id="email" name="email" placeholder="Misali: email@misali.com" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="subject">
+                        <i class="fas fa-tag"></i> Taken Saƙo:
+                    </label>
+                    <input type="text" id="subject" name="subject" placeholder="Misali: Tambaya Kan Sabis" required>
+                </div>
+                
+                <div class="input-group">
+                    <label for="message">
+                        <i class="fas fa-comment-dots"></i> Saƙonka:
+                    </label>
+                    <textarea id="message" name="message" rows="5" placeholder="Rubuta saƙonka a nan..." required></textarea>
+                </div>
+                
+                <button type="submit" class="submit-btn">
+                    <i class="fas fa-paper-plane"></i> Tura Saƙo
+                </button>
+            </form>
+        </section>
+
+        <section class="info-section">
+            <h2>Sauran Hanyoyin Tuntuɓa</h2>
+            
+            <div class="contact-item email-contact">
+                <i class="fas fa-envelope fa-2x"></i>
+                <div class="details">
+                    <h3>Email</h3>
+                    <p>Adireshin mu na Email don Tuntuɓa:</p>
+                    <a href="mailto:tauraronwasa@gmail.com?subject=Tuntuɓa%20daga%20Yanar%20Gizo" class="contact-link">tauraronwasa@gmail.com</a>
+                </div>
+            </div>
+
+            <div class="contact-item whatsapp-contact">
+                <i class="fab fa-whatsapp fa-2x"></i>
+                <div class="details">
+                    <h3>WhatsApp</h3>
+                    <p>Tuntuɓar mu kai tsaye ta WhatsApp:</p>
+                    <a href="https://wa.me/+2348166836059?text=Assalamu%20Alaikum.%20Na%20ga%20labarinku%20daga%20shafin%20TauraronWasa.%20Ina%20da%20tambaya." target="_blank" class="contact-link whatsapp-link">
+                         Aika Saƙo A WhatsApp
+                    </a>
+                </div>
+            </div>
+
+            <div class="contact-item location-contact">
+                <i class="fas fa-map-marker-alt fa-2x"></i>
+                <div class="details">
+                    <h3>Adireshin Ofishin Mu</h3>
+                    <p>Kwanon Tuntuɓa (Misali):</p>
+                    <a href="#" class="contact-link">Abuja, Nigeria</a>
+                </div>
+            </div>
+            
+        </section>
+        
+    </main>
+    
+    <script>
+        
+        document.getElementById('contactForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+   
+    const name = document.getElementById('name').value;
+    const email = document.getElementById('email').value;
+    const subject = document.getElementById('subject').value;
+    const message = document.getElementById('message').value;
+
+    
+    const targetEmail = "tauraronwasa@gmail.com";
+    
+   
+    const emailBody = `Suna (Mai Aikawa): ${name}\n`
+                    + `Email (Mai Aikawa): ${email}\n\n`
+                    + `Saƙo:\n`
+                    + `----------------------------------\n`
+                    + `${message}`;
+    
+   
+    const encodedSubject = encodeURIComponent(`TauraronWasa: ${subject} (${name})`);
+    const encodedBody = encodeURIComponent(emailBody);
+    
+   
+    const mailtoLink = `mailto:${targetEmail}?subject=${encodedSubject}&body=${encodedBody}`;
+ 
+    window.location.href = mailtoLink;
+       
+    alert("Saƙonku ya shiryu! Za a buɗe shafin email ɗinku don kammala aikawar.");
+});
+    </script>
+</body>
+</html>

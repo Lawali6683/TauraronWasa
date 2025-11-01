@@ -1,0 +1,1277 @@
+<!DOCTYPE html>
+<html lang="ha">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>TauraronWasa Status View</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap">
+    <style>
+        :root {
+            --primary-color: #ffcb05;
+            --background-color: #12001a;
+            --text-color: #ffffff;
+            --overlay-color: rgba(24, 0, 34, 0.7);
+            --accent: #16e7cf;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            overflow: hidden;
+        }
+        
+              
+        
+    .loading-backdrop {
+        position: fixed;
+        z-index: 9000;
+        inset: 0;
+        background: linear-gradient(to bottom, #180022, #300040);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        transition: opacity 0.3s, visibility 0.3s;
+        text-align: center;
+        padding: 1em;
+    }
+    .loading-backdrop.hidden {
+        opacity: 0;
+        visibility: hidden;
+    }
+    .lds-roller {
+        display: inline-block;
+        position: relative;
+        width: 72px;
+        height: 72px;
+    }
+    .lds-roller div {
+        animation: lds-roller 1.2s cubic-bezier(0.6, 0, 0.6, 1) infinite;
+        transform-origin: 36px 36px;
+    }
+    .lds-roller div:after {
+        content: " ";
+        display: block;
+        position: absolute;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--accent);
+        margin: -4px 0 0 -4px;
+    }
+    .lds-roller div:nth-child(1) { animation-delay: -0.036s; top: 63px; left: 63px; }
+    .lds-roller div:nth-child(2) { animation-delay: -0.072s; top: 68px; left: 56px; }
+    .lds-roller div:nth-child(3) { animation-delay: -0.108s; top: 71px; left: 48px; }
+    .lds-roller div:nth-child(4) { animation-delay: -0.144s; top: 72px; left: 39px; }
+    .lds-roller div:nth-child(5) { animation-delay: -0.18s; top: 71px; left: 31px; }
+    .lds-roller div:nth-child(6) { animation-delay: -0.216s; top: 68px; left: 24px; }
+    .lds-roller div:nth-child(7) { animation-delay: -0.252s; top: 63px; left: 17px; }
+    .lds-roller div:nth-child(8) { animation-delay: -0.288s; top: 56px; left: 12px; }
+    @keyframes lds-roller {
+        0% { transform: rotate(0deg);}
+        100% { transform: rotate(360deg);}
+    }
+    
+        
+       
+        .status-container {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+        .status-post {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.5s cubic-bezier(0.77,0,0.175,1);
+            will-change: transform;
+        }
+        .status-post.active {
+            display: flex;
+        }
+        .status-post .media-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: var(--background-color);
+            z-index: 1;
+        }
+        .status-post .media-element {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        .status-post .youtube-container {
+            position: relative;
+            width: 100vw;
+            max-width: 100vw;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+        }
+        .status-post .youtube-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100%;
+            border: 0;
+        }
+        .post-content {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            z-index: 2;
+            padding: 30px 18px 24px 18px;
+            background: linear-gradient(to top, var(--overlay-color) 0%, transparent 80%);
+        }
+        .app-logo {
+            position: absolute;
+            top: 18px;
+            right: 18px;
+            z-index: 4;
+            background: rgba(0,0,0,0.18);
+            border-radius: 99px;
+            padding: 4px 8px 4px 8px;
+        }
+        .app-logo img {
+            width: 100px;
+            height: 100px;
+        }
+        .post-text-container {
+            width: 100%;
+            margin-bottom: 0;
+        }
+        .post-text {
+            color: var(--text-color);
+            font-size: 1rem;
+            max-height: 5.2em;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            line-height: 1.7;
+            margin-bottom: 8px;
+            font-weight: 500;
+            
+            border-radius: 14px;
+            padding: 18px 15px 18px 15px;
+            box-shadow: 0 4px 26px 0 rgba(0,0,0,0.13);
+            position: relative;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+        .read-more-btn {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 0;
+            margin-bottom: 22px;
+            font-size: 1.04rem;
+            display: none;
+            align-self: flex-end;
+            letter-spacing: 0.03em;
+            background: rgba(35,20,35,0.18);
+            border-radius: 9px;
+            padding: 5px 15px;
+            transition: background 0.18s;
+        }
+        .read-more-btn:hover {
+            background: rgba(255,255,255,0.09);
+        }
+        .audio-player-container {
+            width: 100%;
+            padding: 10px 0 0 0;
+            box-sizing: border-box;
+            background: rgba(18, 0, 28, 0.77);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 12px;
+            margin-top: 0.5em;
+            margin-bottom: 1.2em;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+        .audio-player-container audio {
+            width: 90%;
+            height: 22px;
+        }
+        .text-more-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(24, 0, 34, 0.98);
+            padding: 24px;
+            box-sizing: border-box;
+            display: none;
+            flex-direction: column;
+            color: var(--text-color);
+            overflow-y: auto;
+            z-index: 10000;
+            animation: fadeIn 0.36s;
+        }
+        .text-more-overlay.show {
+            display: flex;
+        }
+        .text-more-overlay .close-btn {
+            position: sticky;
+            top: 8%;
+            left: 0;
+            background: green;
+            border-radius: 50%;
+            border: none;
+            color: #ff3e3e;
+            font-size: 2.1rem;
+            cursor: pointer;
+            padding: 12px;
+            text-align: right;
+            align-self: flex-end;
+            z-index: 10000;
+        }
+        .text-more-overlay p {
+            font-size: 1.15rem;
+            margin-top: 28px;
+            margin-bottom: 40px;
+            background: rgba(20,0,30,0.78);
+            border-radius: 13px;
+            padding: 32px 18px;
+            box-shadow: 0 4px 18px 0 rgba(0,0,0,0.23);
+            overflow-y: auto;
+            max-height: 70vh;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+        .actions-container {
+        top: 40%;
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            z-index: 3;
+        }
+        .action-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--primary-color);
+            cursor: pointer;
+        }
+        .action-item .icon {
+            font-size: 2rem;
+        }
+        .action-item .count {
+            font-size: 0.85rem;
+            margin-top: 5px;
+            color: var(--text-color);
+        }
+        .action-item .love-icon.loved {
+            color: #ff256a;
+            animation: bounce 0.5s ease-in-out;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: scale(1);}
+            50% { transform: scale(1.25);}
+        }
+        .love-flyer {
+            position: absolute;
+            font-size: 2.2rem;
+            color: #ff3e80;
+            pointer-events: none;
+            opacity: 0;
+            animation: flyup 1.8s cubic-bezier(.41,1.1,.71,1.1) forwards;
+            z-index: 6;
+        }
+        @keyframes flyup {
+            0% { transform: translate(0, 0) scale(1); opacity: 1;}
+            100% { transform: translate(calc(var(--rand-x,0) * 1px), -420px) scale(0.4); opacity: 0;}
+        }
+        
+        @media (max-width: 600px) {
+            .post-content {padding: 18px 4vw 16vw 4vw;}
+            .text-more-overlay {padding: 12px;}
+            .app-logo img {width: 33px; height: 33px;}
+            .audio-player-container audio {width: 99%;}
+        }
+        
+        
+        .fullscreen-viewer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.95);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .fullscreen-viewer.active {
+            display: flex;
+        }
+
+        .fullscreen-viewer .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 2rem;
+            cursor: pointer;
+        }
+    </style>
+    
+    <style>
+  .poll-card-content {
+        background-color: var(--surface-dark);
+        border: 2px solid var(--secondary-color) !important;
+        padding: 20px;
+        border-radius: 10px;
+        width: 95%; 
+        max-width: 450px;
+        margin-bottom: 20px;
+        box-sizing: border-box;
+    }
+    
+    .posting-logo-row {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+        gap: 10px;
+    }
+
+    .posting-logo-img {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        border: 1px solid var(--primary-color);
+    }
+
+    .posting-timestamp {
+        font-size: 0.9em;
+        color: #aaa;
+    }
+    
+    .poll-label {
+        margin-left: auto;
+        font-size: 0.9em;
+        padding: 2px 8px;
+        background-color: rgba(255, 87, 34, 0.1);
+        border-radius: 5px;
+    }
+
+    .poll-text-approved {
+        font-size: 1.25em;
+        font-weight: bold;
+        color: var(--text-light);
+        margin-bottom: 10px;
+        line-height: 1.3;
+    }
+    
+    .total-votes-approved {
+        text-align: center;
+        font-size: 1em;
+        color: #aaa;
+        padding-top: 15px;
+        border-top: 1px dashed rgba(255, 255, 255, 0.1);
+        margin-top: 15px;
+    }
+    
+    .total-votes-approved strong {
+        color: var(--text-light);
+    }
+
+    
+    .candidate-item {
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+    }
+    
+    .vote-button-circle {
+        width: 25px; 
+        height: 25px;
+        min-width: 25px; 
+        border-radius: 50%;
+        border: 3px solid var(--primary-color);
+        background-color: transparent;
+        margin-right: 15px;
+        cursor: pointer;
+        flex-shrink: 0;
+        display: flex; 
+        justify-content: center;
+        align-items: center;
+        box-sizing: border-box;
+        transition: all 0.2s ease-in-out; 
+    }
+
+    .vote-button-circle.voted {
+        background-color: var(--primary-color) !important;
+        border: none !important; 
+        color: white; 
+        font-size: 1.1em;
+    }
+    
+    .candidate-details-content {
+        flex-grow: 1;
+    }
+
+    .candidate-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-weight: bold;
+        color: var(--text-light);
+        margin-bottom: 5px;
+    }
+
+    .candidate-name {
+        font-size: 1.1em;
+        font-weight: 500;
+    }
+
+    .vote-count {
+        background-color: var(--secondary-color);
+        color: white;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 0.8em;
+        min-width: 30px;
+        text-align: center;
+    }
+
+   
+    .progress-bar-container {
+        height: 18px; 
+        background-color: #333;
+        border-radius: 9px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .progress-bar {
+        height: 100%;
+        width: 0%; 
+        border-radius: 9px;
+        transition: width 1.5s cubic-bezier(0.25, 1, 0.5, 1);
+        position: relative;
+    }
+
+    .progress-bar::after {
+        content: attr(data-percentage);
+        position: absolute;
+        top: 50%;
+        right: 5px;
+        transform: translateY(-50%);
+        color: white;
+        font-size: 0.8em;
+        font-weight: bold;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+        z-index: 2;
+    }
+    
+  
+    .progress-bar[style*="width: 0%"]::after,
+    .progress-bar[style*="width: 1%"]::after,
+    .progress-bar[style*="width: 2%"]::after,
+    .progress-bar[style*="width: 3%"]::after,
+    .progress-bar[style*="width: 4%"]::after,
+    .progress-bar[style*="width: 5%"]::after,
+    .progress-bar[style*="width: 6%"]::after,
+    .progress-bar[style*="width: 7%"]::after {
+        right: auto;
+        left: 5px;
+        color: var(--text-light);
+        text-shadow: none;
+    }
+    
+  
+    .poll-options-list .candidate-item:nth-child(1) .progress-bar { background: linear-gradient(to right, #00BCD4, #03A9F4); } 
+    .poll-options-list .candidate-item:nth-child(2) .progress-bar { background: linear-gradient(to right, #FF9800, #FFC107); } 
+    .poll-options-list .candidate-item:nth-child(3) .progress-bar { background: linear-gradient(to right, #4CAF50, #8BC34A); } 
+    .poll-options-list .candidate-item:nth-child(4) .progress-bar { background: linear-gradient(to right, #E91E63, #F48FB1); } 
+    .poll-options-list .candidate-item:nth-child(5) .progress-bar { background: linear-gradient(to right, #9C27B0, #BA68C8); } 
+
+  
+    .TauraronWasa {
+        font-size: 1.5em;
+        font-weight: bold;    
+        background: repeating-linear-gradient(
+            45deg,
+            #FF5733,
+            #00A8E8 10px,
+            #00A8E8 10px,
+            #1B263B 20px
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .app-logo img {
+        filter: drop-shadow(0 0 5px #00A8E8); 
+    }
+
+    
+    #loading-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: var(--background-dark);
+        z-index: 9999;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: opacity 0.3s ease;
+    }
+    
+    #loading-backdrop.hidden {
+        opacity: 0;
+        pointer-events: none;
+    }
+  
+
+    
+    @media (max-width: 600px) {
+        .app-logo {
+            top: -70px;
+        }
+
+        .post-text {
+            font-size: 1em;
+            max-height: 4em;
+        }
+        
+        .poll-card-content {
+            padding: 15px;
+            width: 90%; 
+        }
+
+        .poll-text-approved {
+            font-size: 1.1em;
+        }
+
+        .candidate-name {
+            font-size: 1em;
+        }
+    }
+    
+       .app {
+            position: absolute;
+            top: 18px;
+            right: 18px;
+            z-index: 4;
+            background: rgba(0,0,0,0.18);
+            border-radius: 99px;
+            padding: 4px 8px 4px 8px;
+        }
+        .app img {
+            width: 100px;
+            height: 100px;
+        }
+        
+            .LodingLogo {
+  width: 70px;
+  height: 70px;
+  filter: drop-shadow(0 0 10px #ffd700);
+  animation: glowEffect 2s infinite ease-in-out;
+}
+
+
+@keyframes glowEffect {
+  0% {
+    filter: drop-shadow(0 0 5px #ffd700);
+  }
+  50% {
+    filter: drop-shadow(0 0 20px #ffea00);
+  }
+  100% {
+    filter: drop-shadow(0 0 5px #ffd700);
+  }
+}
+    
+</style>
+
+</head>
+<body>
+    
+   <div class="loading-backdrop" id="loading-backdrop">
+       
+    <span class="lds-roller">
+        
+        <div></div><div></div><div></div><div></div>
+        
+        <div></div><div></div><div></div><div></div>
+        <img src="https://i.imgur.com/CgvdgMA.png" class="LodingLogo">
+    </span>        
+    </div>
+    
+    </div>
+        <img src="https://i.imgur.com/CgvdgMA.png" style="width: 70px; height: 70px;" class="app">
+    </div>
+    
+    <div class="status-container" id="status-container"></div>
+    <audio id="bg-audio" loop autoplay></audio>
+    
+    
+    <script type="module">
+    import { app } from './firebase.js';
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
+    import { getDatabase, ref, get, runTransaction, child, set } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";
+
+    const db = getDatabase(app);
+    const auth = getAuth(app);
+    const statusContainer = document.getElementById('status-container');
+    const loadingBackdrop = document.getElementById('loading-backdrop');
+    const bgAudio = document.getElementById('bg-audio');
+    let posts = [];
+    let currentIndex = 0;
+    let startY = 0;
+    let isSwiping = false;
+    let isAnimating = false;
+    const POST_VIEWED_KEY = "viewed_posts";
+    let viewedPosts = JSON.parse(localStorage.getItem(POST_VIEWED_KEY)) || {};
+    let userUid = null;
+    let allFetchedPosts = [];
+    let isBgAudioPlaying = true;
+    const backgroundMusicList = ['1mizi.mp3', '2mizi.mp3', '3mizi.mp3', '4mizi.mp3'];
+    
+    
+    const VOTED_POLL_KEY_PREFIX = 'tw_voted_poll_';
+    const site8Logo = "https://i.imgur.com/CgvdgMA.png";
+    const MAX_TEXT_LENGTH_PREVIEW = 200;
+
+    function site8_formatCount(count) {
+        if (count >= 1000000) return (count / 1000000).toFixed(1) + 'M';
+        if (count >= 1000) return (count / 1000).toFixed(1) + 'K';
+        return count.toString();
+    }
+    
+    function site8_formatTimestamp(timestamp) {
+        if (!timestamp) return '';
+        const now = new Date();
+        const past = new Date(timestamp);
+        const diffInSeconds = Math.floor((now - past) / 1000);
+        if (diffInSeconds < 60) return `${diffInSeconds}s ago`;
+        const diffInMinutes = Math.floor(diffInSeconds / 60);
+        if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
+        const diffInHours = Math.floor(diffInMinutes / 60);
+        if (diffInHours < 24) return `${diffInHours}h ago`;
+        const diffInDays = Math.floor(diffInHours / 24);
+        if (diffInDays < 7) return `${diffInDays}d ago`;
+        return past.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    }
+
+    function hideLoader() {
+        loadingBackdrop.classList.add('hidden');
+    }
+
+    function playNextBackgroundMusic() {
+        if (!isBgAudioPlaying) return;
+        const randomIndex = Math.floor(Math.random() * backgroundMusicList.length);
+        bgAudio.src = backgroundMusicList[randomIndex];
+        bgAudio.play().catch(()=>{});
+    }
+
+    bgAudio.addEventListener('ended', playNextBackgroundMusic);
+
+    async function fetchAllPosts() {
+        try {
+            const postingSnapshot = await get(ref(db, 'Posting'));
+            const allPosts = [];
+            if (postingSnapshot.exists()) {
+                postingSnapshot.forEach(postIdSnap => {
+                    allPosts.push({ ...postIdSnap.val(), postType: 'Posting', postId: postIdSnap.key });
+                });
+            }
+            allFetchedPosts = allPosts;
+            processAndRenderPosts();
+            hideLoader();
+        } catch (error) {
+            hideLoader();
+            statusContainer.innerHTML = `<p style="color:var(--primary-color);text-align:center; font-size:1.3rem;">An samu matsala wajen ɗauko posts.</p>`;
+        }
+    }
+
+    function processAndRenderPosts() {
+        const validPosts = allFetchedPosts.filter(post =>
+            post.photoLink1 || post.imageLink || post.videoLink || post.audioLink || post.text || post.game1logo || post.isPoll
+        );
+        let newPosts = validPosts.filter(post => !viewedPosts[post.postId]);
+        if (newPosts.length === 0) {
+            posts = validPosts;
+            currentIndex = 0;
+            viewedPosts = {};
+            localStorage.setItem(POST_VIEWED_KEY, JSON.stringify(viewedPosts));
+        } else {
+            posts = newPosts;
+        }
+        posts.sort((a, b) => (b.love || b.like || 0) - (a.love || a.like || 0));
+        renderPosts();
+    }
+
+    function renderPosts() {
+        statusContainer.innerHTML = '';
+        posts.forEach((post, index) => {
+            const postElement = document.createElement('div');
+            postElement.className = 'status-post';
+            postElement.dataset.postId = post.postId;
+            postElement.dataset.postType = post.postType;
+            postElement.innerHTML = post.isPoll ? site8_renderPollCard(post, index) : generatePostHTML(post, index);
+            statusContainer.appendChild(postElement);
+        });
+        showPost(currentIndex);
+    }
+
+    function generatePostHTML(post, index) {
+        let mediaHtml = '';
+        let textHtml = '';
+        let hasMedia = false;
+
+        if (post.photoLink1 || post.imageLink) {
+            mediaHtml = `<div class="media-container"><img src="${post.photoLink1 || post.imageLink}" class="media-element"></div>`;
+            hasMedia = true;
+        } else if (post.videoLink) {
+            const isYouTube = post.videoLink.includes('youtu.be') || post.videoLink.includes('youtube.com');
+            if (isYouTube) {
+                let videoId = '';
+                if (post.videoLink.includes('v=')) {
+                    videoId = post.videoLink.split('v=')[1];
+                    const ampersandPosition = videoId.indexOf('&');
+                    if (ampersandPosition !== -1) videoId = videoId.substring(0, ampersandPosition);
+                } else {
+                    videoId = post.videoLink.split('/').pop();
+                }
+                mediaHtml = `
+                    <div class="media-container">
+                        <div class="youtube-container">
+                            <iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=1&modestbranding=1&rel=0&showinfo=0"
+                                allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>
+                        </div>
+                    </div>
+                `;
+            } else {
+                mediaHtml = `<div class="media-container"><video src="${post.videoLink}" class="media-element" playsinline autoplay controls></video></div>`;
+            }
+            hasMedia = true;
+        }
+
+        let showAudio = !!post.audioLink;
+        let showText = !!post.text;
+        let audioHtml = '';
+        if (showAudio) {
+            audioHtml = `
+                <div class="audio-player-container">
+                    <audio src="${post.audioLink}" controls></audio>
+                </div>
+            `;
+        }
+
+        if (showText) {
+            textHtml = `
+                <div class="post-text-container">
+                    <div class="post-text" id="post-text-${index}">${post.text}</div>
+                    <button class="read-more-btn">Kara karantawa</button>
+                </div>
+                <div class="text-more-overlay" id="text-more-overlay-${index}">
+                    <button class="close-btn"><i class="fa-solid fa-xmark"></i></button>
+                    <p>${post.text}</p>
+                </div>
+            `;
+        }
+
+        if (showText && showAudio) {
+            textHtml += audioHtml;
+        } else if (showAudio && !showText) {
+            textHtml = audioHtml;
+        }
+
+        const seeCount = post.see || 0;
+        const loveCount = post.like || 0;
+        const commentCount = post.totalComment || 0;
+        const actionsHtml = `
+            <div class="actions-container">
+                <div class="action-item see-action">
+                    <span class="icon"><i class="fa-solid fa-eye"></i></span>
+                    <span class="count">${seeCount}</span>
+                </div>
+                <div class="action-item comment-action">
+                    <span class="icon"><i class="fa-solid fa-comment"></i></span>
+                    <span class="count">${commentCount}</span>
+                </div>
+                <div class="action-item love-action">
+                    <span class="icon"><i class="fa-solid fa-heart love-icon"></i></span>
+                    <span class="count">${loveCount}</span>
+                </div>
+            </div>
+        `;
+
+        return `
+            ${mediaHtml}
+            <div class="post-content">
+                <div class="app-logo">
+                    <img src="https://i.imgur.com/CgvdgMA.png" alt="Logo">
+                </div>
+                ${textHtml}
+                ${actionsHtml}
+            </div>
+        `;
+    }
+
+    function site8_renderPollCard(p, index) {
+        let optionsHTML = '';
+        let totalVotes = 0;
+        const candidates = [];
+        const hasVoted = localStorage.getItem(`${VOTED_POLL_KEY_PREFIX}${p.postId}`); 
+        const votedOptionIndex = hasVoted ? parseInt(hasVoted) : -1;
+        
+        for (let i = 1; i <= 5; i++) {
+            if (p[`takara${i}`]) {
+                const votes = p[`zabi${i}`] || 0;
+                totalVotes += votes;
+                candidates.push({ name: p[`takara${i}`], votes: votes, index: i });
+            }
+        }
+        
+        const initialTotalVotesDisplay = site8_formatCount(totalVotes);
+        
+        candidates.forEach(candidate => {
+            const votes = candidate.votes;
+            const percentage = totalVotes === 0 ? 0 : Math.round((votes / totalVotes) * 100);
+            
+            const displayVotes = site8_formatCount(votes);
+            const displayWidth = percentage;  
+            
+            const isVotedOption = (hasVoted && votedOptionIndex === candidate.index);
+            
+            let votedClass = '';
+            let votedContent = '';
+            let cursorStyle = 'cursor: pointer;';
+            let onclickHandler = `window.site8_voteOnPoll('${p.postId}', ${candidate.index}, ${index})`;
+            let votedStyle = ''; 
+            
+            if (hasVoted) {
+                cursorStyle = 'cursor: default;';
+                onclickHandler = ''; 
+                
+                if (isVotedOption) {
+                    votedClass = ' selected voted'; 
+                    votedContent = '<i class="fa-solid fa-check" style="color: white; font-size: 0.8em;"></i>';
+                    votedStyle = 'background-color: #007bff; border-color: #007bff; border: none;';
+                } else {
+                    votedStyle = 'border: 3px solid #ccc; background-color: transparent;'; 
+                }
+            } else {
+                votedStyle = 'border: 3px solid #007bff; background-color: transparent;';
+            }
+            
+            optionsHTML += `
+                <div class="candidate-item" data-postid="${p.postId}" data-index="${candidate.index}" data-votes="${votes}">
+                    <div class="vote-button-circle${votedClass}"
+                        title="${hasVoted ? 'An riga an zaba!' : 'Danna nan don zaba ' + candidate.name}" 
+                        data-postid="${p.postId}" 
+                        data-index="${candidate.index}"
+                        style="${votedStyle} ${cursorStyle}"
+                        onclick="${onclickHandler}">
+                        ${votedContent}
+                    </div>
+                    
+                    <div class="candidate-details-content">
+                        <div class="candidate-info">
+                            <span class="candidate-name">${candidate.name}</span>
+                            <span class="vote-count">${displayVotes}</span>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" 
+                                style="width: ${displayWidth}%;" 
+                                data-percentage="${percentage}%">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        return `
+            <div class="poll-card poll-card-content">
+                <div class="posting-logo-row">
+                    <img class="posting-logo-img" src="${site8Logo}" alt="logo">
+                    <span class="posting-timestamp" id="postingTime-${p.postId}">${site8_formatTimestamp(p.postingTime)}</span>
+                    <span class="poll-label" style="color: #ff5722; font-weight: bold;"><i class="fa-solid fa-square-poll-vertical"></i> ZAƁE</span>
+                </div>
+                <div class="poll-header" style="text-align: left; border-bottom: none; margin-bottom: 20px; padding-bottom: 0;">
+                     <h2 class="text poll-text-approved">${p.text || 'Babu Tambaya'}</h2>
+                    <p style="color: green; font-size: 0.9em; margin-top: 5px;">Danna zagaye don bayar da ƙuri'arku, ga ra'ayin ku Mafi Cancanta.</p>
+                </div>
+                <div class="poll-options-list" id="candidates-list">
+                    ${optionsHTML}
+                </div>
+                <div id="total-votes-display">
+                    <p class="total-votes-approved" style="font-style: italic;">Jimillar Zaɓe: <strong id="total-votes">${initialTotalVotesDisplay}</strong></p>
+                </div>
+                <div class="actions-container poll-actions-hide"></div>
+            </div>
+        `;
+    }
+
+    function site8_updatePollUI(postElement, postData) {
+        if (!postData || !postData.isPoll) return;
+
+        const hasVoted = localStorage.getItem(`${VOTED_POLL_KEY_PREFIX}${postData.postId}`);
+        const votedOptionIndex = hasVoted ? parseInt(hasVoted) : -1;
+        let totalVotes = 0;
+        const items = postElement.querySelectorAll('.candidate-item');
+
+        for (let i = 1; i <= 5; i++) {
+            if (postData[`takara${i}`]) {
+                totalVotes += postData[`zabi${i}`] || 0;
+            }
+        }
+        
+        const totalVotesDisplay = postElement.querySelector('#total-votes');
+        if(totalVotesDisplay) {
+            totalVotesDisplay.textContent = site8_formatCount(totalVotes);
+        }
+        
+        items.forEach(item => {
+            const index = parseInt(item.dataset.index);
+            const votes = postData[`zabi${index}`] || 0;
+            const percentage = totalVotes === 0 ? 0 : Math.round((votes / totalVotes) * 100);
+
+            const voteBtn = item.querySelector('.vote-button-circle');
+            const voteCountDisplay = item.querySelector('.vote-count');
+            const progressBar = item.querySelector('.progress-bar');
+            
+            voteCountDisplay.textContent = site8_formatCount(votes);
+            item.dataset.votes = votes;
+            
+            progressBar.style.width = percentage + '%'; 
+            progressBar.setAttribute('data-percentage', percentage + '%');
+            
+            if (hasVoted) {
+                voteBtn.onclick = null; 
+                voteBtn.style.cursor = 'default';
+                voteBtn.style.border = 'none'; 
+                
+                if(index === votedOptionIndex) {
+                    voteBtn.classList.add('selected'); 
+                    voteBtn.classList.add('voted'); 
+                    voteBtn.innerHTML = '<i class="fa-solid fa-check" style="color: white; font-size: 0.8em;"></i>';
+                    voteBtn.title = 'An riga an zaba!';
+                    voteBtn.style.backgroundColor = '#007bff';
+                    voteBtn.style.borderColor = '#007bff';
+                    
+                } else {
+                    voteBtn.classList.remove('selected'); 
+                    voteBtn.classList.remove('voted'); 
+                    voteBtn.style.border = '3px solid #ccc';
+                    voteBtn.style.backgroundColor = 'transparent';
+                    voteBtn.innerHTML = '';
+                    voteBtn.title = 'An riga an zaba!';
+                }
+            } else {
+                voteBtn.classList.remove('selected'); 
+                voteBtn.classList.remove('voted'); 
+                voteBtn.onclick = () => window.site8_voteOnPoll(postData.postId, index);
+                voteBtn.style.cursor = 'pointer';
+                voteBtn.style.border = '3px solid #007bff'; 
+                voteBtn.style.backgroundColor = 'transparent';
+                voteBtn.innerHTML = '';
+                voteBtn.title = `Danna nan don zaba ${postData[`takara${index}`]}`;
+            }
+        });
+    }
+
+    function site8_voteOnPoll(postid, optionIndex, postIndex) {
+        const hasVotedKey = `${VOTED_POLL_KEY_PREFIX}${postid}`;
+        
+        if (localStorage.getItem(hasVotedKey)) {
+            return;
+        }   
+        
+        const card = document.querySelectorAll('.status-post')[postIndex];
+        const buttonToSpin = card.querySelector(`.candidate-item[data-index="${optionIndex}"] .vote-button-circle`);
+        
+        if (buttonToSpin) {
+            buttonToSpin.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="color: #007bff;"></i>';
+            buttonToSpin.style.cursor = 'wait';
+            buttonToSpin.onclick = null; 
+        }
+        
+        const optionKey = `zabi${optionIndex}`;
+        const postRef = ref(db, `Posting/${postid}`);
+        
+        runTransaction(postRef, (currentPost) => {
+            if (currentPost && currentPost.isPoll) {
+                const currentVotes = currentPost[optionKey] || 0;
+                currentPost[optionKey] = currentVotes + 1; 
+                return currentPost;
+            }
+            return currentPost;
+        })
+        .then((snapshot) => {
+            if (snapshot.committed) {
+                localStorage.setItem(hasVotedKey, optionIndex.toString());
+                
+                const updatedPost = snapshot.snapshot.val();
+                
+                if (card && updatedPost) {
+                    site8_updatePollUI(card, updatedPost);
+                    card.querySelectorAll('.vote-button-circle').forEach(btn => {
+                        btn.onclick = null;
+                        btn.style.cursor = 'default';
+                    });
+                }
+            } else {
+                if (buttonToSpin) {
+                    buttonToSpin.innerHTML = '';
+                    buttonToSpin.style.cursor = 'pointer';
+                    buttonToSpin.onclick = () => window.site8_voteOnPoll(postid, optionIndex, postIndex);
+                }
+            }
+        })
+        .catch(error => {
+            if (buttonToSpin) {
+                buttonToSpin.innerHTML = '';
+                buttonToSpin.style.cursor = 'pointer';
+                buttonToSpin.onclick = () => window.site8_voteOnPoll(postid, optionIndex, postIndex);
+            }
+        });
+    }
+    window.site8_voteOnPoll = site8_voteOnPoll;
+
+
+    function showPost(index) {
+        if (isAnimating || index < 0 || index >= posts.length) return;
+        isAnimating = true;
+
+        const allPosts = document.querySelectorAll('.status-post');
+        const newPost = allPosts[index];
+        const oldPost = allPosts[currentIndex];
+
+        if (oldPost) {
+            const oldMedia = oldPost.querySelector('video, audio[controls]');
+            if (oldMedia) { try { oldMedia.pause(); } catch(e){} }
+        }
+
+        const newMedia = newPost.querySelector('video, audio[controls]');
+        if (newMedia) {
+            newMedia.currentTime = 0;
+            newMedia.play().catch(()=>{});
+            bgAudio.pause();
+        } else {
+            bgAudio.play().catch(()=>{});
+        }
+        
+        
+        const actionsContainer = newPost.querySelector('.actions-container');
+        if (posts[index].isPoll) {
+            if(actionsContainer) actionsContainer.style.display = 'none';
+         
+            site8_updatePollUI(newPost, posts[index]);
+        } else {
+            if(actionsContainer) actionsContainer.style.display = 'flex';
+        }
+
+        allPosts.forEach((post, i) => {
+            post.style.transform = `translateY(${100 * (i - index)}%)`;
+            if (i === index) {
+                post.classList.add('active');
+                updateSeeCount(post);
+                viewedPosts[post.dataset.postId] = true;
+                localStorage.setItem(POST_VIEWED_KEY, JSON.stringify(viewedPosts));
+            } else {
+                post.classList.remove('active');
+            }
+        });
+
+        currentIndex = index;
+
+        setTimeout(() => {
+            isAnimating = false;
+            checkTextLength();
+        }, 500);
+    }
+
+    statusContainer.addEventListener('touchstart', (e) => {
+        if (isAnimating) return;
+        startY = e.touches[0].clientY;
+        isSwiping = true;
+    });
+
+    statusContainer.addEventListener('touchmove', (e) => {
+        if (!isSwiping || isAnimating) return;
+        const currentY = e.touches[0].clientY;
+        const diffY = currentY - startY;
+        if (Math.abs(diffY) > 50) {
+            if (diffY < 0) {
+                showPost(currentIndex + 1);
+            } else {
+                showPost(currentIndex - 1);
+            }
+            isSwiping = false;
+        }
+    });
+
+    statusContainer.addEventListener('touchend', () => {
+        isSwiping = false;
+    });
+
+    async function updateSeeCount(postElement) {
+        const postId = postElement.dataset.postId;
+        const postType = postElement.dataset.postType;
+        let postRef;
+
+        if (postType === 'Posting') {
+            postRef = ref(db, `Posting/${postId}`);
+        }
+
+        if (postRef && !posts[currentIndex].isPoll) {
+            runTransaction(postRef, (currentData) => {
+                if (currentData) {
+                    if (!currentData.see) currentData.see = 0;
+                    currentData.see++;
+                }
+                return currentData;
+            });
+        }
+    }
+
+    document.addEventListener('click', async (e) => {
+        const commentBtn = e.target.closest('.comment-action');
+        if (commentBtn) {
+            const postEl = commentBtn.closest('.status-post');
+            const postId = postEl.dataset.postId;
+            window.location.href = `viewsComent.html?postId=${postId}`;
+        }
+
+        const loveBtn = e.target.closest('.love-action');
+        if (loveBtn) {
+            const postEl = loveBtn.closest('.status-post');
+            const postId = postEl.dataset.postId;
+            const postType = postEl.dataset.postType;
+            if (!userUid) return;
+            let postRef, likeKey, likePath;
+
+            if (postType === 'Posting') {
+                postRef = ref(db, `Posting/${postId}`);
+                likeKey = 'like';
+                likePath = `Posting/${postId}/likes/${userUid}`;
+            }
+
+            if (postRef) {
+                const likedByUser = await get(child(ref(db), likePath));
+                if (!likedByUser.exists()) {
+                    runTransaction(postRef, (currentData) => {
+                        if (currentData) {
+                            if (!currentData[likeKey]) currentData[likeKey] = 0;
+                            currentData[likeKey]++;
+                        }
+                        return currentData;
+                    });
+                    set(child(ref(db), likePath), true);
+                    const loveIcon = loveBtn.querySelector('.love-icon');
+                    loveIcon.classList.add('loved');
+                    const loveEmojis = ['💕', '💞', '💓', '💖', '💗', '💘'];
+                    for (let i = 0; i < 10; i++) {
+                        const flyer = document.createElement('span');
+                        flyer.className = 'love-flyer';
+                        flyer.textContent = loveEmojis[Math.floor(Math.random() * loveEmojis.length)];
+                        flyer.style.left = `${Math.random()*window.innerWidth}px`;
+                        flyer.style.top = `${Math.random()*window.innerHeight}px`;
+                        flyer.style.setProperty('--rand-x', Math.random() * 200 - 100);
+                        document.body.appendChild(flyer);
+                        setTimeout(() => flyer.remove(), 1800);
+                    }
+                }
+            }
+        }
+
+        const readMoreBtn = e.target.closest('.read-more-btn');
+        if (readMoreBtn) {
+            const activePost = readMoreBtn.closest('.status-post');
+            const overlay = activePost.querySelector('.text-more-overlay');
+            if (overlay) {
+                overlay.classList.add('show');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        const closeBtn = e.target.closest('.text-more-overlay .close-btn');
+        if (closeBtn) {
+            closeBtn.closest('.text-more-overlay').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+    });
+
+    function checkTextLength() {
+        const activePost = document.querySelector('.status-post.active');
+        if (!activePost) return;
+        const postText = activePost.querySelector('.post-text');
+        const readMoreBtn = activePost.querySelector('.read-more-btn');
+
+        if (postText && readMoreBtn) {
+            if (postText.scrollHeight > postText.clientHeight) {
+                readMoreBtn.style.display = 'block';
+            } else {
+                readMoreBtn.style.display = 'none';
+            }
+        }
+    }
+
+    document.body.addEventListener('play', function(e){
+        if((e.target.tagName === "VIDEO" || (e.target.tagName === "AUDIO" && e.target.getAttribute('controls')!==null)) && isBgAudioPlaying){
+            bgAudio.pause();
+        }
+    }, true);
+
+    document.body.addEventListener('ended', function(e){
+        if((e.target.tagName === "VIDEO" || e.target.tagName === "AUDIO") && isBgAudioPlaying){
+            bgAudio.play().catch(()=>{});
+        }
+    }, true);
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            userUid = user.uid;
+        } else {
+            userUid = null;
+        }
+        fetchAllPosts();
+    });
+
+    playNextBackgroundMusic();
+
+</script>
+</body>
+</html>
